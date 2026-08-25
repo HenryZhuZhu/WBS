@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DE-WBS Prototype v1</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --surface: #ffffff;
+      --surface-alt: #f8fafc;
+      --line: #dfe4ea;
+      --line-strong: #c9d1da;
+      --text: #18212f;
+      --text-2: #536172;
+      --text-3: #7d8998;
+      --nav: #16212b;
+      --nav-2: #22313e;
+      --blue: #1769e0;
+      --blue-soft: #eaf2ff;
+      --green: #178255;
+      --green-soft: #e8f6ef;
+      --amber: #a86300;
+      --amber-soft: #fff3dd;
+      --red: #c53d3d;
+      --red-soft: #fff0ef;
+      --cyan: #087f8c;
+      --cyan-soft: #e7f6f7;
+      --shadow: 0 12px 32px rgba(26, 39, 52, 0.12);
+      --sidebar: 224px;
+      --topbar: 58px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-width: 1180px; min-height: 720px; background: var(--bg); color: var(--text); }
+    body { font: 14px/1.5 "Aptos", "PingFang SC", "Microsoft YaHei", sans-serif; letter-spacing: 0; }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 2px solid rgba(23, 105, 224, 0.3);
+      outline-offset: 1px;
+    }
+
+    .app { min-height: 100vh; }
+    .sidebar {
+      position: fixed; inset: 0 auto 0 0; width: var(--sidebar); background: var(--nav); color: #d9e2ea;
+      display: flex; flex-direction: column; z-index: 20;
+    }
+    .brand { height: var(--topbar); padding: 0 18px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #2b3945; }
+    .brand-mark { width: 28px; height: 28px; border-radius: 6px; background: #3c8df5; color: white; display: grid; place-items: center; font-weight: 800; }
+    .brand strong { font-size: 16px; color: white; }
+    .brand small { display: block; color: #8ea0af; font-size: 10px; }
+    .nav { padding: 14px 10px; display: grid; gap: 4px; }
+    .nav-label { color: #718493; padding: 8px 10px 4px; font-size: 11px; text-transform: uppercase; }
+    .nav button {
+      border: 0; background: transparent; color: #aebbc6; height: 40px; border-radius: 6px; padding: 0 10px;
+      display: flex; align-items: center; gap: 11px; text-align: left;
+    }
+    .nav button:hover { background: #1d2b36; color: white; }
+    .nav button.active { background: #273b4b; color: white; box-shadow: inset 3px 0 #4c9aff; }
+    .nav-icon { width: 20px; text-align: center; font-size: 16px; }
+    .nav-badge { margin-left: auto; background: #c33c3c; color: white; border-radius: 9px; min-width: 18px; height: 18px; padding: 0 5px; font-size: 11px; text-align: center; line-height: 18px; }
+    .sidebar-foot { margin-top: auto; border-top: 1px solid #2b3945; padding: 14px; }
+    .user { display: flex; gap: 10px; align-items: center; }
+    .avatar { width: 30px; height: 30px; border-radius: 50%; background: #dfe9f5; color: #27435c; display: grid; place-items: center; font-weight: 700; }
+    .user small { color: #8193a2; display: block; }
+
+    .topbar {
+      position: fixed; left: var(--sidebar); right: 0; top: 0; height: var(--topbar); background: var(--surface);
+      border-bottom: 1px solid var(--line); display: flex; align-items: center; padding: 0 24px; z-index: 15;
+    }
+    .project-picker { display: flex; gap: 10px; align-items: center; }
+    .project-picker select { border: 0; font-weight: 700; color: var(--text); background: transparent; padding: 6px 24px 6px 4px; }
+    .project-tag { color: var(--green); background: var(--green-soft); border-radius: 4px; padding: 2px 7px; font-size: 12px; font-weight: 600; }
+    .top-actions { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+    .icon-btn { width: 34px; height: 34px; border: 1px solid var(--line); background: white; border-radius: 6px; display: grid; place-items: center; color: var(--text-2); }
+    .icon-btn:hover { color: var(--blue); border-color: #9cc1f5; background: var(--blue-soft); }
+    .today { color: var(--text-2); font-size: 12px; padding-right: 8px; }
+
+    main { margin-left: var(--sidebar); padding-top: var(--topbar); min-height: 100vh; }
+    .page { display: none; padding: 22px 24px 30px; }
+    .page.active { display: block; animation: enter .18s ease-out; }
+    @keyframes enter { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+    .page-head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 18px; }
+    .page-head h1 { margin: 0; font-size: 22px; line-height: 1.2; letter-spacing: 0; }
+    .page-head p { margin: 5px 0 0; color: var(--text-2); }
+    .head-actions { display: flex; gap: 8px; }
+    .btn { height: 34px; border-radius: 6px; padding: 0 13px; border: 1px solid var(--line-strong); background: white; color: var(--text); font-weight: 600; }
+    .btn:hover { border-color: #8bb4ed; background: #f6f9ff; }
+    .btn.primary { background: var(--blue); color: white; border-color: var(--blue); }
+    .btn.primary:hover { background: #0e5cc8; }
+    .btn.danger { color: var(--red); }
+    .btn:disabled { cursor: not-allowed; opacity: .45; }
+    .btn .symbol { margin-right: 6px; }
+
+    .metric-grid { display: grid; grid-template-columns: repeat(5, minmax(160px, 1fr)); gap: 10px; margin-bottom: 14px; }
+    .metric { background: var(--surface); border: 1px solid var(--line); border-radius: 7px; padding: 15px 16px; min-height: 102px; }
+    .metric-top { display: flex; justify-content: space-between; color: var(--text-2); font-size: 12px; }
+    .metric-icon { width: 26px; height: 26px; border-radius: 5px; display: grid; place-items: center; background: var(--blue-soft); color: var(--blue); }
+    .metric strong { display: block; margin-top: 7px; font-size: 27px; line-height: 1; }
+    .metric-foot { margin-top: 8px; color: var(--text-3); font-size: 11px; }
+    .metric.danger strong { color: var(--red); }
+    .metric.warning strong { color: var(--amber); }
+    .metric.success strong { color: var(--green); }
+
+    .dashboard-grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 12px; }
+    .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 7px; }
+    .panel-head { min-height: 48px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }
+    .panel-head h2 { font-size: 14px; margin: 0; }
+    .panel-head span { color: var(--text-3); font-size: 12px; }
+    .panel-body { padding: 16px; }
+    .rail-row { display: grid; grid-template-columns: 110px 1fr 46px; gap: 12px; align-items: center; margin: 17px 0; }
+    .rail-label strong { display: block; }
+    .rail-label small { color: var(--text-3); }
+    .progress { height: 8px; background: #edf0f3; border-radius: 4px; overflow: hidden; }
+    .progress > span { display: block; height: 100%; border-radius: 4px; background: var(--blue); }
+    .progress.green > span { background: var(--green); }
+    .progress.cyan > span { background: var(--cyan); }
+    .progress.amber > span { background: var(--amber); }
+    .rail-value { text-align: right; font-weight: 700; }
+    .issue-list { display: grid; }
+    .issue { display: grid; grid-template-columns: 9px 1fr auto; gap: 10px; align-items: center; padding: 11px 0; border-bottom: 1px solid #edf0f3; }
+    .issue:last-child { border-bottom: 0; }
+    .issue-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
+    .issue-dot.amber { background: var(--amber); }
+    .issue strong { display: block; font-size: 13px; }
+    .issue small { color: var(--text-3); }
+    .issue time { font-size: 12px; color: var(--red); font-weight: 600; }
+
+    .workspace { background: var(--surface); border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
+    .workspace-tabs { min-height: 48px; display: flex; align-items: stretch; border-bottom: 1px solid var(--line); padding: 0 14px; }
+    .workspace-tabs button { border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--text-2); padding: 0 16px; font-weight: 700; }
+    .workspace-tabs button.active { color: var(--blue); border-color: var(--blue); }
+    .workspace-tabs .count { margin-left: 6px; border-radius: 9px; padding: 1px 6px; background: #edf1f5; color: var(--text-2); font-size: 11px; }
+    .workspace-tabs button.active .count { background: var(--blue-soft); color: var(--blue); }
+    .view-switch { margin-left: auto; align-self: center; display: flex; background: #eef1f4; border-radius: 6px; padding: 2px; height: 32px; }
+    .view-switch button { height: 28px; padding: 0 10px; border: 0; border-radius: 4px; background: transparent; color: var(--text-2); font-size: 12px; }
+    .view-switch button.active { background: white; color: var(--text); box-shadow: 0 1px 4px rgba(30, 45, 60, .12); }
+    .toolbar { min-height: 52px; padding: 9px 14px; display: flex; gap: 8px; align-items: center; border-bottom: 1px solid var(--line); background: var(--surface-alt); }
+    .search { position: relative; width: 280px; }
+    .search input { width: 100%; height: 32px; border: 1px solid var(--line-strong); border-radius: 5px; padding: 0 10px 0 31px; background: white; }
+    .search span { position: absolute; left: 10px; top: 6px; color: var(--text-3); }
+    .toolbar select { height: 32px; border: 1px solid var(--line-strong); border-radius: 5px; background: white; padding: 0 28px 0 9px; color: var(--text-2); }
+    .toolbar-meta { margin-left: auto; color: var(--text-3); font-size: 12px; }
+
+    .table-wrap { overflow: auto; max-height: calc(100vh - 235px); min-height: 420px; }
+    table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1060px; }
+    th { position: sticky; top: 0; z-index: 3; height: 38px; background: #f7f9fb; color: #667384; font-size: 11px; text-transform: none; text-align: left; border-bottom: 1px solid var(--line); padding: 0 10px; white-space: nowrap; }
+    td { height: 48px; border-bottom: 1px solid #edf0f3; padding: 0 10px; white-space: nowrap; font-size: 12px; }
+    tbody tr { transition: background .12s; }
+    tbody tr:hover { background: #f7faff; }
+    tbody tr.selected { background: #eef5ff; box-shadow: inset 3px 0 var(--blue); }
+    .block-cell { display: flex; align-items: center; min-width: 230px; }
+    .tree-toggle { width: 22px; height: 22px; border: 0; background: transparent; color: var(--text-3); padding: 0; }
+    .tree-toggle.hidden { visibility: hidden; }
+    .block-name { font-weight: 700; color: #233244; cursor: pointer; }
+    .block-name:hover { color: var(--blue); text-decoration: underline; }
+    .tier { font-size: 10px; color: var(--text-3); border: 1px solid var(--line); border-radius: 3px; padding: 1px 4px; margin-left: 6px; }
+    .instance-mark { color: var(--cyan); margin-left: 5px; font-size: 11px; }
+    .status { display: inline-flex; gap: 5px; align-items: center; border-radius: 4px; padding: 3px 7px; font-weight: 700; font-size: 11px; }
+    .status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .status.done, .status.valid { color: var(--green); background: var(--green-soft); }
+    .status.ongoing { color: var(--blue); background: var(--blue-soft); }
+    .status.delay, .status.invalid { color: var(--red); background: var(--red-soft); }
+    .status.not-started, .status.pending { color: #687584; background: #eef1f4; }
+    .status.warning { color: var(--amber); background: var(--amber-soft); }
+    .mini-progress { width: 92px; display: flex; align-items: center; gap: 7px; }
+    .mini-progress .progress { flex: 1; height: 5px; }
+    .mini-progress b { font-size: 11px; min-width: 28px; }
+    .owner-cell { display: flex; align-items: center; gap: 7px; }
+    .owner-dot { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: #edf2f7; color: #435366; font-size: 10px; font-weight: 800; }
+    .date.late { color: var(--red); font-weight: 700; }
+    .date.changed { color: var(--amber); font-weight: 700; }
+    .check-dots { display: flex; gap: 3px; }
+    .check-dot { width: 14px; height: 14px; border-radius: 3px; background: #e7ebef; color: transparent; display: grid; place-items: center; font-size: 9px; }
+    .check-dot.on { color: white; background: var(--green); }
+
+    .flat-view .tree-toggle, .flat-view .instance-mark { display: none; }
+    .flat-view .block-cell { padding-left: 0 !important; }
+
+    .drawer-backdrop { position: fixed; inset: 0; background: rgba(20, 31, 42, .28); opacity: 0; pointer-events: none; z-index: 40; transition: opacity .2s; }
+    .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
+    .drawer { position: fixed; top: 0; bottom: 0; right: 0; width: 520px; background: white; z-index: 45; transform: translateX(100%); transition: transform .25s ease; box-shadow: var(--shadow); display: flex; flex-direction: column; }
+    .drawer.open { transform: translateX(0); }
+    .drawer-head { min-height: 78px; padding: 16px 18px; border-bottom: 1px solid var(--line); display: flex; align-items: flex-start; gap: 12px; }
+    .drawer-head h2 { margin: 0; font-size: 18px; }
+    .drawer-head p { margin: 4px 0 0; color: var(--text-2); font-size: 12px; }
+    .drawer-close { margin-left: auto; border: 0; background: #f0f3f6; border-radius: 5px; width: 30px; height: 30px; color: var(--text-2); }
+    .drawer-body { overflow: auto; padding: 0 18px 24px; }
+    .drawer-section { padding: 17px 0; border-bottom: 1px solid var(--line); }
+    .drawer-section:last-child { border-bottom: 0; }
+    .section-title { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .section-title h3 { margin: 0; font-size: 13px; }
+    .section-title small { color: var(--text-3); }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
+    .field label { display: block; color: var(--text-3); font-size: 11px; margin-bottom: 4px; }
+    .field strong { display: block; font-size: 13px; }
+    .field input, .field select, .field textarea { width: 100%; border: 1px solid var(--line-strong); border-radius: 5px; padding: 7px 8px; background: white; }
+    .field textarea { min-height: 70px; resize: vertical; }
+    .check-list { display: grid; gap: 7px; }
+    .check-item { min-height: 38px; border: 1px solid var(--line); border-radius: 5px; padding: 7px 9px; display: flex; align-items: center; gap: 9px; }
+    .check-item input { width: 16px; height: 16px; accent-color: var(--green); }
+    .check-item span { flex: 1; font-weight: 600; }
+    .check-item small { color: var(--text-3); }
+    .date-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+    .date-box { border-left: 3px solid var(--line-strong); background: var(--surface-alt); padding: 8px 9px; }
+    .date-box.changed-box { border-color: var(--amber); }
+    .date-box.actual-box { border-color: var(--green); }
+    .date-box small { display: block; color: var(--text-3); }
+    .date-box strong { font-size: 12px; }
+    .history { margin-top: 12px; }
+    .history-item { display: grid; grid-template-columns: 88px 1fr; gap: 10px; padding: 8px 0; border-bottom: 1px dashed var(--line); }
+    .history-item:last-child { border-bottom: 0; }
+    .history-item time { color: var(--text-3); font-size: 11px; }
+    .history-item strong { display: block; font-size: 12px; }
+    .history-item p { margin: 2px 0; color: var(--text-2); font-size: 11px; white-space: normal; }
+    .history-item small { color: var(--text-3); }
+    .validation-grid { display: grid; grid-template-columns: 1fr auto; gap: 7px 10px; align-items: center; }
+    .validation-item { border: 1px solid var(--line); border-radius: 5px; padding: 8px; }
+    .validation-item label { color: var(--text-3); font-size: 10px; display: block; }
+    .validation-item strong { font-size: 12px; }
+    .recommendation { margin-top: 10px; padding: 9px 10px; background: #fff8e9; border-left: 3px solid var(--amber); color: #684b1b; font-size: 11px; }
+
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(20, 31, 42, .4); display: none; place-items: center; z-index: 60; }
+    .modal-backdrop.open { display: grid; }
+    .modal { width: 440px; background: white; border-radius: 7px; box-shadow: var(--shadow); }
+    .modal-head { padding: 15px 17px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
+    .modal-head h3 { margin: 0; font-size: 15px; }
+    .modal-body { padding: 17px; display: grid; gap: 12px; }
+    .modal-foot { padding: 12px 17px; background: var(--surface-alt); border-top: 1px solid var(--line); display: flex; justify-content: flex-end; gap: 8px; }
+
+    .delay-table, .mapping-table { min-width: 900px; }
+    .summary-strip { display: flex; gap: 24px; padding: 12px 16px; border-bottom: 1px solid var(--line); background: var(--surface-alt); }
+    .summary-strip span { color: var(--text-2); font-size: 12px; }
+    .summary-strip strong { color: var(--text); margin-left: 5px; }
+    .mapping-type { font-family: "SFMono-Regular", Consolas, monospace; color: var(--text-2); }
+    .toast { position: fixed; right: 24px; bottom: 24px; background: #172531; color: white; border-radius: 6px; padding: 11px 14px; box-shadow: var(--shadow); z-index: 80; opacity: 0; transform: translateY(8px); pointer-events: none; transition: .2s; }
+    .toast.show { opacity: 1; transform: none; }
+    .empty { padding: 70px 20px; text-align: center; color: var(--text-3); }
+    .empty strong { display: block; color: var(--text-2); margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">D</div>
+        <div><strong>DE-WBS</strong><small>Design & Layout Control</small></div>
+      </div>
+      <nav class="nav">
+        <div class="nav-label">Project control</div>
+        <button data-page="dashboard"><span class="nav-icon">▦</span>Fullchip 总览</button>
+        <button class="active" data-page="wbs"><span class="nav-icon">⌘</span>WBS Hierarchy</button>
+        <button data-page="delay"><span class="nav-icon">◷</span>Delay 监控<span class="nav-badge" id="delayBadge">4</span></button>
+        <button data-page="mapping"><span class="nav-icon">⇄</span>Mapping 例外<span class="nav-badge" id="mappingBadge">3</span></button>
+      </nav>
+      <div class="sidebar-foot">
+        <div class="user"><div class="avatar">PL</div><div><strong>Lin Q.</strong><small>Process Leader</small></div></div>
+      </div>
+    </aside>
+
+    <header class="topbar">
+      <div class="project-picker">
+        <span style="color:var(--text-3)">Project</span>
+        <select id="projectSelect" aria-label="选择项目"><option>ChanEdgel / P26A</option><option>Rainier / P26B</option><option>Alta / P27A</option></select>
+        <span class="project-tag">Execution</span>
+      </div>
+      <div class="top-actions">
+        <span class="today" id="todayLabel"></span>
+        <button class="icon-btn" title="通知">●</button>
+        <button class="icon-btn" title="帮助">?</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="page" id="dashboardPage">
+        <div class="page-head">
+          <div><h1>Fullchip 总览</h1><p>按 unique Block 汇总，不重复计算 hierarchy 实例。</p></div>
+          <div class="head-actions"><button class="btn" id="refreshDashboard"><span class="symbol">↻</span>刷新状态</button></div>
+        </div>
+        <div class="metric-grid" id="metricGrid"></div>
+        <div class="dashboard-grid">
+          <section class="panel">
+            <div class="panel-head"><h2>三条 WBS 进度</h2><span>由 check item 自动派生</span></div>
+            <div class="panel-body" id="railProgress"></div>
+          </section>
+          <section class="panel">
+            <div class="panel-head"><h2>需要关注</h2><button class="btn" data-go="delay">查看全部</button></div>
+            <div class="panel-body issue-list" id="issueList"></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="page active" id="wbsPage">
+        <div class="page-head">
+          <div><h1>WBS Hierarchy</h1><p>在同一工作区自由切换 Schematic、Layout 与 SPF hierarchy。</p></div>
+          <div class="head-actions"><button class="btn" id="collapseAll"><span class="symbol">−</span>全部折叠</button><button class="btn primary" id="exportBtn"><span class="symbol">↓</span>导出当前视图</button></div>
+        </div>
+        <div class="workspace">
+          <div class="workspace-tabs" id="hierarchyTabs">
+            <button class="active" data-hierarchy="schematic">Schematic <span class="count">128</span></button>
+            <button data-hierarchy="layout">Layout <span class="count">134</span></button>
+            <button data-hierarchy="spf">SPF <span class="count">24</span></button>
+            <div class="view-switch"><button class="active" data-view="tree">树状</button><button data-view="flat">清单</button></div>
+          </div>
+          <div class="toolbar">
+            <div class="search"><span>⌕</span><input id="searchInput" placeholder="搜索 Block、Owner 或 Reference project"></div>
+            <select id="statusFilter"><option value="all">全部状态</option><option value="delay">Delay</option><option value="ongoing">Ongoing</option><option value="done">Done</option><option value="not-started">Not started</option></select>
+            <select id="categoryFilter"><option value="all">全部 Block category</option><option>Analog</option><option>controller</option><option>DFT</option><option>DLDO</option><option>IO</option><option>Row+Refresh+RHR</option></select>
+            <span class="toolbar-meta" id="resultMeta"></span>
+          </div>
+          <div class="table-wrap" id="tableWrap"><table><thead id="wbsHead"></thead><tbody id="wbsBody"></tbody></table></div>
+        </div>
+      </section>
+
+      <section class="page" id="delayPage">
+        <div class="page-head"><div><h1>Delay 监控</h1><p>Schematic 对比原始 Planned；Layout 对比 Plan finish date。</p></div><div class="head-actions"><button class="btn" id="delaySort">按延误天数排序</button></div></div>
+        <div class="workspace">
+          <div class="summary-strip"><span>Delay Block<strong id="delayTotal">4</strong></span><span>Schematic<strong>2</strong></span><span>Layout<strong>2</strong></span><span>未完成<strong>3</strong></span></div>
+          <div class="table-wrap"><table class="delay-table"><thead><tr><th>Block</th><th>Hierarchy</th><th>Owner</th><th>比较基线</th><th>当前 / 实际</th><th>延误</th><th>状态</th><th></th></tr></thead><tbody id="delayBody"></tbody></table></div>
+        </div>
+      </section>
+
+      <section class="page" id="mappingPage">
+        <div class="page-head"><div><h1>Mapping 例外</h1><p>Schematic 与 Layout 默认按 Block name 1:1 自动匹配，只处理少量例外。</p></div><div class="head-actions"><button class="btn primary" id="resolveAll">批量确认自动建议</button></div></div>
+        <div class="workspace">
+          <div class="summary-strip"><span>Auto matched<strong>125</strong></span><span>待处理<strong id="mappingPending">3</strong></span><span>1:N / N:1<strong>2</strong></span></div>
+          <div class="table-wrap"><table class="mapping-table"><thead><tr><th>Schematic instance</th><th>关系</th><th>Layout instance</th><th>匹配依据</th><th>状态</th><th></th></tr></thead><tbody id="mappingBody"></tbody></table></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="drawer" id="detailDrawer" aria-label="Block 详情">
+    <div class="drawer-head"><div><h2 id="drawerTitle">Block</h2><p id="drawerSubtitle"></p></div><button class="drawer-close" id="drawerClose" title="关闭">×</button></div>
+    <div class="drawer-body" id="drawerBody"></div>
+  </aside>
+
+  <div class="modal-backdrop" id="rescheduleModal">
+    <div class="modal">
+      <div class="modal-head"><h3>新增 Schematic 改期记录</h3><button class="drawer-close" data-close-modal>×</button></div>
+      <div class="modal-body">
+        <div class="field"><label>前一版日期</label><input id="oldDate" disabled></div>
+        <div class="field"><label>新的 Changed release date</label><input id="newDate" type="date"></div>
+        <div class="field"><label>改期原因（必填）</label><textarea id="changeReason" placeholder="说明依赖变化、设计调整或资源原因"></textarea></div>
+      </div>
+      <div class="modal-foot"><button class="btn" data-close-modal>取消</button><button class="btn primary" id="saveReschedule">保存并追加历史</button></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const TODAY = new Date('2026-08-25T12:00:00');
+    const checkLabels = {
+      schematic: ['Power mapping', 'ERC', 'Fanout', 'CN marker', 'Verification (Verilog & Finesim)'],
+      layout: ['Floorplan Reviewed', 'IO 满足上层需求', 'Power 合理并满足上层需求', 'Verification (DRC/LVS)'],
+      spf: ['UT DRC', 'MRC / shielding check', 'LN net', 'LRC']
+    };
+    const hierarchyMeta = {
+      schematic: { owner: 'Schematic Owner', date: 'Planned release', actual: 'Actual release' },
+      layout: { owner: 'Layout Owner', date: 'Plan finish', actual: 'Actual finish' },
+      spf: { owner: 'SPF Owner', date: 'Planned SPF release', actual: 'Actual SPF release' }
+    };
+
+    const common = {
+      top: { id:'top', name:'CE_TOP', category:'controller', reference:'DBPLG', blockOwner:'Yan S.', schematicOwner:'Ming Z.', layoutOwner:'Tao H.', spfOwner:'Jia W.' },
+      core: { id:'core', name:'CORE_ARRAY', category:'Row+Refresh+RHR', reference:'DOHIT', blockOwner:'Lei W.', schematicOwner:'Han L.', layoutOwner:'Nina G.', spfOwner:'Bo C.' },
+      row: { id:'row', name:'ROW_CTRL', category:'Row+Refresh+RHR', reference:'DBPLG', blockOwner:'Lei W.', schematicOwner:'Qin Y.', layoutOwner:'Eric L.', spfOwner:'Bo C.' },
+      sense: { id:'sense', name:'SENSE_AMP', category:'Analog', reference:'DOHIT', blockOwner:'Ming Z.', schematicOwner:'Ming Z.', layoutOwner:'Nina G.', spfOwner:'Jia W.' },
+      bitcell: { id:'bitcell', name:'BITCELL', category:'Analog', reference:'DOHIT', blockOwner:'Ming Z.', schematicOwner:'Han L.', layoutOwner:'Tao H.', spfOwner:'Jia W.' },
+      io: { id:'io', name:'IO_RING', category:'IO', reference:'DBPLG', blockOwner:'Yan S.', schematicOwner:'Ivy X.', layoutOwner:'Eric L.', spfOwner:'Bo C.' },
+      dft: { id:'dft', name:'MBIST_CTRL', category:'DFT', reference:'DBPLG', blockOwner:'Kai D.', schematicOwner:'Kai D.', layoutOwner:'Sora P.', spfOwner:'Jia W.' },
+      pwr: { id:'pwr', name:'DLDO_MAIN', category:'DLDO', reference:'DOHIT', blockOwner:'Rui J.', schematicOwner:'Rui J.', layoutOwner:'Tao H.', spfOwner:'Bo C.' }
+    };
+
+    const schematic = [
+      row('sch-top', common.top, null, 1, [1,1,1,1,0], '2026-08-18', '2026-08-29', '', true),
+      row('sch-core', common.core, 'sch-top', 2, [1,1,1,1,1], '2026-08-12', '2026-08-14', '2026-08-14'),
+      row('sch-row', common.row, 'sch-core', 3, [1,1,1,0,0], '2026-08-22', '2026-08-30', ''),
+      row('sch-sense', common.sense, 'sch-core', 3, [1,1,1,1,1], '2026-08-20', '2026-08-20', '2026-08-19'),
+      row('sch-bit-a', common.bitcell, 'sch-core', 4, [1,1,1,1,1], '2026-08-08', '2026-08-08', '2026-08-07', false, 'A'),
+      row('sch-bit-b', common.bitcell, 'sch-core', 4, [1,1,1,1,1], '2026-08-08', '2026-08-08', '2026-08-07', false, 'B'),
+      row('sch-io', common.io, 'sch-top', 2, [1,1,0,0,0], '2026-09-02', '2026-09-02', ''),
+      row('sch-dft', common.dft, 'sch-top', 2, [0,0,0,0,0], '2026-09-08', '2026-09-08', ''),
+      row('sch-pwr', common.pwr, 'sch-top', 2, [1,1,1,1,0], '2026-08-24', '2026-08-28', '')
+    ];
+    const layout = [
+      row('lay-top', common.top, null, 1, [1,1,0,0], '2026-09-18', '', '', true),
+      row('lay-core', common.core, 'lay-top', 2, [1,1,1,0], '2026-09-05', '', '', true),
+      row('lay-bit-a', common.bitcell, 'lay-core', 3, [1,1,1,1], '2026-08-15', '', '2026-08-17', false, 'A'),
+      row('lay-bit-b', common.bitcell, 'lay-core', 3, [1,1,1,1], '2026-08-15', '', '2026-08-17', false, 'B'),
+      row('lay-sense', common.sense, 'lay-core', 3, [1,1,1,1], '2026-08-21', '', '2026-08-21'),
+      row('lay-row', common.row, 'lay-core', 3, [1,1,0,0], '2026-08-23', '', ''),
+      row('lay-io', common.io, 'lay-top', 2, [1,0,0,0], '2026-09-10', '', ''),
+      row('lay-dft', common.dft, 'lay-top', 2, [0,0,0,0], '2026-09-16', '', ''),
+      row('lay-pwr', common.pwr, 'lay-top', 2, [1,1,1,0], '2026-08-30', '', '', true)
+    ];
+    const spf = [
+      row('spf-top', common.top, null, 1, [1,1,0,0], '2026-09-25', '', '', true),
+      row('spf-core', common.core, 'spf-top', 2, [1,1,1,1], '2026-09-12', '', '2026-09-11'),
+      row('spf-array', common.bitcell, 'spf-core', 3, [1,1,1,0], '2026-09-06', '', ''),
+      row('spf-peri', common.sense, 'spf-core', 3, [1,0,0,0], '2026-09-08', '', ''),
+      row('spf-io', common.io, 'spf-top', 2, [0,0,0,0], '2026-09-18', '', ''),
+      row('spf-pwr', common.pwr, 'spf-top', 2, [1,1,1,1], '2026-09-03', '', '')
+    ];
+    const data = { schematic, layout, spf };
+    const detailState = {
+      schematic: {
+        top: { history:[{at:'2026-08-19', from:'2026-08-26', to:'2026-08-29', reason:'Fullchip interface review 增加一轮', editor:'Ming Z.'},{at:'2026-08-12', from:'2026-08-22', to:'2026-08-26', reason:'上层 power spec 调整', editor:'Ming Z.'}] },
+        row: { history:[{at:'2026-08-21', from:'2026-08-22', to:'2026-08-30', reason:'Refresh logic verification 追加 corner', editor:'Qin Y.'}] },
+        pwr: { history:[{at:'2026-08-23', from:'2026-08-24', to:'2026-08-28', reason:'Reference project 数据补充确认', editor:'Rui J.'}] }
+      },
+      spf: {
+        top: { lvsPath:'/proj/ce/lvs/top/run_0824', cell:'CE_TOP', gds:'/proj/ce/gds/CE_TOP_0824.gds', machine:'valid', human:false, round:'R2' },
+        core: { lvsPath:'/proj/ce/lvs/core/run_0819', cell:'CORE_ARRAY', gds:'/proj/ce/gds/CORE_ARRAY.gds', machine:'valid', human:true, round:'R3' },
+        bitcell: { lvsPath:'/proj/ce/lvs/array/latest', cell:'BITCELL_ARRAY', gds:'', machine:'invalid', human:false, round:'R1' },
+        sense: { lvsPath:'/proj/ce/lvs/peri/run_0821', cell:'SENSE_AMP', gds:'/proj/ce/gds/SENSE_AMP.gds', machine:'pending', human:false, round:'R1' },
+        io: { lvsPath:'', cell:'IO_RING', gds:'', machine:'invalid', human:false, round:'R0' },
+        pwr: { lvsPath:'/proj/ce/lvs/dldo/run_0820', cell:'DLDO_MAIN', gds:'/proj/ce/gds/DLDO_MAIN.gds', machine:'valid', human:true, round:'R2' }
+      }
+    };
+
+    function row(id, def, parent, tier, checks, planned, changed, actual, tierTop=false, instance='') {
+      return { id, def, parent, tier, checks, planned, changed, actual, tierTop, instance, expanded:true };
+    }
+    function parseDate(value) { return value ? new Date(value + 'T12:00:00') : null; }
+    function daysBetween(a, b) { return Math.ceil((a - b) / 86400000); }
+    function progress(item) { return Math.round(item.checks.filter(Boolean).length / item.checks.length * 100); }
+    function stateFor(item, type) {
+      const p = progress(item);
+      const planned = parseDate(item.planned);
+      const actual = parseDate(item.actual);
+      const delayed = type === 'layout'
+        ? (actual ? actual > planned : TODAY > planned)
+        : (actual ? actual > planned : TODAY > planned);
+      if (delayed) return 'delay';
+      if (p === 100) return 'done';
+      if (p === 0) return 'not-started';
+      return 'ongoing';
+    }
+    function statusText(state) { return ({done:'Done', ongoing:'Ongoing', delay:'Delay', 'not-started':'Not started', valid:'Validated', invalid:'Failed', pending:'Pending'})[state] || state; }
+    function ownerFor(item, type) { return item.def[type + 'Owner']; }
+    function initials(name) { return name.split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase(); }
+    function esc(value) { return String(value ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+    function unique(items) { return [...new Map(items.map(i => [i.def.id, i])).values()]; }
+
+    let currentHierarchy = 'schematic';
+    let currentView = 'tree';
+    let selectedItem = null;
+
+    const wbsHead = document.getElementById('wbsHead');
+    const wbsBody = document.getElementById('wbsBody');
+    const tableWrap = document.getElementById('tableWrap');
+
+    function renderWbs() {
+      const meta = hierarchyMeta[currentHierarchy];
+      const isLayout = currentHierarchy === 'layout';
+      const isSpf = currentHierarchy === 'spf';
+      wbsHead.innerHTML = `<tr><th style="width:280px">Block / Instance</th><th>Category</th><th>${meta.owner}</th><th>Reference project</th><th>${isSpf ? 'SPF Ready' : 'Overall status'}</th><th>Checks</th>${isLayout ? '<th>Own / Rollup</th>' : '<th>Progress</th>'}<th>${meta.date}</th><th>${meta.actual}</th>${isSpf ? '<th>Validation</th>' : ''}</tr>`;
+      const query = document.getElementById('searchInput').value.trim().toLowerCase();
+      const sf = document.getElementById('statusFilter').value;
+      const cf = document.getElementById('categoryFilter').value;
+      const all = data[currentHierarchy];
+      const visibleByTree = item => {
+        if (currentView === 'flat') return true;
+        let p = item.parent;
+        while (p) { const parent = all.find(x => x.id === p); if (!parent || !parent.expanded) return false; p = parent.parent; }
+        return true;
+      };
+      const items = all.filter(item => {
+        const s = stateFor(item, currentHierarchy);
+        const hay = `${item.def.name} ${ownerFor(item,currentHierarchy)} ${item.def.reference}`.toLowerCase();
+        return visibleByTree(item) && (!query || hay.includes(query)) && (sf === 'all' || s === sf) && (cf === 'all' || item.def.category === cf);
+      });
+      tableWrap.classList.toggle('flat-view', currentView === 'flat');
+      wbsBody.innerHTML = items.length ? items.map(item => rowHtml(item)).join('') : `<tr><td colspan="11"><div class="empty"><strong>没有匹配的 Block</strong>调整搜索词或筛选条件</div></td></tr>`;
+      document.getElementById('resultMeta').textContent = `显示 ${items.length} 个实例 · ${unique(all).length} 个 unique Block`;
+      bindWbsRows();
+    }
+
+    function rowHtml(item) {
+      const type = currentHierarchy;
+      const state = stateFor(item, type);
+      const p = progress(item);
+      const hasChildren = data[type].some(x => x.parent === item.id);
+      const levelPad = currentView === 'tree' ? (item.tier - 1) * 21 : 0;
+      const late = state === 'delay';
+      const spfState = detailState.spf[item.def.id];
+      const validation = type === 'spf' ? (spfState?.machine || 'pending') : '';
+      const ownRollup = type === 'layout' && item.tierTop ? `<td><div class="mini-progress"><div class="progress"><span style="width:${p}%"></span></div><b>${p}%</b></div><small style="color:var(--text-3)">Rollup ${Math.min(100,p+12)}%</small></td>` : `<td><div class="mini-progress"><div class="progress"><span style="width:${p}%"></span></div><b>${p}%</b></div></td>`;
+      return `<tr data-id="${item.id}" class="${selectedItem?.id === item.id ? 'selected' : ''}">
+        <td><div class="block-cell" style="padding-left:${levelPad}px"><button class="tree-toggle ${hasChildren?'':'hidden'}" title="展开/折叠">${item.expanded?'▾':'▸'}</button><span class="block-name">${esc(item.def.name)}</span>${item.instance ? `<span class="instance-mark" title="同一 Block definition 的重复实例">↗ ${item.instance}</span>` : ''}<span class="tier">T${item.tier}${item.tierTop && type==='layout'?' · TOP':''}</span></div></td>
+        <td>${esc(item.def.category)}</td>
+        <td><div class="owner-cell"><span class="owner-dot">${initials(ownerFor(item,type))}</span>${esc(ownerFor(item,type))}</div></td>
+        <td>${esc(item.def.reference)}</td>
+        <td><span class="status ${state}">${statusText(state)}</span></td>
+        <td><div class="check-dots">${item.checks.map(v=>`<span class="check-dot ${v?'on':''}">${v?'✓':''}</span>`).join('')}</div></td>
+        ${ownRollup}
+        <td class="date ${late?'late':''}">${esc(item.planned)}</td>
+        <td class="date">${item.actual ? esc(item.actual) : '—'}</td>
+        ${type === 'spf' ? `<td><span class="status ${validation}">${statusText(validation)}</span></td>` : ''}
+      </tr>`;
+    }
+
+    function bindWbsRows() {
+      wbsBody.querySelectorAll('tr[data-id]').forEach(tr => {
+        const item = data[currentHierarchy].find(x => x.id === tr.dataset.id);
+        tr.querySelector('.tree-toggle')?.addEventListener('click', e => { e.stopPropagation(); item.expanded = !item.expanded; renderWbs(); });
+        tr.querySelector('.block-name')?.addEventListener('click', e => { e.stopPropagation(); openDrawer(item); });
+        tr.addEventListener('click', () => { selectedItem = item; renderWbs(); });
+      });
+    }
+
+    function openDrawer(item) {
+      selectedItem = item;
+      document.getElementById('drawerTitle').textContent = item.def.name;
+      document.getElementById('drawerSubtitle').textContent = `${currentHierarchy.toUpperCase()} · Tier ${item.tier}${item.instance ? ` · Instance ${item.instance}` : ''}`;
+      document.getElementById('drawerBody').innerHTML = drawerHtml(item);
+      document.getElementById('drawerBackdrop').classList.add('open');
+      document.getElementById('detailDrawer').classList.add('open');
+      bindDrawer(item);
+      renderWbs();
+    }
+
+    function drawerHtml(item) {
+      const type = currentHierarchy;
+      const state = stateFor(item, type);
+      let specific = '';
+      if (type === 'schematic') specific = schematicDetail(item);
+      if (type === 'layout') specific = layoutDetail(item);
+      if (type === 'spf') specific = spfDetail(item);
+      return `<section class="drawer-section">
+        <div class="section-title"><h3>Block 信息</h3><span class="status ${state}">${statusText(state)}</span></div>
+        <div class="info-grid">
+          <div class="field"><label>Block category</label><strong>${esc(item.def.category)}</strong></div>
+          <div class="field"><label>Reference project</label><strong>${esc(item.def.reference)}</strong></div>
+          <div class="field"><label>Block Owner</label><strong>${esc(item.def.blockOwner)}</strong></div>
+          <div class="field"><label>${hierarchyMeta[type].owner}</label><strong>${esc(ownerFor(item,type))}</strong></div>
+          <div class="field"><label>Definition ID</label><strong>${esc(item.def.id)}</strong></div>
+          <div class="field"><label>Instance ID</label><strong>${esc(item.id)}</strong></div>
+        </div>
+      </section>${specific}
+      <section class="drawer-section"><div class="section-title"><h3>Back up</h3></div><div class="field"><label>Materials</label><input value="/project/ChanEdgel/${esc(item.def.name)}/materials"></div><div class="field" style="margin-top:10px"><label>Comments</label><textarea placeholder="补充说明"></textarea></div></section>`;
+    }
+
+    function checksHtml(item, type) {
+      return `<div class="check-list">${checkLabels[type].map((label,i)=>`<label class="check-item"><input type="checkbox" data-check="${i}" ${item.checks[i]?'checked':''}><span>${label}</span><small>${type==='layout'?'KR 确认':''}</small></label>`).join('')}</div>`;
+    }
+    function schematicDetail(item) {
+      const history = detailState.schematic[item.def.id]?.history || [];
+      return `<section class="drawer-section"><div class="section-title"><h3>Schematic release</h3><button class="btn" id="addReschedule">+ 记录改期</button></div>
+        <div class="date-row"><div class="date-box"><small>Planned · 固定基线</small><strong>${item.planned}</strong></div><div class="date-box changed-box"><small>Changed · 最新预计</small><strong>${item.changed || item.planned}</strong></div><div class="date-box actual-box"><small>Actual</small><strong>${item.actual || '—'}</strong></div></div>
+        <div class="history">${history.length ? history.map(h=>`<div class="history-item"><time>${h.at}</time><div><strong>${h.from} → ${h.to}</strong><p>${esc(h.reason)}</p><small>${esc(h.editor)}</small></div></div>`).join('') : '<div class="empty" style="padding:18px">暂无改期记录</div>'}</div>
+      </section><section class="drawer-section"><div class="section-title"><h3>Schematic check item</h3><small>${progress(item)}% · 自动计算</small></div>${checksHtml(item,'schematic')}</section>`;
+    }
+    function layoutDetail(item) {
+      return `<section class="drawer-section"><div class="section-title"><h3>Layout Schedule</h3><span class="status ${stateFor(item,'layout')}">${statusText(stateFor(item,'layout'))}</span></div>
+        <div class="info-grid"><div class="field"><label>Layout start date</label><strong>2026-08-04</strong></div><div class="field"><label>Plan workdays</label><strong>16 days</strong></div><div class="field"><label>Resource</label><strong>${esc(item.def.layoutOwner)}</strong></div><div class="field"><label>Plan finish date</label><strong>${item.planned}</strong></div><div class="field"><label>实际完成时间</label><strong>${item.actual || '—'}</strong></div><div class="field"><label>日期口径</label><strong>无 release date</strong></div></div>
+      </section><section class="drawer-section"><div class="section-title"><h3>Check List (with Layout KR)</h3><small>${progress(item)}% · 自动计算</small></div>${checksHtml(item,'layout')}</section>${item.tierTop?`<section class="drawer-section"><div class="section-title"><h3>Tier 顶层进度</h3></div><div class="rail-row" style="grid-template-columns:80px 1fr 40px"><span>Own</span><div class="progress"><span style="width:${progress(item)}%"></span></div><b>${progress(item)}%</b></div><div class="rail-row" style="grid-template-columns:80px 1fr 40px"><span>Rollup</span><div class="progress green"><span style="width:${Math.min(100,progress(item)+12)}%"></span></div><b>${Math.min(100,progress(item)+12)}%</b></div></section>`:''}`;
+    }
+    function spfDetail(item) {
+      const v = detailState.spf[item.def.id] || {lvsPath:'',cell:item.def.name,gds:'',machine:'pending',human:false,round:'R0'};
+      return `<section class="drawer-section"><div class="section-title"><h3>SPF status</h3><span class="status ${v.machine}">${statusText(v.machine)}</span></div>
+        <div class="info-grid"><div class="field"><label>SPF round</label><strong>${v.round}</strong></div><div class="field"><label>Planned SPF release</label><strong>${item.planned}</strong></div></div>
+        <div class="field" style="margin-top:10px"><label>LVS path</label><input data-spf-field="lvsPath" value="${esc(v.lvsPath)}"></div>
+        <div class="info-grid" style="margin-top:10px"><div class="field"><label>cell</label><input data-spf-field="cell" value="${esc(v.cell)}"></div><div class="field"><label>gds</label><input data-spf-field="gds" value="${esc(v.gds)}"></div></div>
+        <div class="validation-grid" style="margin-top:12px"><div class="validation-item"><label>系统基础校验</label><strong>必填、格式与可访问性</strong></div><button class="btn" id="runBasicValidation">${v.machine === 'valid' ? '重新校验' : '运行校验'}</button><div class="validation-item"><label>校验结果</label><strong>${v.machine === 'valid' ? '基础字段有效' : v.machine === 'invalid' ? '存在缺失或格式错误' : '字段变化，等待校验'}</strong></div><span class="status ${v.machine}">${statusText(v.machine)}</span><div class="validation-item"><label>人工技术确认</label><strong>寄生层级与连接正确性</strong></div><button class="btn" id="humanValidate">${v.human?'已确认':'确认通过'}</button></div>
+        <div class="recommendation">方案建议：机器只做基础有效性检查；寄生 RC 的技术正确性仍由 SPF Owner 人工确认。暂不承诺 EDA 或文件内容解析。</div>
+      </section><section class="drawer-section"><div class="section-title"><h3>SPF check list</h3><small>${progress(item)}% · as-is 4 项</small></div>${checksHtml(item,'spf')}</section>`;
+    }
+
+    function bindDrawer(item) {
+      document.querySelectorAll('[data-check]').forEach(input => input.addEventListener('change', () => {
+        item.checks[Number(input.dataset.check)] = input.checked ? 1 : 0;
+        showToast('Check item 已更新，Overall status 已重新计算');
+        openDrawer(item); renderDashboard(); renderDelay();
+      }));
+      document.getElementById('addReschedule')?.addEventListener('click', () => openReschedule(item));
+      document.querySelectorAll('[data-spf-field]').forEach(input => input.addEventListener('change', () => {
+        const v = detailState.spf[item.def.id]; v[input.dataset.spfField] = input.value; v.machine = 'pending'; v.human = false;
+        showToast('字段已变化，原校验结果已失效'); openDrawer(item);
+      }));
+      document.getElementById('runBasicValidation')?.addEventListener('click', () => {
+        const v = detailState.spf[item.def.id];
+        const pathOk = value => value.startsWith('/proj/') && !/\s/.test(value);
+        v.machine = v.cell.trim() && pathOk(v.lvsPath) && pathOk(v.gds) ? 'valid' : 'invalid';
+        if (v.machine !== 'valid') v.human = false;
+        showToast(v.machine === 'valid' ? '基础校验通过，仍需人工技术确认' : '基础校验未通过，请检查必填项和路径格式');
+        openDrawer(item); renderWbs();
+      });
+      document.getElementById('humanValidate')?.addEventListener('click', () => {
+        const v = detailState.spf[item.def.id];
+        if (v.machine !== 'valid') return showToast('请先通过系统基础校验');
+        v.human = true; showToast('人工技术确认已记录'); openDrawer(item);
+      });
+    }
+
+    function openReschedule(item) {
+      selectedItem = item;
+      document.getElementById('oldDate').value = item.changed || item.planned;
+      document.getElementById('newDate').value = '';
+      document.getElementById('changeReason').value = '';
+      document.getElementById('rescheduleModal').classList.add('open');
+    }
+
+    function renderDashboard() {
+      const schUnique = unique(schematic), layUnique = unique(layout), spfUnique = unique(spf);
+      const allUnique = unique([...schematic,...layout]);
+      const delayed = [...schematic.map(i=>[i,'schematic']),...layout.map(i=>[i,'layout'])].filter(([i,t])=>stateFor(i,t)==='delay');
+      document.getElementById('metricGrid').innerHTML = [
+        ['Unique Blocks','128','不含重复实例','▦',''],['Schematic Ready',`${schUnique.filter(i=>progress(i)===100).length}/${schUnique.length}`,'5 项 check 自动判定','✓','success'],['Layout Qualified',`${layUnique.filter(i=>progress(i)===100).length}/${layUnique.length}`,'4 项 KR check 自动判定','◎','success'],['Delay',delayed.length,'按确认日期口径计算','!','danger'],['Mapping exceptions',mappings.length,'少量非 1:1 关系','⇄','warning']
+      ].map(m=>`<div class="metric ${m[4]}"><div class="metric-top"><span>${m[0]}</span><span class="metric-icon">${m[3]}</span></div><strong>${m[1]}</strong><div class="metric-foot">${m[2]}</div></div>`).join('');
+      document.getElementById('railProgress').innerHTML = [['Schematic',schUnique,'blue'],['Layout',layUnique,'green'],['SPF',spfUnique,'cyan']].map(([name,items,color])=>{const val=Math.round(items.reduce((s,i)=>s+progress(i),0)/items.length);return `<div class="rail-row"><div class="rail-label"><strong>${name}</strong><small>${items.length} unique</small></div><div class="progress ${color}"><span style="width:${val}%"></span></div><div class="rail-value">${val}%</div></div>`}).join('');
+      document.getElementById('issueList').innerHTML = delayed.slice(0,4).map(([i,t],idx)=>`<div class="issue"><span class="issue-dot ${idx>1?'amber':''}"></span><div><strong>${i.def.name}</strong><small>${t==='schematic'?'Schematic Planned':'Layout Plan finish'} · ${ownerFor(i,t)}</small></div><time>+${Math.max(1,daysBetween(i.actual?parseDate(i.actual):TODAY,parseDate(i.planned)))}d</time></div>`).join('');
+      document.getElementById('delayBadge').textContent = delayed.length;
+    }
+
+    function renderDelay() {
+      const records = [...schematic.map(i=>[i,'schematic']),...layout.map(i=>[i,'layout'])]
+        .filter(([i,t])=>stateFor(i,t)==='delay')
+        .map(([i,t])=>({i,t,days:Math.max(1,daysBetween(i.actual?parseDate(i.actual):TODAY,parseDate(i.planned)))}))
+        .sort((a,b)=>b.days-a.days);
+      document.getElementById('delayTotal').textContent = records.length;
+      document.getElementById('delayBody').innerHTML = records.map(({i,t,days})=>`<tr><td><strong>${i.def.name}</strong></td><td>${t==='schematic'?'Schematic':'Layout'}</td><td>${ownerFor(i,t)}</td><td>${t==='schematic'?'Planned release':'Plan finish'} · ${i.planned}</td><td>${i.actual || 'Today · 2026-08-25'}</td><td class="date late">+${days} days</td><td><span class="status delay">Delay</span></td><td><button class="btn" data-delay-id="${i.id}" data-delay-type="${t}">查看 Block</button></td></tr>`).join('');
+      document.querySelectorAll('[data-delay-id]').forEach(b=>b.addEventListener('click',()=>{currentHierarchy=b.dataset.delayType; showPage('wbs'); setHierarchy(currentHierarchy); openDrawer(data[currentHierarchy].find(i=>i.id===b.dataset.delayId));}));
+    }
+
+    const mappings = [
+      {sch:'ROW_CTRL',type:'1:N',lay:'ROW_DECODER_A + ROW_DECODER_B',basis:'前缀相似 · 待人工确认',state:'warning'},
+      {sch:'DLDO_MAIN',type:'1:1',lay:'DLDO_TOP',basis:'Reference project + Owner',state:'warning'},
+      {sch:'MBIST_CTRL',type:'—',lay:'未找到对应实例',basis:'名称无匹配',state:'invalid'}
+    ];
+    function renderMappings() {
+      document.getElementById('mappingBody').innerHTML = mappings.length ? mappings.map((m,i)=>`<tr><td><strong>${m.sch}</strong></td><td class="mapping-type">${m.type}</td><td>${m.lay}</td><td>${m.basis}</td><td><span class="status ${m.state}">${m.state==='invalid'?'Unmatched':'Review'}</span></td><td><button class="btn" data-resolve="${i}">确认映射</button></td></tr>`).join('') : `<tr><td colspan="6"><div class="empty"><strong>全部例外已处理</strong>新导入数据时会重新检查</div></td></tr>`;
+      document.getElementById('mappingPending').textContent = mappings.length;
+      document.getElementById('mappingBadge').textContent = mappings.length;
+      document.querySelectorAll('[data-resolve]').forEach(b=>b.addEventListener('click',()=>{mappings.splice(Number(b.dataset.resolve),1); renderMappings(); showToast('Mapping 已人工确认');}));
+    }
+
+    function setHierarchy(type) {
+      currentHierarchy = type;
+      document.querySelectorAll('[data-hierarchy]').forEach(b=>b.classList.toggle('active',b.dataset.hierarchy===type));
+      document.getElementById('categoryFilter').disabled = type === 'spf';
+      renderWbs();
+    }
+    function showPage(name) {
+      document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===name+'Page'));
+      document.querySelectorAll('.nav button[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===name));
+      if(name==='dashboard') renderDashboard(); if(name==='delay') renderDelay(); if(name==='mapping') renderMappings();
+    }
+    function closeDrawer() { document.getElementById('drawerBackdrop').classList.remove('open'); document.getElementById('detailDrawer').classList.remove('open'); selectedItem=null; renderWbs(); }
+    let toastTimer;
+    function showToast(message) { const t=document.getElementById('toast'); t.textContent=message; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2200); }
+
+    document.querySelectorAll('.nav button[data-page]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
+    document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.go)));
+    document.querySelectorAll('[data-hierarchy]').forEach(b=>b.addEventListener('click',()=>setHierarchy(b.dataset.hierarchy)));
+    document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{currentView=b.dataset.view;document.querySelectorAll('[data-view]').forEach(x=>x.classList.toggle('active',x===b));renderWbs();}));
+    ['searchInput','statusFilter','categoryFilter'].forEach(id=>document.getElementById(id).addEventListener(id==='searchInput'?'input':'change',renderWbs));
+    document.getElementById('drawerClose').addEventListener('click',closeDrawer);
+    document.getElementById('drawerBackdrop').addEventListener('click',closeDrawer);
+    document.querySelectorAll('[data-close-modal]').forEach(b=>b.addEventListener('click',()=>document.getElementById('rescheduleModal').classList.remove('open')));
+    document.getElementById('saveReschedule').addEventListener('click',()=>{
+      const next=document.getElementById('newDate').value, reason=document.getElementById('changeReason').value.trim();
+      if(!next || !reason) return showToast('新的日期和改期原因均为必填');
+      const item=selectedItem, from=item.changed||item.planned;
+      detailState.schematic[item.def.id] ||= {history:[]};
+      detailState.schematic[item.def.id].history.unshift({at:'2026-08-25',from,to:next,reason,editor:'Lin Q.'});
+      item.changed=next; document.getElementById('rescheduleModal').classList.remove('open'); showToast('改期已追加，Delay 仍比较原始 Planned'); openDrawer(item);
+    });
+    document.getElementById('collapseAll').addEventListener('click',()=>{data[currentHierarchy].forEach(i=>i.expanded=false);renderWbs();showToast('Hierarchy 已折叠到顶层');});
+    document.getElementById('exportBtn').addEventListener('click',()=>showToast('原型演示：已生成当前 hierarchy 导出任务'));
+    document.getElementById('refreshDashboard').addEventListener('click',()=>{renderDashboard();showToast('状态已按最新 check 和日期重新计算');});
+    document.getElementById('projectSelect').addEventListener('change',e=>showToast(`已切换到 ${e.target.value}`));
+    document.getElementById('delaySort').addEventListener('click',()=>{renderDelay();showToast('已按延误天数从高到低排序');});
+    document.getElementById('resolveAll').addEventListener('click',()=>{for(let i=mappings.length-1;i>=0;i--){if(mappings[i].state!=='invalid')mappings.splice(i,1);}renderMappings();showToast('已确认自动建议；Unmatched 保留人工处理');});
+    document.getElementById('todayLabel').textContent = '2026-08-25 · Project week 34';
+
+    renderWbs(); renderDashboard(); renderDelay(); renderMappings();
+  </script>
+</body>
+</html>
