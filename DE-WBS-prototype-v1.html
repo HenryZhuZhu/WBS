@@ -150,7 +150,15 @@
     .search input { width: 100%; height: 32px; border: 1px solid var(--line-strong); border-radius: 5px; padding: 0 10px 0 31px; background: white; }
     .search span { position: absolute; left: 10px; top: 6px; color: var(--text-3); }
     .toolbar select { height: 32px; border: 1px solid var(--line-strong); border-radius: 5px; background: white; padding: 0 28px 0 9px; color: var(--text-2); }
-    .toolbar-meta { margin-left: auto; color: var(--text-3); font-size: 12px; }
+    .toolbar-meta { color: var(--text-3); font-size: 12px; }
+    .structure-change-button { margin-left: auto; max-width: 340px; height: 34px; padding: 0 9px; border: 1px solid var(--line-strong); border-radius: 5px; background: white; color: var(--text); display: grid; grid-template-columns: 18px 1fr auto; align-items: center; gap: 7px; text-align: left; }
+    .structure-change-button:hover, .structure-change-button.open { border-color: #8fb6e9; background: #f6f9ff; }
+    .structure-change-button svg { width: 16px; height: 16px; stroke: var(--blue); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .structure-change-copy { min-width: 0; }
+    .structure-change-copy small, .structure-change-copy strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .structure-change-copy small { color: var(--text-3); font-size: 9px; }
+    .structure-change-copy strong { font-size: 10px; }
+    .structure-change-count { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--blue-soft); color: var(--blue); display: grid; place-items: center; font-size: 9px; font-weight: 800; }
     .cell-select, .cell-input { height: 30px; min-width: 112px; border: 1px solid transparent; border-radius: 5px; background: transparent; color: var(--text); padding: 0 24px 0 7px; font-size: 11px; }
     .cell-select:hover, .cell-input:hover, .cell-select:focus, .cell-input:focus { border-color: var(--line-strong); background: white; }
     .editable-cell { min-width: 112px; min-height: 34px; display: flex; align-items: center; }
@@ -198,6 +206,10 @@
     .block-cell { display: flex; align-items: center; min-width: 230px; }
     .block-main { display: grid; min-width: 0; }
     .block-title-line { display: flex; align-items: center; gap: 5px; }
+    .row-delete { width: 26px; height: 26px; margin-left: 3px; padding: 0; border: 1px solid transparent; border-radius: 4px; background: transparent; color: var(--text-3); display: grid; place-items: center; opacity: .2; }
+    tbody tr:hover .row-delete, .row-delete:focus-visible { opacity: 1; }
+    .row-delete:hover { color: var(--red); border-color: #efb7b4; background: var(--red-soft); }
+    .row-delete svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     .tree-toggle { width: 22px; height: 22px; border: 0; background: transparent; color: var(--text-3); padding: 0; }
     .tree-toggle.hidden { visibility: hidden; }
     .block-name { font-weight: 700; color: #233244; cursor: pointer; }
@@ -218,10 +230,45 @@
     .owner-cell { display: flex; align-items: center; gap: 7px; }
     .owner-dot { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: #edf2f7; color: #435366; font-size: 10px; font-weight: 800; }
     .date.late { color: var(--red); font-weight: 700; }
-    .date.changed { color: var(--amber); font-weight: 700; }
-    .check-dots { display: flex; gap: 3px; }
-    .check-dot { width: 14px; height: 14px; border-radius: 3px; background: #e7ebef; color: transparent; display: grid; place-items: center; font-size: 9px; }
-    .check-dot.on { color: white; background: var(--green); }
+    .check-dots { display: flex; gap: 4px; }
+    .check-dot { width: 16px; height: 16px; padding: 0; border: 1px solid #c8d0d8; border-radius: 3px; background: white; color: transparent; display: grid; place-items: center; font-size: 10px; line-height: 1; }
+    .check-dot:hover { border-color: var(--green); background: var(--green-soft); }
+    .check-dot.on { color: white; border-color: var(--green); background: var(--green); }
+
+    th.change-column, td.change-column { position: sticky; right: 0; z-index: 4; width: 300px; min-width: 300px; border-left: 1px solid var(--line); box-shadow: -7px 0 13px rgba(26, 39, 52, .04); }
+    th.change-column { z-index: 6; background: #f3f7fb; }
+    td.change-column { padding: 4px 7px; background: #fbfdff; }
+    tbody tr:hover td.change-column { background: #f4f9ff; }
+    .latest-change { width: 100%; min-height: 40px; padding: 4px 6px; border: 1px solid transparent; border-radius: 5px; background: transparent; color: var(--text); text-align: left; display: grid; grid-template-columns: 25px 1fr 12px; gap: 7px; align-items: center; }
+    .latest-change:hover, .latest-change.open { border-color: #bdd3ef; background: white; }
+    .change-avatar { width: 24px; height: 24px; border-radius: 50%; background: #dce8f5; color: #29455e; display: grid; place-items: center; font-size: 9px; font-weight: 800; }
+    .latest-change-main { min-width: 0; }
+    .latest-change-top { display: flex; align-items: baseline; gap: 5px; min-width: 0; }
+    .latest-change-top strong { font-size: 10px; flex: 0 0 auto; }
+    .latest-change-top span { min-width: 0; overflow: hidden; text-overflow: ellipsis; color: #405269; font-size: 10px; font-weight: 700; }
+    .latest-change-value { margin-top: 1px; overflow: hidden; text-overflow: ellipsis; color: var(--text-3); font-size: 9px; }
+    .empty-change { color: var(--text-3); font-size: 10px; padding-left: 7px; }
+    .change-chevron { color: var(--text-3); font-size: 13px; }
+
+    .change-popover { position: fixed; z-index: 70; width: 420px; max-height: 430px; display: none; overflow: hidden; border: 1px solid #c7d2dd; border-radius: 7px; background: white; box-shadow: var(--shadow); }
+    .change-popover.open { display: block; animation: enter .14s ease-out; }
+    .change-popover-head { min-height: 50px; padding: 8px 12px; border-bottom: 1px solid var(--line); display: flex; align-items: center; }
+    .change-popover-head strong { display: block; }
+    .change-popover-head small { color: var(--text-3); }
+    .change-popover-close { margin-left: auto; width: 30px; height: 30px; border: 0; border-radius: 4px; background: transparent; color: var(--text-2); font-size: 19px; }
+    .change-popover-close:hover { background: #eef2f6; color: var(--text); }
+    .change-popover-list { max-height: 360px; overflow: auto; padding: 3px 12px 10px; }
+    .change-record { display: grid; grid-template-columns: 30px 1fr; gap: 9px; padding: 11px 0; border-bottom: 1px solid #edf0f3; }
+    .change-record:last-child { border-bottom: 0; }
+    .change-record .change-avatar { width: 28px; height: 28px; }
+    .change-record-meta { display: flex; align-items: baseline; gap: 6px; }
+    .change-record-meta strong { font-size: 11px; }
+    .change-record-meta span { color: var(--text-3); font-size: 9px; }
+    .change-record-field { margin-top: 4px; font-weight: 800; }
+    .change-record-values { margin-top: 2px; color: var(--text-2); font-size: 10px; white-space: normal; }
+    .change-record-old { color: #8d4c4c; }
+    .change-record-new { color: var(--green); font-weight: 800; }
+    .change-record-effect { margin-top: 5px; padding: 5px 7px; border-radius: 4px; color: #315979; background: var(--blue-soft); font-size: 9px; }
 
     .flat-view .tree-toggle { display: none; }
     .flat-view .block-cell { padding-left: 0 !important; }
@@ -250,24 +297,11 @@
     .check-item input { width: 16px; height: 16px; accent-color: var(--green); }
     .check-item span { flex: 1; font-weight: 600; }
     .check-item small { color: var(--text-3); }
-    .date-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+    .date-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 9px; }
     .date-box { border-left: 3px solid var(--line-strong); background: var(--surface-alt); padding: 8px 9px; }
-    .date-box.changed-box { border-color: var(--amber); }
     .date-box.actual-box { border-color: var(--green); }
     .date-box small { display: block; color: var(--text-3); }
     .date-box strong { font-size: 12px; }
-    .history { margin-top: 12px; }
-    .history-item { display: grid; grid-template-columns: 88px 1fr; gap: 10px; padding: 8px 0; border-bottom: 1px dashed var(--line); }
-    .history-item:last-child { border-bottom: 0; }
-    .history-item time { color: var(--text-3); font-size: 11px; }
-    .history-item strong { display: block; font-size: 12px; }
-    .history-item p { margin: 2px 0; color: var(--text-2); font-size: 11px; white-space: normal; }
-    .history-item small { color: var(--text-3); }
-    .validation-grid { display: grid; grid-template-columns: 1fr auto; gap: 7px 10px; align-items: center; }
-    .validation-item { border: 1px solid var(--line); border-radius: 5px; padding: 8px; }
-    .validation-item label { color: var(--text-3); font-size: 10px; display: block; }
-    .validation-item strong { font-size: 12px; }
-    .recommendation { margin-top: 10px; padding: 9px 10px; background: #fff8e9; border-left: 3px solid var(--amber); color: #684b1b; font-size: 11px; }
     .relation-overview { display: flex; align-items: center; justify-content: space-between; padding: 9px 10px; background: var(--cyan-soft); border-radius: 5px; margin-bottom: 10px; }
     .relation-overview strong { color: var(--cyan); }
     .relation-group { display: grid; grid-template-columns: 88px 1fr; gap: 10px; padding: 8px 0; border-bottom: 1px solid #edf0f3; }
@@ -384,6 +418,11 @@
             <div class="search"><span>⌕</span><input id="searchInput" placeholder="搜索 Block、Owner 或 Reference project"></div>
             <select id="statusFilter"><option value="all">全部状态</option><option value="delay">Delay</option><option value="ongoing">Ongoing</option><option value="done">Done</option><option value="not-started">Not started</option></select>
             <select id="categoryFilter"><option value="all">全部 Block Category</option><option>DFT</option><option>Analog</option><option>Fuse</option><option>Data path</option><option>DqByte</option><option>Banklogic</option><option>Xdec+Ydec</option><option>Row+Refresh+RHR</option><option>IO</option><option>Controller</option><option>DLDO</option><option value="">空</option></select>
+            <select id="modifierFilter" aria-label="按修改人筛选"><option value="all">全部修改人</option></select>
+            <button class="structure-change-button" id="structureChangeButton" aria-expanded="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l3 2"></path></svg>
+              <span class="structure-change-copy"><small>最近结构变更</small><strong id="structureChangeLatest"></strong></span><span class="structure-change-count" id="structureChangeCount"></span>
+            </button>
             <span class="toolbar-meta" id="resultMeta"></span>
           </div>
           <div class="dataset-summary" id="datasetSummary"></div>
@@ -415,17 +454,10 @@
     <div class="drawer-body" id="drawerBody"></div>
   </aside>
 
-  <div class="modal-backdrop" id="rescheduleModal">
-    <div class="modal">
-      <div class="modal-head"><h3>新增 Schematic 改期记录</h3><button class="drawer-close" data-close-modal>×</button></div>
-      <div class="modal-body">
-        <div class="field"><label>前一版日期</label><input id="oldDate" disabled></div>
-        <div class="field"><label>新的 Changed release date</label><input id="newDate" type="date"></div>
-        <div class="field"><label>改期原因（必填）</label><textarea id="changeReason" placeholder="说明依赖变化、设计调整或资源原因"></textarea></div>
-      </div>
-      <div class="modal-foot"><button class="btn" data-close-modal>取消</button><button class="btn primary" id="saveReschedule">保存并追加历史</button></div>
-    </div>
-  </div>
+  <aside class="change-popover" id="changePopover" role="dialog" aria-label="修改记录">
+    <div class="change-popover-head"><div><strong id="changePopoverTitle"></strong><small id="changePopoverSubtitle"></small></div><button class="change-popover-close" id="changePopoverClose" aria-label="关闭">×</button></div>
+    <div class="change-popover-list" id="changePopoverList"></div>
+  </aside>
 
   <div class="modal-backdrop" id="addInstanceModal">
     <div class="modal">
@@ -443,7 +475,6 @@
   <datalist id="referenceProjects"><option value="空"></option><option value="DPJQC"></option><option value="DPKRC"></option><option value="DPLSA"></option><option value="DPMXB"></option><option value="DPNQC"></option><option value="DPQTA"></option></datalist>
   <datalist id="schematicOwners"><option value="" label="空"></option><option value="Ming Zhao"></option><option value="Han Li"></option><option value="Qin Yang"></option><option value="Ivy Xu"></option><option value="Kai Ding"></option><option value="Rui Jiang"></option></datalist>
   <datalist id="layoutOwners"><option value="" label="空"></option><option value="Tao He"></option><option value="Nina Gao"></option><option value="Eric Lin"></option><option value="Sora Pan"></option><option value="Wei Chen"></option></datalist>
-  <datalist id="spfOwners"><option value="" label="空"></option><option value="Jia Wu"></option><option value="Bo Chen"></option><option value="Lena Gu"></option><option value="David Qian"></option></datalist>
 
   <div class="toast" id="toast"></div>
 
@@ -460,49 +491,56 @@
       spf: { owner: 'SPF Owner', date: 'Planned SPF release', actual: 'Actual SPF release' }
     };
     const blockCategories = ['', 'DFT', 'Analog', 'Fuse', 'Data path', 'DqByte', 'Banklogic', 'Xdec+Ydec', 'Row+Refresh+RHR', 'IO', 'Controller', 'DLDO'];
-    const checkStatuses = ['Done', 'Ongoing', 'Delay', 'Not started'];
     const progressStatuses = ['On schedule', 'Delay'];
+    const changeActors = {
+      lin: { name:'Lin Q.', role:'Process Leader', initials:'LQ' },
+      qin: { name:'Qin Yang', role:'Schematic Owner', initials:'QY' },
+      eric: { name:'Eric Lin', role:'Layout Owner', initials:'EL' },
+      nina: { name:'Nina Gao', role:'Layout Owner', initials:'NG' },
+      han: { name:'Han Li', role:'Schematic Owner', initials:'HL' }
+    };
+    const currentActorId = 'lin';
 
     const common = {
-      top: { id:'top', name:'CE_TOP', category:'Controller', reference:'DPJQC', blockOwner:'Yan Sun', schematicOwner:'Ming Zhao', layoutOwner:'Tao He', spfOwner:'Jia Wu' },
-      core: { id:'core', name:'CORE_ARRAY', category:'Banklogic', reference:'DPKRC', blockOwner:'Lei Wang', schematicOwner:'Han Li', layoutOwner:'Nina Gao', spfOwner:'Bo Chen' },
-      row: { id:'row', name:'ROW_CTRL', category:'Row+Refresh+RHR', reference:'DPLSA', blockOwner:'Lei Wang', schematicOwner:'Qin Yang', layoutOwner:'Eric Lin', spfOwner:'Bo Chen' },
-      sense: { id:'sense', name:'SENSE_AMP', category:'Analog', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Ming Zhao', layoutOwner:'Nina Gao', spfOwner:'Jia Wu' },
-      bitcell: { id:'bitcell', name:'BITCELL', category:'Data path', reference:'DPNQC', blockOwner:'Ming Zhao', schematicOwner:'Han Li', layoutOwner:'Tao He', spfOwner:'Jia Wu' },
-      io: { id:'io', name:'IO_RING', category:'IO', reference:'', blockOwner:'Yan Sun', schematicOwner:'Ivy Xu', layoutOwner:'Eric Lin', spfOwner:'Bo Chen' },
-      dft: { id:'dft', name:'MBIST_CTRL', category:'DFT', reference:'DPQTA', blockOwner:'Kai Ding', schematicOwner:'Kai Ding', layoutOwner:'Sora Pan', spfOwner:'Jia Wu' },
-      pwr: { id:'pwr', name:'DLDO_MAIN', category:'DLDO', reference:'DPMXB', blockOwner:'Rui Jiang', schematicOwner:'Rui Jiang', layoutOwner:'Tao He', spfOwner:'Bo Chen' }
+      top: { id:'top', name:'CE_TOP', category:'Controller', reference:'DPJQC', blockOwner:'Yan Sun', schematicOwner:'Ming Zhao', layoutOwner:'Tao He' },
+      core: { id:'core', name:'CORE_ARRAY', category:'Banklogic', reference:'DPKRC', blockOwner:'Lei Wang', schematicOwner:'Han Li', layoutOwner:'Nina Gao' },
+      row: { id:'row', name:'ROW_CTRL', category:'Row+Refresh+RHR', reference:'DPLSA', blockOwner:'Lei Wang', schematicOwner:'Qin Yang', layoutOwner:'Eric Lin' },
+      sense: { id:'sense', name:'SENSE_AMP', category:'Analog', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Ming Zhao', layoutOwner:'Nina Gao' },
+      bitcell: { id:'bitcell', name:'BITCELL', category:'Data path', reference:'DPNQC', blockOwner:'Ming Zhao', schematicOwner:'Han Li', layoutOwner:'Tao He' },
+      io: { id:'io', name:'IO_RING', category:'IO', reference:'', blockOwner:'Yan Sun', schematicOwner:'Ivy Xu', layoutOwner:'Eric Lin' },
+      dft: { id:'dft', name:'MBIST_CTRL', category:'DFT', reference:'DPQTA', blockOwner:'Kai Ding', schematicOwner:'Kai Ding', layoutOwner:'Sora Pan' },
+      pwr: { id:'pwr', name:'DLDO_MAIN', category:'DLDO', reference:'DPMXB', blockOwner:'Rui Jiang', schematicOwner:'Rui Jiang', layoutOwner:'Tao He' }
     };
 
     const schematic = [
-      row('sch-top', common.top, null, 1, [1,1,1,1,0], '2026-08-18', '2026-08-29', '', true),
-      row('sch-core', common.core, 'sch-top', 2, [1,1,1,1,1], '2026-08-12', '2026-08-14', '2026-08-14'),
-      row('sch-row', common.row, 'sch-core', 3, [1,1,1,0,0], '2026-08-22', '2026-08-30', ''),
-      row('sch-sense', common.sense, 'sch-core', 3, [1,1,1,1,1], '2026-08-20', '2026-08-20', '2026-08-19'),
-      row('sch-bit-a', common.bitcell, 'sch-core', 4, [1,1,1,1,1], '2026-08-08', '2026-08-08', '2026-08-07', false, 'A'),
-      row('sch-bit-b', common.bitcell, 'sch-core', 4, [1,1,1,1,1], '2026-08-08', '2026-08-08', '2026-08-07', false, 'B'),
-      row('sch-io', common.io, 'sch-top', 2, [1,1,0,0,0], '2026-09-02', '2026-09-02', ''),
-      row('sch-dft', common.dft, 'sch-top', 2, [0,0,0,0,0], '2026-09-08', '2026-09-08', ''),
-      row('sch-pwr', common.pwr, 'sch-top', 2, [1,1,1,1,0], '2026-08-24', '2026-08-28', '')
+      row('sch-top', common.top, null, 1, [1,1,1,1,0], '2026-08-18', '', true),
+      row('sch-core', common.core, 'sch-top', 2, [1,1,1,1,1], '2026-08-12', '2026-08-14'),
+      row('sch-row', common.row, 'sch-core', 3, [1,1,1,0,0], '2026-08-22', ''),
+      row('sch-sense', common.sense, 'sch-core', 3, [1,1,1,1,1], '2026-08-20', '2026-08-19'),
+      row('sch-bit-a', common.bitcell, 'sch-core', 4, [1,1,1,1,1], '2026-08-08', '2026-08-07', false, 'A'),
+      row('sch-bit-b', common.bitcell, 'sch-core', 4, [1,1,1,1,1], '2026-08-08', '2026-08-07', false, 'B'),
+      row('sch-io', common.io, 'sch-top', 2, [1,1,0,0,0], '2026-09-02', ''),
+      row('sch-dft', common.dft, 'sch-top', 2, [0,0,0,0,0], '2026-09-08', ''),
+      row('sch-pwr', common.pwr, 'sch-top', 2, [1,1,1,1,0], '2026-08-24', '')
     ];
     const layout = [
-      row('lay-top', common.top, null, 1, [1,1,0,0], '2026-09-18', '2026-09-20', '', true),
-      row('lay-core', common.core, 'lay-top', 2, [1,1,1,0], '2026-09-05', '', '', true),
-      row('lay-bit-a', common.bitcell, 'lay-core', 3, [1,1,1,1], '2026-08-15', '', '2026-08-17', false, 'A'),
-      row('lay-bit-b', common.bitcell, 'lay-core', 3, [1,1,1,1], '2026-08-15', '', '2026-08-17', false, 'B'),
-      row('lay-sense', common.sense, 'lay-core', 3, [1,1,1,1], '2026-08-21', '', '2026-08-21'),
-      row('lay-row', common.row, 'lay-core', 3, [1,1,0,0], '2026-08-23', '2026-08-27', ''),
-      row('lay-io', common.io, 'lay-top', 2, [1,0,0,0], '2026-09-10', '', ''),
-      row('lay-dft', common.dft, 'lay-top', 2, [0,0,0,0], '2026-09-16', '', ''),
-      row('lay-pwr', common.pwr, 'lay-top', 2, [1,1,1,0], '2026-08-30', '2026-09-02', '', true)
+      row('lay-top', common.top, null, 1, [1,1,0,0], '2026-09-18', '', true),
+      row('lay-core', common.core, 'lay-top', 2, [1,1,1,0], '2026-09-05', '', true),
+      row('lay-bit-a', common.bitcell, 'lay-core', 3, [1,1,1,1], '2026-08-15', '2026-08-17', false, 'A'),
+      row('lay-bit-b', common.bitcell, 'lay-core', 3, [1,1,1,1], '2026-08-15', '2026-08-17', false, 'B'),
+      row('lay-sense', common.sense, 'lay-core', 3, [1,1,1,1], '2026-08-21', '2026-08-21'),
+      row('lay-row', common.row, 'lay-core', 3, [1,1,0,0], '2026-08-23', ''),
+      row('lay-io', common.io, 'lay-top', 2, [1,0,0,0], '2026-09-10', ''),
+      row('lay-dft', common.dft, 'lay-top', 2, [0,0,0,0], '2026-09-16', ''),
+      row('lay-pwr', common.pwr, 'lay-top', 2, [1,1,1,0], '2026-08-30', '', true)
     ];
     const spf = [
-      row('spf-top', common.top, null, 1, [1,1,0,0], '2026-09-25', '', '', true),
-      row('spf-core', common.core, 'spf-top', 2, [1,1,1,1], '2026-09-12', '', '2026-09-11'),
-      row('spf-array', common.bitcell, 'spf-core', 3, [1,1,1,0], '2026-09-06', '', ''),
-      row('spf-peri', common.sense, 'spf-core', 3, [1,0,0,0], '2026-09-08', '', ''),
-      row('spf-io', common.io, 'spf-top', 2, [0,0,0,0], '2026-09-18', '', ''),
-      row('spf-pwr', common.pwr, 'spf-top', 2, [1,1,1,1], '2026-09-03', '', '')
+      row('spf-top', common.top, null, 1, [1,1,0,0], '2026-09-25', '', true),
+      row('spf-core', common.core, 'spf-top', 2, [1,1,1,1], '2026-09-12', '2026-09-11'),
+      row('spf-array', common.bitcell, 'spf-core', 3, [1,1,1,0], '2026-09-06', ''),
+      row('spf-peri', common.sense, 'spf-core', 3, [1,0,0,0], '2026-09-08', ''),
+      row('spf-io', common.io, 'spf-top', 2, [0,0,0,0], '2026-09-18', ''),
+      row('spf-pwr', common.pwr, 'spf-top', 2, [1,1,1,1], '2026-09-03', '')
     ];
     const data = { schematic, layout, spf };
     const railState = { schematic:{}, layout:{}, spf:{} };
@@ -512,7 +550,6 @@
       railState[type][instance.def.id] ||= {
         checks: normalizedChecks,
         planned: instance.planned,
-        changed: instance.changed,
         actual: instance.actual,
         startDate: type === 'layout' ? ({top:'2026-08-28',core:'2026-08-18',bitcell:'2026-08-04',sense:'2026-08-08',row:'2026-08-11',io:'2026-08-25',dft:'2026-09-01',pwr:'2026-08-20'}[instance.def.id] || '') : '',
         planWorkdays: type === 'layout' ? ({top:'15',core:'12',bitcell:'8',sense:'9',row:'10',io:'14',dft:'11',pwr:'7'}[instance.def.id] || '') : '',
@@ -525,24 +562,41 @@
       };
     }));
     const detailState = {
-      schematic: {
-        top: { history:[{at:'2026-08-19', from:'2026-08-26', to:'2026-08-29', reason:'Fullchip interface review 增加一轮', editor:'Ming Z.'},{at:'2026-08-12', from:'2026-08-22', to:'2026-08-26', reason:'上层 power spec 调整', editor:'Ming Z.'}] },
-        row: { history:[{at:'2026-08-21', from:'2026-08-22', to:'2026-08-30', reason:'Refresh logic verification 追加 corner', editor:'Qin Y.'}] },
-        pwr: { history:[{at:'2026-08-23', from:'2026-08-24', to:'2026-08-28', reason:'Reference project 数据补充确认', editor:'Rui J.'}] }
-      },
       spf: {
-        top: { lvsPath:'/proj/ce/lvs/top/run_0824', cdl:'/proj/ce/cdl/CE_TOP.cdl', gds:'/proj/ce/gds/CE_TOP_0824.gds', machine:'valid', human:false, round:'1st SPF' },
-        core: { lvsPath:'/proj/ce/lvs/core/run_0819', cdl:'/proj/ce/cdl/CORE_ARRAY.cdl', gds:'/proj/ce/gds/CORE_ARRAY.gds', machine:'valid', human:true, round:'3rd SPF' },
-        bitcell: { lvsPath:'/proj/ce/lvs/array/latest', cdl:'/proj/ce/cdl/BITCELL_ARRAY.cdl', gds:'', machine:'invalid', human:false, round:'1st SPF' },
-        sense: { lvsPath:'/proj/ce/lvs/peri/run_0821', cdl:'/proj/ce/cdl/SENSE_AMP.cdl', gds:'/proj/ce/gds/SENSE_AMP.gds', machine:'pending', human:false, round:'1st SPF' },
-        io: { lvsPath:'', cdl:'/proj/ce/cdl/IO_RING.cdl', gds:'', machine:'invalid', human:false, round:'Not started' },
-        pwr: { lvsPath:'/proj/ce/lvs/dldo/run_0820', cdl:'/proj/ce/cdl/DLDO_MAIN.cdl', gds:'/proj/ce/gds/DLDO_MAIN.gds', machine:'valid', human:true, round:'2nd SPF' }
+        top: { lvsPath:'/proj/ce/lvs/top/run_0824', cdl:'/proj/ce/cdl/CE_TOP.cdl', gds:'/proj/ce/gds/CE_TOP_0824.gds', round:'2nd SPF' },
+        core: { lvsPath:'/proj/ce/lvs/core/run_0819', cdl:'/proj/ce/cdl/CORE_ARRAY.cdl', gds:'/proj/ce/gds/CORE_ARRAY.gds', round:'3rd SPF' },
+        bitcell: { lvsPath:'/proj/ce/lvs/array/latest', cdl:'/proj/ce/cdl/BITCELL_ARRAY.cdl', gds:'', round:'1st SPF' },
+        sense: { lvsPath:'/proj/ce/lvs/peri/run_0821', cdl:'/proj/ce/cdl/SENSE_AMP.cdl', gds:'/proj/ce/gds/SENSE_AMP.gds', round:'1st SPF' },
+        io: { lvsPath:'', cdl:'/proj/ce/cdl/IO_RING.cdl', gds:'', round:'Not started' },
+        pwr: { lvsPath:'/proj/ce/lvs/dldo/run_0820', cdl:'/proj/ce/cdl/DLDO_MAIN.cdl', gds:'/proj/ce/gds/DLDO_MAIN.gds', round:'2nd SPF' }
       }
     };
+    const changeHistory = {
+      schematic: {
+        top: [changeEvent('qin','Progress','On schedule','Delay','2026-08-26 10:32')],
+        core: [changeEvent('han','CN marker','未完成','完成','2026-08-26 09:58')],
+        row: [changeEvent('qin','Fanout','未完成','完成','2026-08-26 09:14')]
+      },
+      layout: {
+        top: [changeEvent('lin','Plan finish','2026-09-15','2026-09-18','2026-08-26 10:18')],
+        core: [changeEvent('nina','Resource','1','1.5','2026-08-25 15:28')]
+      },
+      spf: {
+        top: [changeEvent('eric','SPF round','1st SPF','2nd SPF','2026-08-26 10:06')],
+        core: [changeEvent('nina','LRC','未完成','完成','2026-08-26 09:38')]
+      }
+    };
+    const structureChanges = {
+      schematic: [changeEvent('lin','删除 Block / Instance','LEGACY_CTRL · sch-legacy · T3','已删除','2026-08-26 08:35')],
+      layout: [changeEvent('nina','移动 Instance','SENSE_AMP · T2','SENSE_AMP · T3','2026-08-26 09:02')],
+      spf: [changeEvent('eric','新增 Block / Instance','不存在','SENSE_AMP · spf-peri · T3','2026-08-25 15:16')]
+    };
+    const backupState = {};
 
-    function row(id, def, parent, tier, checks, planned, changed, actual, tierTop=false, instance='') {
-      return { id, def, parent, tier, checks, planned, changed, actual, tierTop, instance, expanded:true };
+    function row(id, def, parent, tier, checks, planned, actual, tierTop=false, instance='') {
+      return { id, def, parent, tier, checks, planned, actual, tierTop, instance, expanded:true };
     }
+    function changeEvent(actor, field, oldValue, newValue, time, effect='') { return {actor,field,oldValue,newValue,time,effect}; }
     function parseDate(value) { return value ? new Date(value + 'T12:00:00') : null; }
     function daysBetween(a, b) { return Math.ceil((a - b) / 86400000); }
     function railFor(item, type) { return railState[type][item.def.id]; }
@@ -551,22 +605,22 @@
     function layoutQualifiedStatus(item) { return railFor(item, 'layout').checks.every(Boolean) ? 'Done' : 'Ongoing'; }
     function spfReadyStatus(item) { return railFor(item, 'spf').checks.every(Boolean) ? 'Done' : 'Ongoing'; }
     function spfInfoFor(item) {
-      return detailState.spf[item.def.id] ||= {lvsPath:'',cdl:'',gds:'',machine:'pending',human:false,round:''};
+      return detailState.spf[item.def.id] ||= {lvsPath:'',cdl:'',gds:'',round:''};
     }
     function optionsHtml(options, selected) { return options.map(value => `<option value="${esc(value)}" ${value === selected ? 'selected' : ''}>${value || '空'}</option>`).join(''); }
     function statusClass(value) { return value.toLowerCase().replaceAll(' ', '-'); }
     function dateEditorCell(field, value, extraClass='') {
-      return `<td class="${extraClass}"><div class="editable-cell"><div class="cell-display">${value ? esc(value) : '—'}</div><div class="cell-editor"><input class="cell-input date-input" type="date" data-edit="${field}" value="${esc(value)}"></div></div></td>`;
+      return `<td class="${extraClass}"><div class="editable-cell"><div class="cell-display ${value ? '' : 'empty'}">${value ? esc(value) : ''}</div><div class="cell-editor"><input class="cell-input date-input" type="date" data-edit="${field}" value="${esc(value)}"></div></div></td>`;
     }
     function numericEditorCell(field, value) {
       const integerOnly = field === 'planWorkdays';
-      return `<td><div class="editable-cell"><div class="cell-display ${value !== '' ? '' : 'empty'}">${value !== '' ? esc(value) : '&nbsp;'}</div><div class="cell-editor"><input class="cell-input numeric-input" type="text" inputmode="${integerOnly ? 'numeric' : 'decimal'}" data-edit="${field}" value="${esc(value)}" pattern="${integerOnly ? '-?[0-9]*' : '-?[0-9]*([.][0-9]*)?'}"></div></div></td>`;
+      return `<td><div class="editable-cell"><div class="cell-display ${value !== '' ? '' : 'empty'}">${value !== '' ? esc(value) : ''}</div><div class="cell-editor"><input class="cell-input numeric-input" type="text" inputmode="${integerOnly ? 'numeric' : 'decimal'}" data-edit="${field}" value="${esc(value)}" pattern="${integerOnly ? '-?[0-9]*' : '-?[0-9]*([.][0-9]*)?'}"></div></div></td>`;
     }
     function textEditorCell(field, value, wide=false) {
-      return `<td><div class="editable-cell ${wide ? 'wide' : ''}"><div class="cell-display ${value ? '' : 'empty'}">${value ? esc(value) : '&nbsp;'}</div><div class="cell-editor"><input class="cell-input" type="text" data-edit="${field}" value="${esc(value)}"></div></div></td>`;
+      return `<td><div class="editable-cell ${wide ? 'wide' : ''}"><div class="cell-display ${value ? '' : 'empty'}">${value ? esc(value) : ''}</div><div class="cell-editor"><input class="cell-input" type="text" data-edit="${field}" value="${esc(value)}"></div></div></td>`;
     }
     function searchableEditorCell(field, value, list, title) {
-      return `<td><div class="editable-cell wide"><div class="cell-display ${value ? '' : 'empty'}">${value ? esc(value) : '&nbsp;'}</div><div class="cell-editor choice"><input class="cell-input" data-edit="${field}" list="${list}" value="${esc(value)}" title="${esc(title)}"></div></div></td>`;
+      return `<td><div class="editable-cell wide"><div class="cell-display ${value ? '' : 'empty'}">${value ? esc(value) : ''}</div><div class="cell-editor choice"><input class="cell-input" data-edit="${field}" list="${list}" value="${esc(value)}" title="${esc(title)}"></div></div></td>`;
     }
     function stateFor(item, type) {
       const rail = railFor(item, type);
@@ -579,37 +633,65 @@
     }
     function statusText(state) { return ({done:'Done', ongoing:'Ongoing', delay:'Delay', 'not-started':'Not started', valid:'Validated', invalid:'Failed', pending:'Pending'})[state] || state; }
     function ownerFor(item, type) { return item.def[type + 'Owner']; }
-    function initials(name) { return name ? name.split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase() : '—'; }
+    function initials(name) { return name ? name.split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase() : ''; }
     function esc(value) { return String(value ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
     function unique(items) { return [...new Map(items.map(i => [i.def.id, i])).values()]; }
+    function auditValue(value) { return value === '' || value == null ? '空' : String(value); }
+    function auditNow() { return new Date().toLocaleString('sv-SE', {hour12:false}).slice(0,16); }
+    function historyFor(item, type=currentHierarchy) { return changeHistory[type][item.def.id] ||= []; }
+    function backupFor(item, type=currentHierarchy) {
+      const key = `${type}:${item.def.id}`;
+      return backupState[key] ||= {materials:`/project/ChanEdgel/${item.def.name}/materials`, comments:''};
+    }
+    function derivedCheckLabel(type) { return type === 'schematic' ? 'Overall check status' : type === 'layout' ? 'Layout qualified' : 'SPF Ready'; }
+    function derivedCheckValue(item, type) { return type === 'schematic' ? overallCheckStatus(item,type) : type === 'layout' ? layoutQualifiedStatus(item) : spfReadyStatus(item); }
+    function recordChange(item, type, field, oldValue, newValue, effect='') {
+      historyFor(item,type).unshift(changeEvent(currentActorId,field,auditValue(oldValue),auditValue(newValue),auditNow(),effect));
+    }
+    function recordDefinitionChange(item, types, field, oldValue, newValue) {
+      const change=changeEvent(currentActorId,field,auditValue(oldValue),auditValue(newValue),auditNow());
+      types.forEach(type=>{
+        if(data[type].some(instance=>instance.def.id===item.def.id)) (changeHistory[type][item.def.id] ||= []).unshift({...change});
+      });
+    }
+    function latestChangeHtml(item, type) {
+      const latest = historyFor(item,type)[0];
+      if (!latest) return '<span class="empty-change">暂无修改记录</span>';
+      const actor = changeActors[latest.actor];
+      return `<button class="latest-change" data-change-history aria-expanded="false"><span class="change-avatar">${actor.initials}</span><span class="latest-change-main"><span class="latest-change-top"><strong>${esc(actor.name)}</strong><span>· ${esc(latest.field)}</span></span><span class="latest-change-value">${esc(latest.time.slice(5))} · ${esc(latest.oldValue)} → ${esc(latest.newValue)}</span></span><span class="change-chevron">›</span></button>`;
+    }
 
     let currentHierarchy = 'schematic';
     let currentView = 'tree';
     let selectedItem = null;
+    let openChangeKey = null;
+    let openChangeButton = null;
 
     const wbsHead = document.getElementById('wbsHead');
     const wbsBody = document.getElementById('wbsBody');
     const tableWrap = document.getElementById('tableWrap');
+    const modifierFilter = document.getElementById('modifierFilter');
+    modifierFilter.innerHTML += Object.entries(changeActors).map(([id,actor])=>`<option value="${id}">${actor.name}</option>`).join('');
 
     Object.entries(data).forEach(([type, instances]) => {
       document.getElementById(type + 'Count').textContent = `${instances.length} instances`;
     });
 
     function renderWbs() {
+      closeChangePopover();
       const meta = hierarchyMeta[currentHierarchy];
       const isLayout = currentHierarchy === 'layout';
       const isSpf = currentHierarchy === 'spf';
       const layoutWorkHeaders = isLayout ? '<th>Plan workdays</th><th>Resource</th>' : '';
-      const layoutQualifiedHeader = isLayout ? '<th>Layout qualified</th>' : '';
       const startDateHeader = isLayout ? '<th>Start date</th>' : '';
-      const changedDateHeader = currentHierarchy === 'schematic' ? '<th>Changed release date</th>' : isLayout ? '<th>Changed finish</th>' : '';
       const overallHeader = currentHierarchy === 'schematic' ? '<th>Overall check status</th>' : '';
       wbsHead.innerHTML = isSpf
-        ? `<tr><th style="width:270px">Block / Instance</th><th>Schematic Owner</th><th>Layout Owner</th><th>SPF round</th><th>SPF Owner</th><th>LVS path</th><th>cdl</th><th>gds</th><th>SPF Ready</th><th>Check item</th><th>Progress</th><th>${meta.date}</th><th>${meta.actual}</th><th>Validation</th></tr>`
-        : `<tr><th style="width:270px">Block / Instance</th><th>Block Category</th><th>Reference project</th><th>${meta.owner}</th>${layoutWorkHeaders}${layoutQualifiedHeader}<th>Check item</th><th>Progress</th>${overallHeader}${startDateHeader}<th>${meta.date}</th>${changedDateHeader}<th>${meta.actual}</th></tr>`;
+        ? `<tr><th style="width:270px">Block / Instance</th><th>Schematic Owner</th><th>Layout Owner</th><th>SPF round</th><th>LVS path</th><th>cdl</th><th>gds</th><th>Check item</th><th>SPF Ready</th><th>${meta.date}</th><th>${meta.actual}</th><th class="change-column">最近修改</th></tr>`
+        : `<tr><th style="width:270px">Block / Instance</th><th>Block Category</th><th>Reference project</th><th>${meta.owner}</th>${layoutWorkHeaders}<th>Check item</th><th>Progress</th>${isLayout?'<th>Layout qualified</th>':''}${overallHeader}${startDateHeader}<th>${meta.date}</th><th>${meta.actual}</th><th class="change-column">最近修改</th></tr>`;
       const query = document.getElementById('searchInput').value.trim().toLowerCase();
       const sf = document.getElementById('statusFilter').value;
       const cf = document.getElementById('categoryFilter').value;
+      const mf = modifierFilter.value;
       const all = data[currentHierarchy];
       const visibleByTree = item => {
         if (currentView === 'flat') return true;
@@ -620,13 +702,14 @@
       const items = all.filter(item => {
         const s = stateFor(item, currentHierarchy);
         const hay = `${item.def.name} ${ownerFor(item,currentHierarchy)} ${item.def.reference}`.toLowerCase();
-        return visibleByTree(item) && (!query || hay.includes(query)) && (sf === 'all' || s === sf) && (cf === 'all' || item.def.category === cf);
+        return visibleByTree(item) && (!query || hay.includes(query)) && (sf === 'all' || s === sf) && (cf === 'all' || item.def.category === cf) && (mf === 'all' || historyFor(item,currentHierarchy).some(change=>change.actor===mf));
       });
       tableWrap.classList.toggle('flat-view', currentView === 'flat');
       wbsBody.innerHTML = items.length ? items.map(item => rowHtml(item)).join('') : `<tr><td colspan="16"><div class="empty"><strong>没有匹配的 Block</strong>调整搜索词或筛选条件</div></td></tr>`;
       document.getElementById('resultMeta').textContent = `显示 ${items.length} 个实例 · ${unique(all).length} 个 unique Block`;
       const repeatedDefinitions = [...new Set(all.filter((item,index)=>all.findIndex(x=>x.def.id===item.def.id)!==index).map(item=>item.def.id))].length;
       document.getElementById('datasetSummary').innerHTML = `<span>当前完整演示集<strong>${all.length} instances</strong></span><span>对应<strong>${unique(all).length} unique Blocks</strong></span><span>重复例化 Block<strong>${repeatedDefinitions}</strong></span><span class="relation-note">点击 Block 查看跨 hierarchy 关系</span>`;
+      updateStructureChangeSummary();
       bindWbsRows();
     }
 
@@ -638,32 +721,29 @@
       const hasChildren = data[type].some(x => x.parent === item.id);
       const levelPad = currentView === 'tree' ? (item.tier - 1) * 21 : 0;
       const late = state === 'delay';
-      const spfState = type === 'spf' ? spfInfoFor(item) : null;
-      const validation = type === 'spf' ? (spfState?.machine || 'pending') : '';
       const siblingCount = data[type].filter(x => x.def.id === item.def.id).length;
-      const categoryCell = `<div class="editable-cell"><div class="cell-display ${item.def.category ? '' : 'empty'}">${item.def.category ? esc(item.def.category) : '&nbsp;'}</div><div class="cell-editor choice"><select class="cell-select ${item.def.category ? '' : 'empty-value'}" data-edit="category" aria-label="${esc(item.def.name)} Block Category">${optionsHtml(blockCategories,item.def.category)}</select></div></div>`;
-      const ownerList = type === 'schematic' ? 'schematicOwners' : type === 'layout' ? 'layoutOwners' : 'spfOwners';
+      const categoryCell = `<div class="editable-cell"><div class="cell-display ${item.def.category ? '' : 'empty'}">${item.def.category ? esc(item.def.category) : ''}</div><div class="cell-editor choice"><select class="cell-select ${item.def.category ? '' : 'empty-value'}" data-edit="category" aria-label="${esc(item.def.name)} Block Category">${optionsHtml(blockCategories,item.def.category)}</select></div></div>`;
+      const ownerList = type === 'schematic' ? 'schematicOwners' : 'layoutOwners';
       const spfInfo = type === 'spf' ? spfInfoFor(item) : null;
       const genericIdentityCells = `<td>${categoryCell}</td>${searchableEditorCell('reference',item.def.reference,'referenceProjects','输入可模糊搜索产品；选择空后单元格留白')}${searchableEditorCell('owner',ownerFor(item,type),ownerList,'输入可模糊搜索人名；清空表示空')}`;
-      const spfIdentityCells = type === 'spf' ? `${searchableEditorCell('schematicOwner',item.def.schematicOwner,'schematicOwners','输入可模糊搜索 Schematic Owner')}${searchableEditorCell('layoutOwner',item.def.layoutOwner,'layoutOwners','输入可模糊搜索 Layout Owner')}${textEditorCell('spfRound',spfInfo.round)}${searchableEditorCell('owner',item.def.spfOwner,'spfOwners','输入可模糊搜索 SPF Owner')}${textEditorCell('lvsPath',spfInfo.lvsPath,true)}${textEditorCell('cdl',spfInfo.cdl,true)}${textEditorCell('gds',spfInfo.gds,true)}` : '';
+      const spfIdentityCells = type === 'spf' ? `${searchableEditorCell('schematicOwner',item.def.schematicOwner,'schematicOwners','输入可模糊搜索 Schematic Owner')}${searchableEditorCell('layoutOwner',item.def.layoutOwner,'layoutOwners','输入可模糊搜索 Layout Owner')}${textEditorCell('spfRound',spfInfo.round)}${textEditorCell('lvsPath',spfInfo.lvsPath,true)}${textEditorCell('cdl',spfInfo.cdl,true)}${textEditorCell('gds',spfInfo.gds,true)}` : '';
       const layoutWorkCells = type === 'layout' ? `${numericEditorCell('planWorkdays',rail.planWorkdays)}${numericEditorCell('resource',rail.resource)}` : '';
       const layoutQualifiedCell = type === 'layout' ? `<td><span class="status ${layoutQualifiedStatus(item).toLowerCase()}">${layoutQualifiedStatus(item)}</span></td>` : '';
       const spfReadyCell = type === 'spf' ? `<td><span class="status ${spfReadyStatus(item).toLowerCase()}">${spfReadyStatus(item)}</span></td>` : '';
+      const checkItemCell = `<td><div class="check-dots">${rail.checks.map((checked,index)=>`<button class="check-dot ${checked?'on':''}" data-check-index="${index}" title="${esc(checkLabels[type][index])}: ${checked?'Done':'Not done'}" aria-label="${esc(checkLabels[type][index])}" aria-pressed="${checked?'true':'false'}">${checked?'✓':''}</button>`).join('')}</div></td>`;
       const overallCell = type === 'schematic' ? `<td><span class="status ${overallCheckStatus(item,type).toLowerCase()}">${overallCheckStatus(item,type)}</span></td>` : '';
       return `<tr data-id="${item.id}" class="${selectedItem?.id === item.id ? 'selected' : ''}">
-        <td><div class="block-cell" style="padding-left:${levelPad}px"><button class="tree-toggle ${hasChildren?'':'hidden'}" title="展开/折叠">${item.expanded?'▾':'▸'}</button><div class="block-main"><div class="block-title-line"><span class="block-name">${esc(item.def.name)}</span>${siblingCount > 1 ? `<button class="instance-mark" title="当前为实例 ${esc(item.instance || item.id)}；同一 Block 在当前 hierarchy 有 ${siblingCount} 个实例。点击查看全部关系">${esc(item.instance || '实例')} · ⛓${siblingCount}</button>` : ''}<span class="tier">T${item.tier}${item.tierTop && type==='layout'?' · TOP':''}</span></div></div></div></td>
+        <td><div class="block-cell" style="padding-left:${levelPad}px"><button class="tree-toggle ${hasChildren?'':'hidden'}" title="展开/折叠">${item.expanded?'▾':'▸'}</button><div class="block-main"><div class="block-title-line"><span class="block-name">${esc(item.def.name)}</span>${siblingCount > 1 ? `<button class="instance-mark" title="当前为实例 ${esc(item.instance || item.id)}；同一 Block 在当前 hierarchy 有 ${siblingCount} 个实例。点击查看全部关系">${esc(item.instance || '实例')} · ⛓${siblingCount}</button>` : ''}<span class="tier">T${item.tier}${item.tierTop && type==='layout'?' · TOP':''}</span><button class="row-delete" data-delete-instance title="删除 ${esc(item.def.name)} Instance" aria-label="删除 ${esc(item.def.name)} Instance"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6v14H5V6"></path><path d="M10 11v5M14 11v5"></path></svg></button></div></div></div></td>
         ${type === 'spf' ? spfIdentityCells : genericIdentityCells}
         ${layoutWorkCells}
+        ${checkItemCell}
+        ${type === 'spf' ? spfReadyCell : `<td><div class="editable-cell"><div class="cell-display"><span class="status ${rail.progressStatus === 'Delay' ? 'delay' : 'done'}">${esc(rail.progressStatus)}</span></div><div class="cell-editor choice"><select class="cell-select" data-edit="progressStatus">${optionsHtml(progressStatuses,rail.progressStatus)}</select></div></div></td>`}
         ${layoutQualifiedCell}
-        ${spfReadyCell}
-        <td><div class="editable-cell"><div class="cell-display"><span class="status ${statusClass(rail.checkStatus)}">${esc(rail.checkStatus)}</span></div><div class="cell-editor choice"><select class="cell-select" data-edit="checkStatus">${optionsHtml(checkStatuses,rail.checkStatus)}</select></div></div></td>
-        <td><div class="editable-cell"><div class="cell-display"><span class="status ${rail.progressStatus === 'Delay' ? 'delay' : 'done'}">${esc(rail.progressStatus)}</span></div><div class="cell-editor choice"><select class="cell-select" data-edit="progressStatus">${optionsHtml(progressStatuses,rail.progressStatus)}</select></div></div></td>
         ${overallCell}
         ${type === 'layout' ? dateEditorCell('startDate',rail.startDate) : ''}
         ${dateEditorCell('planned',rail.planned,late?'date late':'date')}
-        ${type === 'schematic' || type === 'layout' ? dateEditorCell('changed',rail.changed,'date changed') : ''}
         ${dateEditorCell('actual',rail.actual,'date')}
-        ${type === 'spf' ? `<td><span class="status ${validation}">${statusText(validation)}</span></td>` : ''}
+        <td class="change-column">${latestChangeHtml(item,type)}</td>
       </tr>`;
     }
 
@@ -673,57 +753,130 @@
         tr.querySelector('.tree-toggle')?.addEventListener('click', e => { e.stopPropagation(); item.expanded = !item.expanded; renderWbs(); });
         tr.querySelector('.block-name')?.addEventListener('click', e => { e.stopPropagation(); openDrawer(item); });
         tr.querySelector('.instance-mark')?.addEventListener('click', e => { e.stopPropagation(); openDrawer(item); });
+        tr.querySelector('[data-delete-instance]')?.addEventListener('click', e => { e.stopPropagation(); deleteInstance(item); });
+        tr.querySelectorAll('[data-check-index]').forEach(button => button.addEventListener('click', e => {
+          e.stopPropagation();
+          const index = Number(button.dataset.checkIndex);
+          updateDefinitionCheck(item,currentHierarchy,index,!railFor(item,currentHierarchy).checks[index]);
+        }));
         tr.querySelectorAll('[data-edit]').forEach(control => {
           control.addEventListener('click', e => e.stopPropagation());
           control.addEventListener('change', () => updateTableField(item, control.dataset.edit, control.value));
         });
+        tr.querySelector('[data-change-history]')?.addEventListener('click', e => { e.stopPropagation(); openRowChangeHistory(item,e.currentTarget); });
         tr.addEventListener('click', () => { selectedItem = item; renderWbs(); });
       });
     }
 
     function updateTableField(item, field, value) {
       const rail = railFor(item, currentHierarchy);
-      if (field === 'category') item.def.category = value;
-      if (field === 'reference') item.def.reference = value === '空' ? '' : value;
-      if (field === 'owner') item.def[currentHierarchy + 'Owner'] = value;
-      if (field === 'schematicOwner') item.def.schematicOwner = value;
-      if (field === 'layoutOwner') item.def.layoutOwner = value;
-      if (field === 'spfRound' || field === 'lvsPath' || field === 'cdl' || field === 'gds') {
-        const info = spfInfoFor(item);
-        info[field === 'spfRound' ? 'round' : field] = value;
-        if (field !== 'spfRound') {
-          info.machine = 'pending';
-          info.human = false;
-        }
-      }
-      if (field === 'progressStatus') rail.progressStatus = value;
+      const info = currentHierarchy === 'spf' ? spfInfoFor(item) : null;
+      const normalized = field === 'reference' && value === '空' ? '' : value;
+      const oldValue = field === 'category' ? item.def.category
+        : field === 'reference' ? item.def.reference
+        : field === 'owner' ? item.def[currentHierarchy + 'Owner']
+        : field === 'schematicOwner' ? item.def.schematicOwner
+        : field === 'layoutOwner' ? item.def.layoutOwner
+        : field === 'spfRound' ? info.round
+        : ['lvsPath','cdl','gds'].includes(field) ? info[field]
+        : rail[field];
+      if (oldValue === normalized) return;
       if (field === 'planWorkdays' || field === 'resource') {
-        const valid = field === 'planWorkdays' ? /^-?\d*$/.test(value) : /^-?\d*(\.\d*)?$/.test(value);
+        const valid = field === 'planWorkdays' ? /^\d*$/.test(normalized) : /^-?\d*(\.\d*)?$/.test(normalized);
         if (!valid) {
           showToast(field === 'planWorkdays' ? 'Plan workdays 仅支持整数' : 'Resource 仅支持数字、负号和小数点');
           renderWbs();
           return;
         }
-        rail[field] = value;
       }
-      if (field === 'planned' || field === 'actual' || field === 'startDate') rail[field] = value;
-      if (field === 'changed') {
-        if (currentHierarchy === 'schematic') {
-          openReschedule(item, value);
-          return;
-        }
-        rail.changed = value;
+      if (field === 'category') item.def.category = normalized;
+      if (field === 'reference') item.def.reference = normalized;
+      if (field === 'owner') item.def[currentHierarchy + 'Owner'] = normalized;
+      if (field === 'schematicOwner') item.def.schematicOwner = normalized;
+      if (field === 'layoutOwner') item.def.layoutOwner = normalized;
+      if (field === 'spfRound' || field === 'lvsPath' || field === 'cdl' || field === 'gds') {
+        info[field === 'spfRound' ? 'round' : field] = normalized;
       }
-      if (field === 'checkStatus') {
-        rail.checkStatus = value;
-        if (value === 'Done') rail.checks.fill(1);
-        if (value === 'Not started') rail.checks.fill(0);
-        if ((value === 'Ongoing' || value === 'Delay') && rail.checks.every(Boolean)) rail.checks[rail.checks.length - 1] = 0;
-        if (value === 'Ongoing' && !rail.checks.some(Boolean)) rail.checks[0] = 1;
+      if (field === 'progressStatus') rail.progressStatus = normalized;
+      if (field === 'planWorkdays' || field === 'resource') {
+        rail[field] = normalized;
       }
+      if (field === 'planned' || field === 'actual' || field === 'startDate') rail[field] = normalized;
+      const labels = {category:'Block Category',reference:'Reference project',owner:hierarchyMeta[currentHierarchy].owner,schematicOwner:'Schematic Owner',layoutOwner:'Layout Owner',spfRound:'SPF round',lvsPath:'LVS path',cdl:'cdl',gds:'gds',progressStatus:'Progress',planWorkdays:'Plan workdays',resource:'Resource',planned:hierarchyMeta[currentHierarchy].date,actual:hierarchyMeta[currentHierarchy].actual,startDate:'Start date'};
+      if(field==='category'||field==='reference') recordDefinitionChange(item,['schematic','layout'],labels[field],oldValue,normalized);
+      else if(field==='schematicOwner'||(field==='owner'&&currentHierarchy==='schematic')) recordDefinitionChange(item,['schematic','spf'],labels[field],oldValue,normalized);
+      else if(field==='layoutOwner'||(field==='owner'&&currentHierarchy==='layout')) recordDefinitionChange(item,['layout','spf'],labels[field],oldValue,normalized);
+      else recordChange(item,currentHierarchy,labels[field],oldValue,normalized);
       renderWbs(); renderDashboard(); renderDelay();
-      const labels = {category:'Block Category',reference:'Reference project',owner:hierarchyMeta[currentHierarchy].owner,schematicOwner:'Schematic Owner',layoutOwner:'Layout Owner',spfRound:'SPF round',lvsPath:'LVS path',cdl:'cdl',gds:'gds',checkStatus:'Check item',progressStatus:'Progress',planWorkdays:'Plan workdays',resource:'Resource',planned:hierarchyMeta[currentHierarchy].date,changed:currentHierarchy==='layout'?'Changed finish':'Changed release date',actual:hierarchyMeta[currentHierarchy].actual,startDate:'Start date'};
       showToast(`${labels[field]} 已更新`);
+    }
+
+    function updateDefinitionCheck(item, type, index, checked) {
+      const rail = railFor(item,type);
+      const beforeDerived = derivedCheckValue(item,type);
+      const oldValue = rail.checks[index] ? '完成' : '未完成';
+      rail.checks[index] = checked ? 1 : 0;
+      rail.checkStatus = rail.checks.every(Boolean) ? 'Done' : rail.checks.some(Boolean) ? 'Ongoing' : 'Not started';
+      const afterDerived = derivedCheckValue(item,type);
+      const effect = beforeDerived === afterDerived ? '' : `${derivedCheckLabel(type)}：${beforeDerived} → ${afterDerived}`;
+      recordChange(item,type,checkLabels[type][index],oldValue,checked?'完成':'未完成',effect);
+      renderWbs(); renderDashboard(); renderDelay();
+      showToast(`${checkLabels[type][index]} 已${checked?'完成':'取消'}`);
+    }
+
+    function deleteInstance(item) {
+      const type = currentHierarchy;
+      if (data[type].some(child=>child.parent===item.id)) return showToast('请先删除或移动该节点的子 Instance');
+      if (!confirm(`确认删除 ${item.def.name} · ${item.instance || item.id}？`)) return;
+      const before = `${item.def.name} · ${item.instance || item.id} · T${item.tier}`;
+      data[type].splice(data[type].findIndex(candidate=>candidate.id===item.id),1);
+      structureChanges[type].unshift(changeEvent(currentActorId,'删除 Block / Instance',before,'已删除',auditNow()));
+      if (selectedItem?.id === item.id) closeDrawer();
+      refreshInstanceCounts(); renderWbs(); renderDashboard(); renderDelay();
+      showToast(`${item.def.name} Instance 已删除`);
+    }
+
+    function changeRecordHtml(change) {
+      const actor = changeActors[change.actor];
+      return `<div class="change-record"><span class="change-avatar">${actor.initials}</span><div><div class="change-record-meta"><strong>${esc(actor.name)}</strong><span>${esc(actor.role)} · ${esc(change.time)}</span></div><div class="change-record-field">${esc(change.field)}</div><div class="change-record-values"><span class="change-record-old">${esc(change.oldValue)}</span> → <span class="change-record-new">${esc(change.newValue)}</span></div>${change.effect?`<div class="change-record-effect">${esc(change.effect)}</div>`:''}</div></div>`;
+    }
+    function openChangePopover(key, title, subtitle, history, button) {
+      if (openChangeKey === key) return closeChangePopover();
+      closeChangePopover();
+      openChangeKey = key;
+      openChangeButton = button;
+      button.classList.add('open');
+      button.setAttribute('aria-expanded','true');
+      document.getElementById('changePopoverTitle').textContent = title;
+      document.getElementById('changePopoverSubtitle').textContent = subtitle;
+      document.getElementById('changePopoverList').innerHTML = history.length ? history.slice(0,20).map(changeRecordHtml).join('') + (history.length>20?'<div style="padding:10px 0;color:var(--text-3)">仅显示最近 20 条</div>':'') : '<div class="empty" style="padding:35px 10px">暂无修改记录</div>';
+      const popover = document.getElementById('changePopover');
+      popover.classList.add('open');
+      const rect = button.getBoundingClientRect(), width = 420, margin = 10;
+      const left = Math.min(window.innerWidth-width-margin,Math.max(margin,rect.right-width));
+      let top = rect.bottom+5;
+      if (top+430>window.innerHeight-margin) top=Math.max(margin,rect.top-Math.min(430,popover.scrollHeight||430)-5);
+      popover.style.left=`${left}px`; popover.style.top=`${top}px`;
+    }
+    function openRowChangeHistory(item, button) {
+      const history = historyFor(item,currentHierarchy);
+      openChangePopover(`${currentHierarchy}:${item.def.id}`,item.def.name,`${currentHierarchy.toUpperCase()} · Definition 共享 · ${history.length} 条修改`,history,button);
+    }
+    function openStructureChangeHistory(button) {
+      const history = structureChanges[currentHierarchy];
+      openChangePopover(`structure:${currentHierarchy}`,`${currentHierarchy.toUpperCase()} 结构变更`,`新增、删除与层级调整 · ${history.length} 条`,history,button);
+    }
+    function closeChangePopover() {
+      document.getElementById('changePopover')?.classList.remove('open');
+      openChangeButton?.classList.remove('open');
+      openChangeButton?.setAttribute('aria-expanded','false');
+      openChangeKey=null; openChangeButton=null;
+    }
+    function updateStructureChangeSummary() {
+      const history=structureChanges[currentHierarchy], latest=history[0];
+      document.getElementById('structureChangeCount').textContent=history.length;
+      const subject=latest?.field.startsWith('新增')?latest.newValue:latest?.oldValue;
+      document.getElementById('structureChangeLatest').textContent=latest?`${changeActors[latest.actor].name} · ${latest.field} · ${subject}`:'暂无结构变更';
     }
 
     function openDrawer(item) {
@@ -740,8 +893,9 @@
     function drawerHtml(item) {
       const type = currentHierarchy;
       const state = stateFor(item, type);
+      const backup = backupFor(item,type);
       const infoFields = type === 'spf'
-        ? `<div class="field"><label>Schematic Owner</label><strong>${esc(item.def.schematicOwner)}</strong></div><div class="field"><label>Layout Owner</label><strong>${esc(item.def.layoutOwner)}</strong></div><div class="field"><label>SPF Owner</label><strong>${esc(item.def.spfOwner)}</strong></div><div class="field"><label>Block Owner</label><strong>${esc(item.def.blockOwner)}</strong></div>`
+        ? `<div class="field"><label>Schematic Owner</label><strong>${esc(item.def.schematicOwner)}</strong></div><div class="field"><label>Layout Owner</label><strong>${esc(item.def.layoutOwner)}</strong></div><div class="field"><label>Block Owner</label><strong>${esc(item.def.blockOwner)}</strong></div>`
         : `<div class="field"><label>Block category</label><strong>${esc(item.def.category)}</strong></div><div class="field"><label>Reference project</label><strong>${esc(item.def.reference)}</strong></div><div class="field"><label>Block Owner</label><strong>${esc(item.def.blockOwner)}</strong></div><div class="field"><label>${hierarchyMeta[type].owner}</label><strong>${esc(ownerFor(item,type))}</strong></div>`;
       let specific = '';
       if (type === 'schematic') specific = schematicDetail(item);
@@ -753,7 +907,7 @@
           ${infoFields}
         </div>
       </section>${relationshipDetail(item)}${specific}
-      <section class="drawer-section"><div class="section-title"><h3>Back up</h3></div><div class="field"><label>Materials</label><input value="/project/ChanEdgel/${esc(item.def.name)}/materials"></div><div class="field" style="margin-top:10px"><label>Comments</label><textarea placeholder="补充说明"></textarea></div></section>`;
+      <section class="drawer-section"><div class="section-title"><h3>Back up</h3></div><div class="field"><label>Materials</label><input data-backup-field="materials" value="${esc(backup.materials)}"></div><div class="field" style="margin-top:10px"><label>Comments</label><textarea data-backup-field="comments" placeholder="补充说明">${esc(backup.comments)}</textarea></div></section>`;
     }
 
     function relationshipDetail(item) {
@@ -774,65 +928,45 @@
     }
     function schematicDetail(item) {
       const rail = railFor(item, 'schematic');
-      const history = detailState.schematic[item.def.id]?.history || [];
-      return `<section class="drawer-section"><div class="section-title"><h3>Schematic release</h3><button class="btn" id="addReschedule">+ 记录改期</button></div>
-        <div class="date-row"><div class="date-box"><small>Planned · 固定基线</small><strong>${rail.planned}</strong></div><div class="date-box changed-box"><small>Changed · 最新预计</small><strong>${rail.changed || rail.planned}</strong></div><div class="date-box actual-box"><small>Actual</small><strong>${rail.actual || '—'}</strong></div></div>
-        <div class="history">${history.length ? history.map(h=>`<div class="history-item"><time>${h.at}</time><div><strong>${h.from} → ${h.to}</strong><p>${esc(h.reason)}</p><small>${esc(h.editor)}</small></div></div>`).join('') : '<div class="empty" style="padding:18px">暂无改期记录</div>'}</div>
+      return `<section class="drawer-section"><div class="section-title"><h3>Schematic release</h3></div>
+        <div class="date-row"><div class="date-box"><small>Planned release</small><strong>${rail.planned}</strong></div><div class="date-box actual-box"><small>Actual release</small><strong>${rail.actual}</strong></div></div>
       </section><section class="drawer-section"><div class="section-title"><h3>Schematic check item</h3><small>${progress(item,'schematic')}% · Definition rail 共享</small></div>${checksHtml(item,'schematic')}</section>`;
     }
     function layoutDetail(item) {
       const rail = railFor(item, 'layout');
       return `<section class="drawer-section"><div class="section-title"><h3>Layout Schedule</h3><span class="status ${stateFor(item,'layout')}">${statusText(stateFor(item,'layout'))}</span></div>
-        <div class="info-grid"><div class="field"><label>Start date</label><strong>${rail.startDate || '—'}</strong></div><div class="field"><label>Plan workdays</label><strong>${rail.planWorkdays || '—'}</strong></div><div class="field"><label>Resource</label><strong>${rail.resource || '—'}</strong></div><div class="field"><label>Plan finish date</label><strong>${rail.planned || '—'}</strong></div><div class="field"><label>Changed finish</label><strong>${rail.changed || '—'}</strong></div><div class="field"><label>实际完成时间</label><strong>${rail.actual || '—'}</strong></div><div class="field"><label>Layout qualified</label><strong>${layoutQualifiedStatus(item)}</strong></div><div class="field"><label>日期口径</label><strong>无 release date</strong></div></div>
+        <div class="info-grid"><div class="field"><label>Start date</label><strong>${rail.startDate || '—'}</strong></div><div class="field"><label>Plan workdays</label><strong>${rail.planWorkdays || '—'}</strong></div><div class="field"><label>Resource</label><strong>${rail.resource || '—'}</strong></div><div class="field"><label>Plan finish date</label><strong>${rail.planned || '—'}</strong></div><div class="field"><label>实际完成时间</label><strong>${rail.actual || '—'}</strong></div><div class="field"><label>Layout qualified</label><strong>${layoutQualifiedStatus(item)}</strong></div><div class="field"><label>日期口径</label><strong>无 release date</strong></div></div>
       </section><section class="drawer-section"><div class="section-title"><h3>Check List (with Layout KR)</h3><small>${progress(item,'layout')}% · Definition rail 共享</small></div>${checksHtml(item,'layout')}</section>${item.tierTop?`<section class="drawer-section"><div class="section-title"><h3>Tier 顶层进度</h3></div><div class="rail-row" style="grid-template-columns:80px 1fr 40px"><span>Own</span><div class="progress"><span style="width:${progress(item,'layout')}%"></span></div><b>${progress(item,'layout')}%</b></div><div class="rail-row" style="grid-template-columns:80px 1fr 40px"><span>Rollup</span><div class="progress green"><span style="width:${Math.min(100,progress(item,'layout')+12)}%"></span></div><b>${Math.min(100,progress(item,'layout')+12)}%</b></div></section>`:''}`;
     }
     function spfDetail(item) {
       const rail = railFor(item, 'spf');
       const v = spfInfoFor(item);
-      return `<section class="drawer-section"><div class="section-title"><h3>SPF status</h3><span class="status ${v.machine}">${statusText(v.machine)}</span></div>
+      return `<section class="drawer-section"><div class="section-title"><h3>SPF status</h3></div>
         <div class="info-grid"><div class="field"><label>SPF round</label><strong>${v.round}</strong></div><div class="field"><label>SPF Ready</label><strong>${spfReadyStatus(item)}</strong></div><div class="field"><label>Planned SPF release</label><strong>${rail.planned}</strong></div></div>
         <div class="field" style="margin-top:10px"><label>LVS path</label><input data-spf-field="lvsPath" value="${esc(v.lvsPath)}"></div>
         <div class="info-grid" style="margin-top:10px"><div class="field"><label>cdl</label><input data-spf-field="cdl" value="${esc(v.cdl)}"></div><div class="field"><label>gds</label><input data-spf-field="gds" value="${esc(v.gds)}"></div></div>
-        <div class="validation-grid" style="margin-top:12px"><div class="validation-item"><label>系统基础校验</label><strong>必填、格式与可访问性</strong></div><button class="btn" id="runBasicValidation">${v.machine === 'valid' ? '重新校验' : '运行校验'}</button><div class="validation-item"><label>校验结果</label><strong>${v.machine === 'valid' ? '基础字段有效' : v.machine === 'invalid' ? '存在缺失或格式错误' : '字段变化，等待校验'}</strong></div><span class="status ${v.machine}">${statusText(v.machine)}</span><div class="validation-item"><label>人工技术确认</label><strong>寄生层级与连接正确性</strong></div><button class="btn" id="humanValidate">${v.human?'已确认':'确认通过'}</button></div>
-        <div class="recommendation">方案建议：机器只做基础有效性检查；寄生 RC 的技术正确性仍由 SPF Owner 人工确认。暂不承诺 EDA 或文件内容解析。</div>
       </section><section class="drawer-section"><div class="section-title"><h3>SPF check list</h3><small>${progress(item,'spf')}% · Definition rail 共享</small></div>${checksHtml(item,'spf')}</section>`;
     }
 
     function bindDrawer(item) {
       document.querySelectorAll('[data-check]').forEach(input => input.addEventListener('change', () => {
-        const rail = railFor(item, currentHierarchy);
-        rail.checks[Number(input.dataset.check)] = input.checked ? 1 : 0;
-        rail.checkStatus = rail.checks.every(Boolean) ? 'Done' : rail.checks.some(Boolean) ? (rail.checkStatus === 'Delay' ? 'Delay' : 'Ongoing') : 'Not started';
-        showToast('Definition check 已更新，同一 hierarchy 的重复 Instance 已同步');
+        updateDefinitionCheck(item,currentHierarchy,Number(input.dataset.check),input.checked);
         openDrawer(item); renderDashboard(); renderDelay();
       }));
-      document.getElementById('addReschedule')?.addEventListener('click', () => openReschedule(item));
       document.querySelectorAll('[data-spf-field]').forEach(input => input.addEventListener('change', () => {
-        const v = spfInfoFor(item); v[input.dataset.spfField] = input.value; v.machine = 'pending'; v.human = false;
-        showToast('字段已变化，原校验结果已失效'); openDrawer(item);
+        const v = spfInfoFor(item), field=input.dataset.spfField, oldValue=v[field];
+        if(oldValue===input.value)return;
+        v[field] = input.value;
+        recordChange(item,'spf',({lvsPath:'LVS path',cdl:'cdl',gds:'gds'})[field],oldValue,input.value);
+        showToast('SPF 字段已更新'); openDrawer(item);
       }));
-      document.getElementById('runBasicValidation')?.addEventListener('click', () => {
-        const v = spfInfoFor(item);
-        const pathOk = value => value.startsWith('/proj/') && !/\s/.test(value);
-        v.machine = pathOk(v.lvsPath) && pathOk(v.cdl) && pathOk(v.gds) ? 'valid' : 'invalid';
-        if (v.machine !== 'valid') v.human = false;
-        showToast(v.machine === 'valid' ? '基础校验通过，仍需人工技术确认' : '基础校验未通过，请检查必填项和路径格式');
-        openDrawer(item); renderWbs();
-      });
-      document.getElementById('humanValidate')?.addEventListener('click', () => {
-        const v = spfInfoFor(item);
-        if (v.machine !== 'valid') return showToast('请先通过系统基础校验');
-        v.human = true; showToast('人工技术确认已记录'); openDrawer(item);
-      });
-    }
-
-    function openReschedule(item, candidateDate='') {
-      selectedItem = item;
-      const rail = railFor(item, 'schematic');
-      document.getElementById('oldDate').value = rail.changed || rail.planned;
-      document.getElementById('newDate').value = candidateDate;
-      document.getElementById('changeReason').value = '';
-      document.getElementById('rescheduleModal').classList.add('open');
+      document.querySelectorAll('[data-backup-field]').forEach(input=>input.addEventListener('change',()=>{
+        const backup=backupFor(item,currentHierarchy), field=input.dataset.backupField, oldValue=backup[field];
+        if(oldValue===input.value)return;
+        backup[field]=input.value;
+        recordChange(item,currentHierarchy,field==='materials'?'Materials':'Comments',oldValue,input.value);
+        showToast(`${field==='materials'?'Materials':'Comments'} 已更新`); openDrawer(item);
+      }));
     }
 
     function renderDashboard() {
@@ -901,14 +1035,15 @@
       if (!def && !name) return showToast('新建 Block 时必须填写 Block name');
       if (!def) {
         const base = name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || `block-${Date.now()}`;
-        def = { id:`${base}-${Date.now().toString().slice(-4)}`, name, category:'', reference:'', blockOwner:'', schematicOwner:'', layoutOwner:'', spfOwner:'' };
+        def = { id:`${base}-${Date.now().toString().slice(-4)}`, name, category:'', reference:'', blockOwner:'', schematicOwner:'', layoutOwner:'' };
       }
       const type = currentHierarchy;
       const sameDefCount = data[type].filter(item=>item.def.id===def.id).length;
       const id = `${type.slice(0,3)}-${def.id}-${data[type].length+1}`;
-      const item = row(id, def, document.getElementById('addParent').value || null, Number(document.getElementById('addTier').value), Array(checkLabels[type].length).fill(0), '', '', '', false, sameDefCount ? `I${sameDefCount+1}` : '');
+      const item = row(id, def, document.getElementById('addParent').value || null, Number(document.getElementById('addTier').value), Array(checkLabels[type].length).fill(0), '', '', false, sameDefCount ? `I${sameDefCount+1}` : '');
       data[type].push(item);
-      railState[type][def.id] ||= { checks:Array(checkLabels[type].length).fill(0), planned:'', changed:'', actual:'', startDate:'', planWorkdays:'', resource:'', checkStatus:'Not started', progressStatus:'On schedule' };
+      railState[type][def.id] ||= { checks:Array(checkLabels[type].length).fill(0), planned:'', actual:'', startDate:'', planWorkdays:'', resource:'', checkStatus:'Not started', progressStatus:'On schedule' };
+      structureChanges[type].unshift(changeEvent(currentActorId,'新增 Block / Instance','不存在',`${def.name} · ${item.instance||item.id} · T${item.tier}`,auditNow()));
       closeAddInstanceModal(); refreshInstanceCounts(); renderWbs();
       showToast(`${def.name} 已添加到 ${type.toUpperCase()} hierarchy`);
     }
@@ -944,20 +1079,17 @@
     document.querySelectorAll('[data-hierarchy]').forEach(b=>b.addEventListener('click',()=>setHierarchy(b.dataset.hierarchy)));
     document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{currentView=b.dataset.view;document.querySelectorAll('[data-view]').forEach(x=>x.classList.toggle('active',x===b));document.getElementById('categoryFilter').disabled=currentHierarchy==='spf';renderWbs();}));
     ['searchInput','statusFilter','categoryFilter'].forEach(id=>document.getElementById(id).addEventListener(id==='searchInput'?'input':'change',renderWbs));
+    modifierFilter.addEventListener('change',renderWbs);
+    document.getElementById('structureChangeButton').addEventListener('click',event=>{event.stopPropagation();openStructureChangeHistory(event.currentTarget);});
+    document.getElementById('changePopoverClose').addEventListener('click',closeChangePopover);
+    document.addEventListener('click',event=>{if(!document.getElementById('changePopover').contains(event.target)&&!event.target.closest('[data-change-history]')&&!event.target.closest('#structureChangeButton'))closeChangePopover();});
+    tableWrap.addEventListener('scroll',closeChangePopover);
+    window.addEventListener('resize',closeChangePopover);
     document.getElementById('drawerClose').addEventListener('click',closeDrawer);
     document.getElementById('drawerBackdrop').addEventListener('click',closeDrawer);
-    document.querySelectorAll('[data-close-modal]').forEach(b=>b.addEventListener('click',()=>document.getElementById('rescheduleModal').classList.remove('open')));
     document.getElementById('addInstanceBtn').addEventListener('click',openAddInstanceModal);
     document.querySelectorAll('[data-close-add-modal]').forEach(b=>b.addEventListener('click',closeAddInstanceModal));
     document.getElementById('saveInstance').addEventListener('click',saveNewInstance);
-    document.getElementById('saveReschedule').addEventListener('click',()=>{
-      const next=document.getElementById('newDate').value, reason=document.getElementById('changeReason').value.trim();
-      if(!next || !reason) return showToast('新的日期和改期原因均为必填');
-      const item=selectedItem, rail=railFor(item,'schematic'), from=rail.changed||rail.planned;
-      detailState.schematic[item.def.id] ||= {history:[]};
-      detailState.schematic[item.def.id].history.unshift({at:'2026-08-25',from,to:next,reason,editor:'Lin Q.'});
-      rail.changed=next; document.getElementById('rescheduleModal').classList.remove('open'); showToast('Definition 改期已追加，同 rail 的 Instance 已同步'); openDrawer(item);
-    });
     document.getElementById('collapseAll').addEventListener('click',()=>{data[currentHierarchy].forEach(i=>i.expanded=false);renderWbs();showToast('Hierarchy 已折叠到顶层');});
     document.getElementById('exportBtn').addEventListener('click',()=>showToast('原型演示：已生成当前 hierarchy 导出任务'));
     document.getElementById('refreshDashboard').addEventListener('click',()=>{renderDashboard();showToast('状态已按最新 check 和日期重新计算');});
@@ -968,7 +1100,7 @@
     document.addEventListener('keydown', event => {
       if (event.key !== 'Escape') return;
       closeDrawer();
-      document.getElementById('rescheduleModal').classList.remove('open');
+      closeChangePopover();
       closeAddInstanceModal();
     });
 
