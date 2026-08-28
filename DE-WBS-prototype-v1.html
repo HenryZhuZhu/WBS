@@ -1152,22 +1152,41 @@
       const saved=wbsColumnWidths[type]||{};
       return wbsColumnDefinitions[type].map(([key,minimum])=>key==='latestChange'&&!latestChangeExpanded?38:Math.max(minimum,Number(saved[key])||minimum));
     }
-    function syncWbsColumnLayout(type,definitions,widths) {
-      [...wbsColgroup.children].forEach((column,index)=>{column.style.width=`${widths[index]}px`;});
+    function displayedWbsColumnWidths(definitions,widths) {
+      if(!isWbsTableFullscreen())return [...widths];
+      const viewportWidth=document.documentElement.clientWidth;
       const totalWidth=widths.reduce((sum,width)=>sum+width,0);
+      if(totalWidth>=viewportWidth)return [...widths];
+      const flexibleIndexes=definitions.map(([key],index)=>key==='latestChange'?-1:index).filter(index=>index>=0);
+      const flexibleTotal=flexibleIndexes.reduce((sum,index)=>sum+widths[index],0);
+      const extra=viewportWidth-totalWidth;
+      const displayed=[...widths];
+      flexibleIndexes.forEach((index,position)=>{
+        const share=position===flexibleIndexes.length-1
+          ? viewportWidth-displayed.reduce((sum,width)=>sum+width,0)
+          : Math.round(extra*(widths[index]/flexibleTotal));
+        displayed[index]=Math.min(600,displayed[index]+share);
+      });
+      return displayed;
+    }
+    function syncWbsColumnLayout(type,definitions,widths) {
+      const displayedWidths=displayedWbsColumnWidths(definitions,widths);
+      [...wbsColgroup.children].forEach((column,index)=>{column.style.width=`${displayedWidths[index]}px`;});
+      const totalWidth=displayedWidths.reduce((sum,width)=>sum+width,0);
       wbsTable.style.width=`${totalWidth}px`;
       wbsTable.style.minWidth=`${totalWidth}px`;
-      const blockWidth=widths[0];
-      const roundWidth=widths[1];
-      const categoryWidth=type==='spf'?0:widths[2];
+      const blockWidth=displayedWidths[0];
+      const roundWidth=displayedWidths[1];
+      const categoryWidth=type==='spf'?0:displayedWidths[2];
       tableWrap.querySelectorAll('.frozen-block-column').forEach(cell=>{cell.style.left='0px';});
       tableWrap.querySelectorAll('.frozen-round-column').forEach(cell=>{cell.style.left=`${blockWidth}px`;});
       tableWrap.querySelectorAll('.frozen-category-column').forEach(cell=>{cell.style.left=`${blockWidth+roundWidth}px`;});
       tableWrap.querySelectorAll('.frozen-reference-column').forEach(cell=>{cell.style.left=`${blockWidth+roundWidth+categoryWidth}px`;});
-      const changeWidth=widths[widths.length-1];
+      const changeWidth=displayedWidths[displayedWidths.length-1];
       tableWrap.closest('.workspace').style.setProperty('--wbs-change-width',`${changeWidth}px`);
-      wbsHead.querySelectorAll('.column-resizer').forEach((handle,index)=>handle.setAttribute('aria-valuenow',String(widths[index])));
+      wbsHead.querySelectorAll('.column-resizer').forEach((handle,index)=>handle.setAttribute('aria-valuenow',String(displayedWidths[index])));
     }
+    function refreshWbsColumnLayout() { syncWbsColumnLayout(currentHierarchy,wbsColumnDefinitions[currentHierarchy],currentWbsColumnWidths()); }
     function applyWbsColumnLayout() {
       const type=currentHierarchy;
       const definitions=wbsColumnDefinitions[type];
@@ -2023,10 +2042,12 @@
     function enterWbsTableFullscreen() {
       closeChangePopover();closeCalculationPopover();closeColumnFilterPopover();
       document.body.classList.add('wbs-table-fullscreen');
+      refreshWbsColumnLayout();
       syncWbsTableFullscreen();
     }
     function exitWbsTableFullscreen() {
       document.body.classList.remove('wbs-table-fullscreen');
+      refreshWbsColumnLayout();
       syncWbsTableFullscreen();
     }
     function toggleWbsTableFullscreen() { return isWbsTableFullscreen()?exitWbsTableFullscreen():enterWbsTableFullscreen(); }
@@ -2073,7 +2094,8 @@
     document.addEventListener('click',event=>{if(!document.getElementById('calculationPopover').contains(event.target)&&!event.target.closest('[data-calculation-rule]'))closeCalculationPopover();});
     document.addEventListener('click',event=>{if(!document.getElementById('columnFilterPopover').contains(event.target)&&!event.target.closest('[data-column-filter]'))closeColumnFilterPopover();});
     tableWrap.addEventListener('scroll',()=>{closeChangePopover();closeCalculationPopover();closeColumnFilterPopover();});
-    window.addEventListener('resize',()=>{closeChangePopover();closeCalculationPopover();closeColumnFilterPopover();});
+    window.addEventListener('resize',()=>{closeChangePopover();closeCalculationPopover();closeColumnFilterPopover();if(isWbsTableFullscreen())refreshWbsColumnLayout();});
+    new ResizeObserver(()=>{if(isWbsTableFullscreen())refreshWbsColumnLayout();}).observe(document.documentElement);
     document.getElementById('drawerClose').addEventListener('click',closeDrawer);
     document.getElementById('drawerBackdrop').addEventListener('click',closeDrawer);
     document.getElementById('importExcelBtn').addEventListener('click',openEmbeddedExcelImport);
