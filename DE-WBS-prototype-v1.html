@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DE-WBS Prototype v1</title>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     :root {
       --bg: #f4f6f8;
@@ -76,9 +77,9 @@
     .sidebar-toggle svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
     .project-picker { display: flex; gap: 10px; align-items: center; }
     .project-picker strong { color: var(--text); }
-    .project-picker select { border: 0; font-weight: 700; color: var(--text); background: transparent; padding: 6px 24px 6px 4px; }
+    .project-picker select { border: 0; font-weight: 700; color: var(--text); background: transparent; padding: 6px 18px 6px 4px; }
+    #tableSelect { width: 104px; }
     .table-picker-label { margin-left: 10px; color: var(--text-3); }
-    .project-tag { color: var(--green); background: var(--green-soft); border-radius: 4px; padding: 2px 7px; font-size: 12px; font-weight: 600; }
     .top-actions { margin-left: auto; display: flex; gap: 10px; align-items: center; }
     .icon-btn { width: 34px; height: 34px; border: 1px solid var(--line); background: white; border-radius: 6px; display: grid; place-items: center; color: var(--text-2); }
     .icon-btn:hover { color: var(--blue); border-color: #9cc1f5; background: var(--blue-soft); }
@@ -86,7 +87,6 @@
     .notification-btn { position: relative; }
     .notification-dot { position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--red); box-shadow: 0 0 0 2px white; }
     .notification-dot.read { display: none; }
-    .today { color: var(--text-2); font-size: 12px; padding-right: 8px; }
 
     main { margin-left: var(--sidebar); padding-top: var(--topbar); min-height: 100vh; transition: margin-left .2s ease; }
     .page { display: none; padding: 22px 24px 30px; }
@@ -96,14 +96,6 @@
     .page-head h1 { margin: 0; font-size: 22px; line-height: 1.2; letter-spacing: 0; }
     .page-head p { margin: 5px 0 0; color: var(--text-2); }
     .head-actions { display: flex; gap: 8px; }
-    .add-method-wrap { position: relative; }
-    .add-method-menu { position: absolute; top: 39px; right: 0; z-index: 35; width: 238px; display: none; padding: 5px; border: 1px solid var(--line-strong); border-radius: 7px; background: white; box-shadow: var(--shadow); }
-    .add-method-menu.open { display: grid; animation: enter .14s ease-out; }
-    .add-method-menu button { min-height: 48px; display: grid; grid-template-columns: 28px 1fr; gap: 8px; align-items: center; border: 0; border-radius: 5px; padding: 6px 8px; color: var(--text); background: transparent; text-align: left; }
-    .add-method-menu button:hover { background: var(--blue-soft); }
-    .add-method-icon { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 5px; color: var(--blue); background: var(--blue-soft); font-size: 15px; font-weight: 800; }
-    .add-method-menu strong, .add-method-menu small { display: block; }
-    .add-method-menu small { color: var(--text-3); font-size: 9px; }
     .btn { height: 34px; border-radius: 6px; padding: 0 13px; border: 1px solid var(--line-strong); background: white; color: var(--text); font-weight: 600; }
     .btn:hover { border-color: #8bb4ed; background: #f6f9ff; }
     .btn.primary { background: var(--blue); color: white; border-color: var(--blue); }
@@ -113,11 +105,9 @@
     .btn .symbol { margin-right: 6px; }
 
     .metric-grid { display: grid; grid-template-columns: repeat(4, minmax(160px, 1fr)); gap: 10px; margin-bottom: 14px; }
-    .metric { background: var(--surface); border: 1px solid var(--line); border-radius: 7px; padding: 15px 16px; min-height: 102px; box-shadow: var(--shadow-soft); }
-    .metric-top { display: flex; justify-content: space-between; color: var(--text-2); font-size: 12px; }
-    .metric-icon { width: 26px; height: 26px; border-radius: 5px; display: grid; place-items: center; background: var(--blue-soft); color: var(--blue); }
-    .metric strong { display: block; margin-top: 7px; font-size: 27px; line-height: 1; }
-    .metric-foot { margin-top: 8px; color: var(--text-3); font-size: 11px; }
+    .metric { background: var(--surface); border: 1px solid var(--line); border-radius: 7px; padding: 13px 16px; min-height: 82px; box-shadow: var(--shadow-soft); }
+    .metric-top { color: var(--text-2); font-size: 12px; }
+    .metric strong { display: block; margin-top: 10px; font-size: 27px; line-height: 1; }
     .metric.danger strong { color: var(--red); }
     .metric.warning strong { color: var(--amber); }
     .metric.success strong { color: var(--green); }
@@ -131,6 +121,9 @@
     .panel-head span { color: var(--text-3); font-size: 12px; }
     .panel-body { padding: 16px; }
     .rail-row { display: grid; grid-template-columns: 110px 1fr 46px; gap: 12px; align-items: center; margin: 17px 0; }
+    .dashboard-check-row { width: 100%; grid-template-columns: 110px 1fr 46px 14px; margin: 7px 0; padding: 10px 7px; border: 0; border-radius: 5px; color: var(--text); background: transparent; text-align: left; cursor: pointer; }
+    .dashboard-check-row:hover, .dashboard-check-row:focus-visible { outline: 0; background: var(--blue-soft); box-shadow: inset 0 0 0 1px #c7dcf7; }
+    .dashboard-check-row .rail-chevron { color: var(--text-3); font-size: 20px; line-height: 1; }
     .rail-label strong { display: block; }
     .rail-label small { color: var(--text-3); }
     .progress { height: 8px; background: #edf0f3; border-radius: 4px; overflow: hidden; }
@@ -148,27 +141,50 @@
     .issue small { color: var(--text-3); }
     .issue time { font-size: 12px; color: var(--red); font-weight: 600; }
 
+    .check-detail-tabs { display: flex; gap: 4px; padding: 10px 12px 0; border-bottom: 1px solid var(--line); background: var(--surface-alt); }
+    .check-detail-tabs button { width: auto; height: 42px; display: inline-flex; align-items: center; gap: 9px; border: 0; border-bottom: 2px solid transparent; padding: 0 12px; color: var(--text-2); background: transparent; text-align: left; }
+    .check-detail-tabs button:hover { color: var(--blue); background: var(--blue-soft); }
+    .check-detail-tabs button.active { color: var(--blue); border-bottom-color: var(--blue); background: white; }
+    .check-detail-tabs button strong { font-size: 12px; }
+    .check-detail-tabs button span { font-size: 11px; font-weight: 700; }
+    #checkItemsPage .search { max-width: 360px; }
+    #checkDetailStatus { width: 180px; }
+    .check-detail-table { min-width: 1240px; }
+    .check-detail-table th { height: 48px; vertical-align: middle; }
+    .check-detail-table td { height: 52px; }
+    .check-detail-table .block-detail-button { border: 0; padding: 0; color: var(--blue); background: transparent; font-weight: 700; text-align: left; }
+    .check-detail-table .block-detail-button:hover { text-decoration: underline; }
+    .check-detail-table .check-frozen { position: sticky; z-index: 2; background: white; }
+    .check-detail-table th.check-frozen { z-index: 8; background: #f7f9fb; }
+    .check-detail-table .check-block-column { left: 0; width: 175px; min-width: 175px; }
+    .check-detail-table .check-tier-column { left: 175px; width: 70px; min-width: 70px; }
+    .check-detail-table .check-owner-column { left: 245px; width: 150px; min-width: 150px; }
+    .check-detail-table .check-layout-owner-column { left: 395px; width: 150px; min-width: 150px; border-right: 1px solid var(--line); box-shadow: 8px 0 14px rgba(26, 39, 52, .08); }
+    .check-detail-table .check-owner-column.last-check-frozen { border-right: 1px solid var(--line); box-shadow: 8px 0 14px rgba(26, 39, 52, .08); }
+    .check-detail-table tbody tr:hover td.check-frozen { background: #f7faff; }
+    .check-column-title { display: grid; gap: 2px; min-width: 118px; white-space: normal; line-height: 1.2; }
+    .check-column-title small { color: var(--text-3); font-size: 9px; font-weight: 600; }
+    .check-matrix-cell { text-align: center; }
+    .check-state { width: 22px; height: 22px; display: inline-grid; place-items: center; border: 1px solid #c8d0d8; border-radius: 4px; color: transparent; background: white; font-size: 13px; font-weight: 800; }
+    .check-state.done { border-color: #75b69c; color: white; background: var(--green); }
+    .check-progress-text { font-variant-numeric: tabular-nums; font-weight: 700; }
+
     .workspace { background: var(--surface); border: 1px solid var(--line); border-radius: 7px; overflow: hidden; box-shadow: var(--shadow-soft); }
     .workspace-tabs { min-height: 48px; display: flex; align-items: stretch; border-bottom: 1px solid var(--line); padding: 0 14px; }
     .workspace-tabs button { border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--text-2); padding: 0 16px; font-weight: 700; }
     .workspace-tabs button.active { color: var(--blue); border-color: var(--blue); }
-    .workspace-tabs .count { margin-left: 6px; border-radius: 9px; padding: 1px 6px; background: #edf1f5; color: var(--text-2); font-size: 11px; }
-    .workspace-tabs button.active .count { background: var(--blue-soft); color: var(--blue); }
-    .view-switch { margin-left: auto; align-self: center; display: flex; background: #eef1f4; border-radius: 6px; padding: 2px; height: 32px; }
-    .view-switch button { height: 28px; padding: 0 10px; border: 0; border-radius: 4px; background: transparent; color: var(--text-2); font-size: 12px; }
-    .view-switch button.active { background: white; color: var(--text); box-shadow: 0 1px 4px rgba(30, 45, 60, .12); }
+    #hierarchyTabs .search { margin-left: clamp(40px, 6vw, 84px); margin-right: auto; align-self: center; }
+    .wbs-fullscreen-toggle { width: 32px; height: 32px; flex: 0 0 32px; align-self: center; display: grid; place-items: center; border: 0 !important; border-radius: 4px; padding: 0 !important; color: #7a8794; background: transparent !important; box-shadow: none; }
+    .wbs-fullscreen-toggle:hover { color: var(--blue); background: transparent !important; }
+    .wbs-fullscreen-toggle:focus-visible { outline: 0; color: var(--blue); background: transparent !important; }
+    .wbs-fullscreen-toggle:focus-visible svg { filter: drop-shadow(0 0 2px rgba(23,105,224,.38)); }
+    .wbs-fullscreen-toggle svg, .wbs-fullscreen-exit svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     .toolbar { min-height: 52px; padding: 9px 14px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; border-bottom: 1px solid var(--line); background: var(--surface-alt); }
     .search { position: relative; width: 280px; min-width: 220px; flex: 1 0 220px; }
     .search input { width: 100%; height: 32px; border: 1px solid var(--line-strong); border-radius: 5px; padding: 0 10px 0 31px; background: white; }
     .search span { position: absolute; left: 10px; top: 6px; color: var(--text-3); }
     .toolbar select { height: 32px; border: 1px solid var(--line-strong); border-radius: 5px; background: white; padding: 0 28px 0 9px; color: var(--text-2); }
-    .structure-change-button { margin-left: auto; width: 300px; min-width: 300px; height: 34px; padding: 0 9px; border: 1px solid var(--line-strong); border-radius: 5px; background: white; color: var(--text); display: grid; grid-template-columns: 18px 1fr auto; align-items: center; gap: 7px; text-align: left; }
-    .structure-change-button:hover, .structure-change-button.open { border-color: #8fb6e9; background: #f6f9ff; }
-    .structure-change-button svg { width: 16px; height: 16px; stroke: var(--blue); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-    .structure-change-copy { min-width: 0; }
-    .structure-change-copy small, .structure-change-copy strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .structure-change-copy small { color: var(--text-3); font-size: 9px; }
-    .structure-change-copy strong { font-size: 10px; }
+    #wbsPage .search { width: 310px; min-width: 220px; max-width: 310px; flex: 0 0 310px; }
     .structure-change-count { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--blue-soft); color: var(--blue); display: grid; place-items: center; font-size: 9px; font-weight: 800; }
     .cell-select, .cell-input { height: 30px; min-width: 112px; border: 1px solid transparent; border-radius: 5px; background: transparent; color: var(--text); padding: 0 24px 0 7px; font-size: 11px; }
     .cell-select:hover, .cell-input:hover, .cell-select:focus, .cell-input:focus { border-color: var(--line-strong); background: white; }
@@ -203,46 +219,65 @@
       width: 0;
       margin: 0;
     }
-    .dataset-summary-row { min-height: 50px; padding: 7px 0 7px 14px; display: flex; align-items: center; gap: 18px; border-bottom: 1px solid var(--line); background: #fbfcfd; }
-    .dataset-summary { min-width: 0; display: flex; align-items: center; gap: 18px; color: var(--text-2); font-size: 11px; }
-    .dataset-summary strong { color: var(--text); margin-left: 4px; }
-    .dataset-summary-row .structure-change-button { align-self: stretch; height: auto; min-height: 34px; border-top: 0; border-right: 0; border-bottom: 0; border-radius: 0; box-shadow: -7px 0 13px rgba(26, 39, 52, .04); }
-
     .table-wrap { overflow: auto; max-height: calc(100vh - 235px); min-height: 420px; }
+    #tableWrap { max-height: calc(100vh - 193px); }
+    .wbs-fullscreen-exit { position: fixed; top: 6px; right: 6px; z-index: 102; width: 30px; height: 30px; display: none; place-items: center; border: 1px solid #bcc8d3; border-radius: 5px; padding: 0; color: #4e5d6c; background: rgba(255,255,255,.94); box-shadow: 0 3px 10px rgba(26,39,52,.12); opacity: .35; transition: opacity .14s ease, color .14s ease, border-color .14s ease; }
+    .wbs-fullscreen-exit:hover, .wbs-fullscreen-exit:focus-visible { opacity: 1; outline: 0; color: var(--blue); border-color: #8fb6e9; }
+    body.wbs-table-fullscreen { overflow: hidden; }
+    body.wbs-table-fullscreen #wbsPage { animation: none !important; transform: none !important; }
+    body.wbs-table-fullscreen #tableWrap { position: fixed; inset: 0; z-index: 100; width: 100vw; height: 100vh; max-height: none; min-height: 0; overflow: auto; background: white; }
+    body.wbs-table-fullscreen .wbs-fullscreen-exit { display: grid; }
     table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1380px; }
     th { position: sticky; top: 0; z-index: 3; height: 38px; background: #f7f9fb; color: #667384; font-size: 11px; text-transform: none; text-align: left; border-bottom: 1px solid var(--line); padding: 0 10px; white-space: nowrap; }
     td { height: 48px; border-bottom: 1px solid #edf0f3; padding: 0 10px; white-space: nowrap; font-size: 12px; }
+    #tableWrap table { width: auto; min-width: 0; table-layout: fixed; }
+    #tableWrap th, #tableWrap td { padding-left: 6px; padding-right: 6px; }
+    #tableWrap td { overflow: hidden; text-overflow: ellipsis; }
+    #tableWrap .editable-cell, #tableWrap .editable-cell.wide, #tableWrap .cell-select, #tableWrap .cell-input, #tableWrap .editable-cell .cell-editor .cell-select, #tableWrap .editable-cell .cell-editor .cell-input { min-width: 0; }
     th.frozen-column { z-index: 7; }
     td.frozen-column { position: sticky; z-index: 2; background: white; }
-    .frozen-block-column { left: 0; width: 270px; min-width: 270px; max-width: 270px; }
-    .frozen-category-column { left: 270px; width: 160px; min-width: 160px; max-width: 160px; }
-    .frozen-reference-column { left: 430px; width: 160px; min-width: 160px; max-width: 160px; }
+    .frozen-block-column { left: 0; padding-left: 3px !important; padding-right: 3px !important; }
+    .frozen-round-column { background: white; }
+    th.frozen-block-column .column-header-content { max-width: calc(100% - 16px); margin-left: 16px; }
     .last-frozen-column { border-right: 1px solid var(--line); box-shadow: 8px 0 14px rgba(26, 39, 52, .08); }
-    th.own-progress-column { color: var(--blue); background: #eef5ff; box-shadow: inset 0 -2px var(--blue); }
-    th.related-progress-column { color: var(--cyan); background: #edf8f8; box-shadow: inset 0 -2px var(--cyan); }
-    td.own-progress-column { background: rgba(238, 245, 255, .45); }
-    td.related-progress-column { background: rgba(237, 248, 248, .6); }
-    .progress-column-context { display: inline-block; margin-right: 5px; padding: 1px 4px; border-radius: 3px; color: white; background: var(--blue); font-size: 9px; line-height: 1.4; }
-    .related-progress-column .progress-column-context { background: var(--cyan); }
+    .column-header-content { height: 100%; max-width: 100%; display: inline-flex; align-items: center; gap: 3px; vertical-align: middle; }
+    .column-header-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .column-resizer { position: relative; z-index: 10; width: 10px; height: 16px; flex: 0 0 10px; display: block; border: 0; border-radius: 3px; padding: 0; color: #a6b0bb; background: transparent; cursor: col-resize; touch-action: none; }
+    .column-resizer::before, .column-resizer::after { content: ""; position: absolute; top: 3px; width: 2px; height: 2px; border-radius: 50%; background: currentColor; box-shadow: 0 4px currentColor, 0 8px currentColor; }
+    .column-resizer::before { left: 2px; }
+    .column-resizer::after { left: 6px; }
+    .column-resizer:hover, .column-resizer:focus-visible, .column-resizer.active { color: var(--blue); background: var(--blue-soft); outline: none; }
+    .column-resizer.filtered { color: white; background: var(--blue); }
+    body.resizing-wbs-column { cursor: col-resize; user-select: none; }
     .calculated-column-title { display: inline-flex; align-items: center; gap: 5px; }
-    .calculation-info { width: 18px; height: 18px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: currentColor; display: inline-grid; place-items: center; opacity: .72; vertical-align: middle; }
+    .calculation-info { width: 18px; height: 18px; flex: 0 0 18px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: currentColor; display: inline-grid; place-items: center; opacity: .72; vertical-align: middle; }
     .calculation-info:hover, .calculation-info:focus-visible, .calculation-info.open { opacity: 1; color: var(--blue); background: white; box-shadow: 0 0 0 1px #9cc1f5; }
     .calculation-info svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .planned-lock-toggle { width: 18px; height: 18px; flex: 0 0 18px; padding: 0; border: 0; border-radius: 4px; display: inline-grid; place-items: center; color: #687584; background: transparent; }
+    .planned-lock-toggle:hover, .planned-lock-toggle:focus-visible { outline: 0; color: var(--blue); background: var(--blue-soft); box-shadow: 0 0 0 1px #9cc1f5; }
+    .planned-lock-toggle.unlocked { color: var(--green); background: var(--green-soft); }
+    .planned-lock-toggle svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .planned-release-locked .cell-display { color: #566273; }
     tbody tr { transition: background .12s; }
     tbody tr:hover { background: #f7faff; }
     tbody tr.selected { background: #eef5ff; box-shadow: inset 3px 0 var(--blue); }
     tbody tr:hover td.frozen-column { background: #f7faff; }
     tbody tr.selected td.frozen-column { background: #eef5ff; }
-    .block-cell { display: flex; align-items: center; min-width: 230px; }
-    .block-main { display: grid; min-width: 0; }
-    .block-title-line { display: flex; align-items: center; gap: 5px; }
-    .row-delete { width: 26px; height: 26px; margin-left: 3px; padding: 0; border: 1px solid transparent; border-radius: 4px; background: transparent; color: var(--text-3); display: grid; place-items: center; opacity: .2; }
-    tbody tr:hover .row-delete, .row-delete:focus-visible { opacity: 1; }
+    .block-cell { display: flex; align-items: center; min-width: 0; overflow: hidden; }
+    .block-main { position: relative; display: grid; min-width: 0; flex: 1; overflow: hidden; }
+    .block-title-line { display: flex; align-items: center; gap: 5px; min-width: 0; overflow: hidden; }
+    .block-name-wrap { position: relative; min-width: 0; max-width: calc(100% - 51px); display: inline-flex; align-items: center; }
+    .row-actions { position: absolute; top: 50%; left: calc(100% + 2px); z-index: 3; display: flex; align-items: center; gap: 1px; padding: 1px 2px; opacity: 0; pointer-events: none; transform: translateY(-50%); background: #f7faff; }
+    tbody tr.selected .row-actions { background: #eef5ff; }
+    tbody tr:hover .row-actions, .row-actions:focus-within { opacity: 1; pointer-events: auto; }
+    .row-action { width: 22px; height: 22px; padding: 0; border: 1px solid transparent; border-radius: 4px; background: transparent; color: var(--text-3); display: grid; place-items: center; }
+    .row-add { font-size: 17px; line-height: 1; }
+    .row-add:hover, .row-add:focus-visible { outline: 0; color: var(--blue); border-color: #9cc1f5; background: var(--blue-soft); }
     .row-delete:hover { color: var(--red); border-color: #efb7b4; background: var(--red-soft); }
     .row-delete svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-    .tree-toggle { width: 22px; height: 22px; border: 0; background: transparent; color: var(--text-3); padding: 0; }
+    .tree-toggle { width: 16px; height: 20px; flex: 0 0 16px; border: 0; background: transparent; color: var(--text-3); padding: 0; font-size: 11px; }
     .tree-toggle.hidden { visibility: hidden; }
-    .block-name { font-weight: 700; color: #233244; cursor: pointer; }
+    .block-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; font-weight: 700; color: #233244; cursor: pointer; }
     .block-name:hover { color: var(--blue); text-decoration: underline; }
     .tier { font-size: 10px; color: var(--text-3); border: 1px solid var(--line); border-radius: 3px; padding: 1px 4px; margin-left: 6px; }
     .instance-mark { border: 1px solid #b7dfe3; border-radius: 4px; background: var(--cyan-soft); color: var(--cyan); padding: 1px 5px; font-size: 10px; font-weight: 700; }
@@ -264,9 +299,28 @@
     .check-dot { width: 16px; height: 16px; padding: 0; border: 1px solid #c8d0d8; border-radius: 3px; background: white; color: transparent; display: grid; place-items: center; font-size: 10px; line-height: 1; }
     .check-dot:hover { border-color: var(--green); background: var(--green-soft); }
     .check-dot.on { color: white; border-color: var(--green); background: var(--green); }
+    .spf-round-stack { width: 100%; min-height: 30px; max-height: 42px; display: grid; align-content: center; gap: 1px; overflow: hidden; padding: 2px 7px; color: var(--text); background: transparent; line-height: 12px; white-space: normal; }
+    .editable-cell.spf-round-cell { min-width: 0; }
+    .cell-display.spf-round-display { min-height: 42px; padding: 0; overflow: visible; white-space: normal; }
+    .spf-round-stack.round-empty { background: transparent; }
+    .spf-round-line { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; }
+    .spf-round-editor { width: 100%; height: 42px !important; min-height: 42px; resize: none; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 5px; padding: 2px 5px; color: var(--text); background: white; font: 10px/12px "Aptos", "PingFang SC", sans-serif; }
+    .spf-round-detail { white-space: pre-line; line-height: 1.45; }
 
-    th.change-column, td.change-column { position: sticky; right: 0; z-index: 4; width: 300px; min-width: 300px; border-left: 1px solid var(--line); box-shadow: -7px 0 13px rgba(26, 39, 52, .04); }
+    th.change-column, td.change-column { position: sticky; right: 0; z-index: 4; width: var(--wbs-change-width, 240px); min-width: var(--wbs-change-width, 240px); max-width: var(--wbs-change-width, 240px); border-left: 1px solid var(--line); box-shadow: -7px 0 13px rgba(26, 39, 52, .04); }
     th.change-column { z-index: 6; background: #f3f7fb; }
+    th.change-column .column-header-content { width: 100%; }
+    th.change-column .column-header-label { flex: 0 0 auto; }
+    .latest-change-panel-toggle { position: relative; width: 24px; height: 24px; flex: 0 0 24px; display: inline-grid; place-items: center; border: 0; border-radius: 4px; padding: 0; color: #687584; background: transparent; }
+    .latest-change-panel-toggle:hover, .latest-change-panel-toggle:focus-visible { outline: 0; color: var(--blue); background: var(--blue-soft); box-shadow: 0 0 0 1px #a8c8f2; }
+    .latest-change-panel-toggle svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .latest-change-panel-toggle.filtered::after { content: ""; position: absolute; top: 3px; right: 3px; width: 5px; height: 5px; border-radius: 50%; background: var(--blue); box-shadow: 0 0 0 1px white; }
+    th.change-column.latest-change-collapsed, td.change-column.latest-change-collapsed { padding: 0 !important; }
+    th.change-column.latest-change-collapsed .column-header-content { display: flex; justify-content: center; gap: 0; }
+    th.change-column.latest-change-collapsed .column-header-label, th.change-column.latest-change-collapsed .column-resizer, td.change-column.latest-change-collapsed > * { display: none; }
+    .header-structure-change { height: 24px; flex: 0 0 auto; display: inline-flex; align-items: center; gap: 4px; border: 1px solid #c5d2df; border-radius: 4px; padding: 0 5px; color: #405269; background: white; font-size: 9px; font-weight: 700; }
+    .header-structure-change:hover, .header-structure-change:focus-visible, .header-structure-change.open { outline: 0; border-color: #8fb6e9; color: var(--blue); background: var(--blue-soft); }
+    .header-structure-change .structure-change-count { min-width: 16px; height: 16px; padding: 0 4px; font-size: 8px; }
     td.change-column { padding: 4px 7px; background: #fbfdff; }
     tbody tr:hover td.change-column { background: #f4f9ff; }
     .latest-change { width: 100%; min-height: 40px; padding: 4px 6px; border: 1px solid transparent; border-radius: 5px; background: transparent; color: var(--text); text-align: left; display: grid; grid-template-columns: 25px 1fr 12px; gap: 7px; align-items: center; }
@@ -295,6 +349,21 @@
     .calculation-popover-body p { margin: 0 0 9px; color: var(--text-2); font-size: 11px; line-height: 1.55; }
     .calculation-steps { margin: 0; padding-left: 20px; color: var(--text); font-size: 11px; line-height: 1.6; }
     .calculation-steps li + li { margin-top: 4px; }
+    .column-filter-popover { position: fixed; z-index: 74; width: 260px; display: none; overflow: hidden; border: 1px solid #b9cadb; border-radius: 7px; background: white; box-shadow: var(--shadow); }
+    .column-filter-popover.open { display: block; animation: enter .12s ease-out; }
+    .column-filter-head { min-height: 40px; padding: 5px 9px 3px; display: flex; align-items: center; gap: 8px; }
+    .column-filter-title-input { appearance: none; min-width: 0; flex: 1; height: 30px; border: 0 !important; border-radius: 0; outline: 0 !important; box-shadow: none !important; padding: 0 3px; color: #566273; background: transparent !important; font-size: 11px; font-weight: 400; caret-color: var(--blue); }
+    .column-filter-title-input::placeholder { color: #9aa4af; opacity: 1; }
+    .column-filter-title-input:focus { border: 0 !important; outline: 0 !important; box-shadow: none !important; color: #405269; background: transparent !important; }
+    .column-filter-close { margin-left: auto; width: 26px; height: 26px; border: 0; border-radius: 4px; color: var(--text-2); background: transparent; font-size: 17px; }
+    .column-filter-close:hover { color: var(--text); background: #eef2f6; }
+    .column-filter-options { max-height: 260px; overflow: auto; padding: 5px 8px; }
+    .column-filter-option { min-height: 30px; display: flex; align-items: center; gap: 7px; padding: 4px 3px; border-bottom: 1px solid #f1f3f5; }
+    .column-filter-option:last-child { border-bottom: 0; }
+    .column-filter-option input { margin: 0; accent-color: var(--blue); }
+    .column-filter-option span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .column-filter-option.select-all { color: var(--blue); font-weight: 700; }
+    .column-filter-foot { padding: 8px 9px; border-top: 1px solid var(--line); display: flex; justify-content: flex-end; gap: 6px; }
     .change-popover-close:hover { background: #eef2f6; color: var(--text); }
     .change-popover-list { max-height: 360px; overflow: auto; padding: 3px 12px 10px; }
     .change-record { display: grid; grid-template-columns: 30px 1fr; gap: 9px; padding: 11px 0; border-bottom: 1px solid #edf0f3; }
@@ -308,9 +377,6 @@
     .change-record-old { color: #8d4c4c; }
     .change-record-new { color: var(--green); font-weight: 800; }
     .change-record-effect { margin-top: 5px; padding: 5px 7px; border-radius: 4px; color: #315979; background: var(--blue-soft); font-size: 9px; }
-
-    .flat-view .tree-toggle { display: none; }
-    .flat-view .block-cell { padding-left: 0 !important; }
 
     .drawer-backdrop { position: fixed; inset: 0; background: rgba(20, 31, 42, .28); opacity: 0; pointer-events: none; z-index: 40; transition: opacity .2s; }
     .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
@@ -326,6 +392,15 @@
     .section-title { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
     .section-title h3 { margin: 0; font-size: 13px; }
     .section-title small { color: var(--text-3); }
+    .ai-routing-section { padding: 13px 0; }
+    .ai-routing-row { min-height: 34px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .ai-routing-row h3 { margin: 0; font-size: 13px; }
+    .ai-routing-toggle { position: relative; width: 104px; height: 32px; flex: 0 0 104px; display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; border: 1px solid #c9d2db; border-radius: 6px; background: #e7ebef; }
+    .ai-routing-indicator { position: absolute; inset: 2px auto 2px 2px; width: calc(50% - 3px); border-radius: 4px; background: var(--green); box-shadow: 0 1px 2px rgba(24,104,69,.22); transform: translateX(0); transition: transform .18s ease; }
+    .ai-routing-toggle[data-value="no"] .ai-routing-indicator { transform: translateX(50px); }
+    .ai-routing-option { position: relative; z-index: 1; border: 0; padding: 0; color: #7b8691; background: transparent; font-size: 11px; font-weight: 800; }
+    .ai-routing-toggle[data-value="yes"] .ai-routing-option[data-ai-routing="yes"], .ai-routing-toggle[data-value="no"] .ai-routing-option[data-ai-routing="no"] { color: white; }
+    .ai-routing-option:focus-visible { outline: 2px solid #81aee8; outline-offset: -3px; border-radius: 4px; }
     .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
     .field label { display: block; color: var(--text-3); font-size: 11px; margin-bottom: 4px; }
     .field strong { display: block; font-size: 13px; }
@@ -404,11 +479,85 @@
     .delay-tabs button:hover { color: var(--blue); background: var(--blue-soft); }
     .delay-tabs button.active { color: var(--blue); border-bottom-color: var(--blue); background: white; }
     .delay-tabs strong { float: right; color: inherit; }
+    .ei-steps { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 1px; margin-bottom: 12px; overflow: hidden; border: 1px solid var(--line); border-radius: 7px; background: var(--line); }
+    .ei-step { min-height: 52px; display: flex; align-items: center; gap: 9px; padding: 7px 11px; color: var(--text-2); background: white; }
+    .ei-step b { width: 24px; height: 24px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 50%; background: #edf1f5; }
+    .ei-step strong, .ei-step small { display: block; }
+    .ei-step small { color: var(--text-3); font-size: 9px; }
+    .ei-step.active { color: var(--blue); background: #f7faff; }
+    .ei-step.active b { color: white; background: var(--blue); }
+    .ei-step.done { color: var(--green); }
+    .ei-step.done b { color: white; background: var(--green); }
+    .ei-grid { display: grid; grid-template-columns: minmax(0,1.15fr) minmax(320px,.85fr); gap: 12px; }
+    .ei-card { border: 1px solid var(--line); border-radius: 7px; background: white; box-shadow: var(--shadow-soft); }
+    .ei-card-head { min-height: 44px; display: flex; align-items: center; padding: 0 13px; border-bottom: 1px solid var(--line); }
+    .ei-card-head h2 { margin: 0; font-size: 13px; }
+    .ei-card-head small { margin-left: auto; color: var(--text-3); }
+    .ei-card-body { padding: 13px; }
+    .ei-dropzone { min-height: 210px; display: grid; place-items: center; border: 1px dashed #91abc4; border-radius: 6px; color: var(--text-2); background: #f8fbff; text-align: center; }
+    .ei-dropzone strong { display: block; color: var(--text); font-size: 14px; }
+    .ei-dropzone p { margin: 5px 0 12px; }
+    .ei-file { margin-top: 9px; padding: 9px; border: 1px solid #b7d2ef; border-radius: 5px; color: #315979; background: var(--blue-soft); }
+    .ei-form { display: grid; gap: 10px; }
+    .ei-form label { display: block; margin-bottom: 4px; color: var(--text-3); font-size: 10px; }
+    .ei-form input, .ei-form select, .ei-tier-row select, .ei-map-row select { width: 100%; height: 33px; border: 1px solid var(--line-strong); border-radius: 5px; padding: 0 8px; color: var(--text); background: white; }
+    .ei-locked { min-height: 33px; display: flex; align-items: center; justify-content: space-between; padding: 0 8px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface-alt); }
+    .ei-locked b { color: var(--green); font-size: 9px; }
+    .ei-notice { padding: 9px 10px; border-left: 3px solid var(--blue); color: #365978; background: var(--blue-soft); font-size: 10px; line-height: 1.55; }
+    .ei-actions { display: flex; justify-content: space-between; gap: 8px; margin-top: 11px; }
+    .ei-actions-right { display: flex; gap: 8px; margin-left: auto; }
+    .ei-raw { overflow: auto; max-height: 430px; border: 1px solid var(--line); border-radius: 5px; }
+    .ei-raw table { min-width: 760px; }
+    .ei-raw th { position: sticky; top: 0; }
+    .ei-tier-box { overflow: hidden; margin-bottom: 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface-alt); }
+    .ei-tier-head { min-height: 36px; display: flex; align-items: center; padding: 5px 8px; border-bottom: 1px solid var(--line); }
+    .ei-tier-head small { margin-left: 6px; color: var(--text-3); }
+    .ei-tier-head button { margin-left: auto; }
+    .ei-tier-list, .ei-map-list { display: grid; gap: 6px; padding: 8px; }
+    .ei-tier-row { display: grid; grid-template-columns: 54px 20px minmax(130px,1fr) 28px; gap: 6px; align-items: center; }
+    .ei-map-row { display: grid; grid-template-columns: minmax(100px,.8fr) 20px minmax(140px,1.2fr); gap: 6px; align-items: center; }
+    .ei-tier-row span, .ei-map-row span { color: var(--text-3); text-align: center; }
+    .ei-remove-tier { width: 28px; height: 28px; border: 0; border-radius: 4px; color: var(--text-3); background: transparent; font-size: 17px; }
+    .ei-remove-tier:hover { color: var(--red); background: var(--red-soft); }
+    .ei-review { overflow: auto; max-height: 430px; border: 1px solid var(--line); border-radius: 5px; }
+    .ei-review table { min-width: 1000px; }
+    .ei-status { display: inline-flex; padding: 3px 6px; border-radius: 4px; font-size: 9px; font-weight: 800; }
+    .ei-status.good { color: var(--green); background: var(--green-soft); }
+    .ei-status.warn { color: var(--amber); background: var(--amber-soft); }
+    .ei-status.bad { color: var(--red); background: var(--red-soft); }
+    .ei-issue { max-width: 240px; color: var(--text-2); white-space: normal; }
+    .ei-decision { height: 29px; border: 1px solid var(--line-strong); border-radius: 4px; background: white; font-size: 10px; }
+    .ei-counts { display: flex; gap: 6px; margin-bottom: 9px; }
+    .ei-count { padding: 4px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+    .ei-count.good { color: var(--green); background: var(--green-soft); }
+    .ei-count.warn { color: var(--amber); background: var(--amber-soft); }
+    .ei-count.bad { color: var(--red); background: var(--red-soft); }
+    .ei-summary { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
+    .ei-summary-item { min-height: 78px; padding: 11px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface-alt); }
+    .ei-summary-item label { display: block; color: var(--text-3); font-size: 9px; }
+    .ei-summary-item strong { display: block; margin-top: 6px; font-size: 21px; }
+    .ei-success { padding: 55px 20px; text-align: center; }
+    .ei-success-mark { width: 58px; height: 58px; display: grid; place-items: center; margin: 0 auto 12px; border-radius: 50%; color: white; background: var(--green); font-size: 28px; }
     .toast { position: fixed; right: 24px; bottom: 24px; background: #172531; color: white; border-radius: 6px; padding: 11px 14px; box-shadow: var(--shadow); z-index: 80; opacity: 0; transform: translateY(8px); pointer-events: none; transition: .2s; }
     .toast.show { opacity: 1; transform: none; }
     .empty { padding: 70px 20px; text-align: center; color: var(--text-3); }
     .empty strong { display: block; color: var(--text-2); margin-bottom: 4px; }
+    .spf-create-row { cursor: pointer; }
+    .spf-create-row td { height: 42px; color: var(--text-3); background: #fbfcfd; }
+    .spf-create-row.create-row-active td { background: #f2f7fd; }
+    .spf-create-row:focus-visible { outline: none; }
+    .spf-create-row td:first-child { position: sticky; text-align: center; overflow: visible !important; }
+    .spf-create-cue { position: relative; display: inline-grid; place-items: center; width: 22px; height: 22px; vertical-align: middle; }
+    .spf-create-row .spf-create-plus { color: var(--text-3); }
+    .spf-create-label { position: absolute; left: 27px; top: 50%; opacity: 0; transform: translateY(-50%); color: var(--blue); font-size: 10px; font-weight: 700; white-space: nowrap; pointer-events: none; }
+    .spf-create-plus:hover { color: var(--blue); border-color: #9cc1f5; background: var(--blue-soft); }
+    .spf-create-plus:hover + .spf-create-label { opacity: 1; }
     body.sidebar-collapsed { --sidebar: 64px; }
+    body.sidebar-collapsed .sidebar { width: 64px; min-width: 64px; max-width: 64px; }
+    body.sidebar-collapsed .topbar { left: 64px; }
+    body.sidebar-collapsed main { margin-left: 64px; }
+    body:not(.sidebar-collapsed) .topbar { left: 224px; }
+    body:not(.sidebar-collapsed) main { margin-left: 224px; }
     body.sidebar-collapsed .brand { padding: 0; justify-content: center; }
     body.sidebar-collapsed .brand-copy,
     body.sidebar-collapsed .nav-label,
@@ -452,10 +601,8 @@
         <strong>DDCPC</strong>
         <span class="table-picker-label">表名称</span>
         <select id="tableSelect" aria-label="选择表名称"><option>ChanEdgel</option><option>ChanLeft</option><option>ChanMid</option></select>
-        <span class="project-tag">Execution</span>
       </div>
       <div class="top-actions">
-        <span class="today" id="todayLabel"></span>
         <button class="icon-btn notification-btn" id="notificationBtn" title="通知" aria-label="通知">
           <svg class="lucide lucide-bell" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.268 21a2 2 0 0 0 3.464 0"></path><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8a6 6 0 0 0-12 0c0 4.499-1.411 5.956-2.738 7.326"></path></svg>
           <span class="notification-dot" id="notificationDot" aria-hidden="true"></span>
@@ -467,13 +614,13 @@
     <main>
       <section class="page" id="dashboardPage">
         <div class="page-head">
-          <div><h1>Fullchip 总览</h1><p>按 unique Block 汇总，不重复计算 hierarchy 实例。</p></div>
+          <div><h1>Fullchip 总览</h1></div>
           <div class="head-actions"><button class="btn" id="refreshDashboard"><span class="symbol">↻</span>刷新状态</button></div>
         </div>
         <div class="metric-grid" id="metricGrid"></div>
         <div class="dashboard-grid">
           <section class="panel">
-            <div class="panel-head"><h2>Check item 进度</h2><span>完成数 / 总数</span></div>
+            <div class="panel-head"><h2>Check item 进度</h2><button class="btn" id="viewAllChecks">查看全部</button></div>
             <div class="panel-body" id="checkItemProgress"></div>
           </section>
           <section class="panel">
@@ -483,44 +630,53 @@
         </div>
       </section>
 
+      <section class="page" id="checkItemsPage">
+        <div class="page-head"><div><h1>Check item 明细</h1><p>按 unique Block 展示，不重复计算 hierarchy 实例。</p></div><div class="head-actions"><button class="btn" id="backToDashboard">返回 Fullchip</button></div></div>
+        <div class="workspace">
+          <div class="check-detail-tabs" id="checkDetailTabs">
+            <button class="active" data-check-hierarchy="schematic"><strong>Schematic</strong><span id="schematicCheckTabCount"></span></button>
+            <button data-check-hierarchy="layout"><strong>Layout</strong><span id="layoutCheckTabCount"></span></button>
+            <button data-check-hierarchy="spf"><strong>SPF</strong><span id="spfCheckTabCount"></span></button>
+          </div>
+          <div class="toolbar">
+            <div class="search"><span>⌕</span><input id="checkDetailSearch" placeholder="搜索 Block、Owner 或 Reference project"></div>
+            <select id="checkDetailStatus" aria-label="按完成状态筛选"><option value="all">全部完成状态</option><option value="incomplete">未完成</option><option value="done">已完成</option></select>
+          </div>
+          <div class="table-wrap"><table class="check-detail-table"><thead id="checkDetailHead"></thead><tbody id="checkDetailBody"></tbody></table></div>
+        </div>
+      </section>
+
       <section class="page active" id="wbsPage">
         <div class="page-head">
-          <div><h1>WBS Hierarchy</h1><p>在同一工作区自由切换 Schematic、Layout 与 SPF hierarchy。</p></div>
-          <div class="head-actions"><div class="add-method-wrap"><button class="btn" id="addInstanceBtn" aria-haspopup="menu" aria-expanded="false"><span class="symbol">＋</span>添加 Block / Instance <span aria-hidden="true">⌄</span></button><div class="add-method-menu" id="addMethodMenu" role="menu"><button type="button" data-add-method="add" role="menuitem"><span class="add-method-icon">＋</span><span><strong>添加 Block / Instance</strong><small>一行或多行添加到当前 hierarchy</small></span></button><button type="button" data-add-method="excel" role="menuitem"><span class="add-method-icon">⇧</span><span><strong>导入 Excel 表格</strong><small>校验后创建新的 DDCPC 表</small></span></button></div></div><button class="btn" id="collapseAll"><span class="symbol">−</span>全部折叠</button><button class="btn primary" id="exportBtn"><span class="symbol">↓</span>导出当前视图</button></div>
+          <div><h1>WBS Hierarchy</h1></div>
+          <div class="head-actions"><button class="btn primary" id="importExcelBtn"><span class="symbol">⇧</span>导入 Excel 表格</button></div>
         </div>
         <div class="workspace">
           <div class="workspace-tabs" id="hierarchyTabs">
-            <button class="active" data-hierarchy="schematic">Schematic <span class="count" id="schematicCount">0</span></button>
-            <button data-hierarchy="layout">Layout <span class="count" id="layoutCount">0</span></button>
-            <button data-hierarchy="spf">SPF <span class="count" id="spfCount">0</span></button>
-            <div class="view-switch"><button class="active" data-view="tree">树状</button><button data-view="flat">全部实例</button></div>
-          </div>
-          <div class="toolbar">
+            <button class="active" data-hierarchy="schematic">Schematic</button>
+            <button data-hierarchy="layout">Layout</button>
+            <button data-hierarchy="spf">SPF</button>
             <div class="search"><span>⌕</span><input id="searchInput" placeholder="搜索 Block、Owner 或 Reference project"></div>
-            <select id="derivedStatusFilter" aria-label="按 Check status 筛选"><option value="all">全部 Check status</option><option value="not-started">Not started</option><option value="ongoing">Ongoing</option><option value="done">Done</option></select>
-            <select id="ownProgressFilter" aria-label="按本表 Progress 筛选"><option value="all">全部 Schematic Progress</option><option value="not-started">Not started</option><option value="on-schedule">On schedule</option><option value="delay">Delay</option></select>
-            <select id="relatedProgressFilter" aria-label="按关联 Progress 筛选"><option value="all">全部 Layout Progress</option><option value="not-started">Not started</option><option value="on-schedule">On schedule</option><option value="delay">Delay</option></select>
+            <button class="wbs-fullscreen-toggle" id="wbsFullscreenToggle" type="button" title="全屏查看表格" aria-label="全屏查看表格" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"></path><path d="M16 3h3a2 2 0 0 1 2 2v3"></path><path d="M8 21H5a2 2 0 0 1-2-2v-3"></path><path d="M16 21h3a2 2 0 0 0 2-2v-3"></path></svg></button>
           </div>
-          <div class="dataset-summary-row">
-            <div class="dataset-summary" id="datasetSummary"></div>
-            <button class="structure-change-button" id="structureChangeButton" aria-expanded="false">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l3 2"></path></svg>
-              <span class="structure-change-copy"><small>最近结构变更</small><strong id="structureChangeLatest"></strong></span><span class="structure-change-count" id="structureChangeCount"></span>
-            </button>
-          </div>
-          <div class="table-wrap" id="tableWrap"><table><thead id="wbsHead"></thead><tbody id="wbsBody"></tbody></table></div>
+          <div class="table-wrap" id="tableWrap"><button class="wbs-fullscreen-exit" id="wbsFullscreenExit" type="button" title="退出全屏" aria-label="退出全屏"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v3a2 2 0 0 1-2 2H3"></path><path d="M16 3v3a2 2 0 0 0 2 2h3"></path><path d="M8 21v-3a2 2 0 0 0-2-2H3"></path><path d="M16 21v-3a2 2 0 0 1 2-2h3"></path></svg></button><table><colgroup id="wbsColgroup"></colgroup><thead id="wbsHead"></thead><tbody id="wbsBody"></tbody></table></div>
         </div>
       </section>
 
       <section class="page" id="delayPage">
-        <div class="page-head"><div><h1>Delay 监控</h1><p>Schematic 对比原始 Planned；Layout 对比 Plan finish date。</p></div><div class="head-actions"><button class="btn" id="delaySort">按延误天数排序</button></div></div>
+        <div class="page-head"><div><h1>Delay 监控</h1></div><div class="head-actions"><button class="btn" id="delaySort">按延误天数排序</button></div></div>
         <div class="workspace">
           <div class="delay-tabs" id="delayTabs">
             <button class="active" data-delay-category="schematic"><span>Schematic Delay</span><strong id="schematicDelayCount">0</strong></button>
             <button data-delay-category="layout"><span>Layout Delay</span><strong id="layoutDelayCount">0</strong></button>
           </div>
-          <div class="table-wrap"><table class="delay-table"><thead><tr><th>Block</th><th>Hierarchy</th><th>Owner</th><th>比较基线</th><th>当前 / 实际</th><th>延误</th><th>状态</th><th></th></tr></thead><tbody id="delayBody"></tbody></table></div>
+          <div class="table-wrap"><table class="delay-table"><thead><tr><th>Block</th><th>Hierarchy</th><th>Owner</th><th id="delayBaselineHeader">Planned release</th><th id="delayActualHeader">Actual release</th><th>延误</th><th>状态</th><th></th></tr></thead><tbody id="delayBody"></tbody></table></div>
         </div>
+      </section>
+
+      <section class="page" id="excelImportPage">
+        <div class="page-head"><div><h1>通过 Excel 模板导入 WBS</h1><p>下载固定模板，填写后上传，系统自动校验并创建新表。</p></div><div class="head-actions"><button class="btn" id="backFromExcelImport">返回 WBS Hierarchy</button></div></div>
+        <div class="workspace"><div class="panel-body" id="embeddedExcelImport"><strong>Excel 导入流程正在加载…</strong></div></div>
       </section>
     </main>
   </div>
@@ -539,6 +695,12 @@
   <aside class="calculation-popover" id="calculationPopover" role="dialog" aria-label="列字段计算逻辑">
     <div class="calculation-popover-head"><strong id="calculationPopoverTitle"></strong><button class="calculation-popover-close" id="calculationPopoverClose" aria-label="关闭">×</button></div>
     <div class="calculation-popover-body"><p id="calculationPopoverIntro"></p><ol class="calculation-steps" id="calculationPopoverSteps"></ol></div>
+  </aside>
+
+  <aside class="column-filter-popover" id="columnFilterPopover" role="dialog" aria-label="列字段筛选">
+    <div class="column-filter-head"><input class="column-filter-title-input" id="columnFilterSearch" aria-label="输入关键词筛选列选项"><button class="column-filter-close" id="columnFilterClose" aria-label="关闭">×</button></div>
+    <div class="column-filter-options" id="columnFilterOptions"></div>
+    <div class="column-filter-foot"><button class="btn" id="columnFilterClear">清除筛选</button><button class="btn primary" id="columnFilterApply">应用</button></div>
   </aside>
 
   <div class="modal-backdrop" id="addInstanceModal" role="dialog" aria-modal="true" aria-labelledby="addInstanceTitle">
@@ -579,10 +741,12 @@
     const calculationRules = {
       schematicProgress: {label:'Schematic Progress',intro:'系统根据 Schematic 日期自动判定，不支持手动修改。',steps:['Planned release 未填写：Not started','Actual release 晚于 Planned release：Delay','其他情况：On schedule']},
       layoutProgress: {label:'Layout Progress',intro:'系统根据 Layout 日期自动判定，不支持手动修改。',steps:['Plan finish 未填写：Not started','Actual finish 晚于 Plan finish：Delay','其他情况：On schedule']},
-      overallCheck: {label:'Overall check status',intro:'由 Schematic Check item 和层级校验规则自动派生。',steps:['本 Block 的 5 个 Schematic Check item 全部完成','父节点完成最后一项前，所有直接子节点必须完成全部 Check item','满足以上条件：Done；否则：Ongoing']},
-      layoutQualified: {label:'Layout qualified',intro:'由 Layout KR Check item 和层级校验规则自动派生。',steps:['本 Block 的 4 个 Layout Check item 全部完成','父节点完成最后一项前，所有直接子节点必须完成全部 Check item','满足以上条件：Done；否则：Ongoing']},
-      spfReady: {label:'SPF Ready',intro:'由 SPF Check item 和层级校验规则自动派生。',steps:['本 Block 的 5 个 SPF Check item 全部完成','父节点完成最后一项前，所有直接子节点必须完成全部 Check item','满足以上条件：Done；否则：Ongoing']}
+      overallCheck: {label:'Schematic check status',intro:'由 Schematic Check item 和层级校验规则自动派生。',steps:['本 Block 的 5 个 Schematic Check item 全部完成','父节点完成最后一项前，所有直接子节点必须完成全部 Check item','满足以上条件：Done；否则：Ongoing']},
+      layoutQualified: {label:'Layout check status',intro:'由 Layout KR Check item 和层级校验规则自动派生。',steps:['本 Block 的 4 个 Layout Check item 全部完成','父节点完成最后一项前，所有直接子节点必须完成全部 Check item','满足以上条件：Done；否则：Ongoing']},
+      spfReady: {label:'SPF check status',intro:'由 SPF Check item 和层级校验规则自动派生。',steps:['本 Block 的 5 个 SPF Check item 全部完成','父节点完成最后一项前，所有直接子节点必须完成全部 Check item','满足以上条件：Done；否则：Ongoing']}
     };
+    const embeddedImportOwners = new Set(['Ming Zhao','Han Li','Qin Yang','Ivy Xu','Kai Ding','Rui Jiang','Tao He','Nina Gao','Eric Lin','Sora Pan','Wei Chen']);
+    let embeddedImportState = null;
     const hierarchyMeta = {
       schematic: { owner: 'Schematic Owner', date: 'Planned release', actual: 'Actual release' },
       layout: { owner: 'Layout Owner', date: 'Plan finish', actual: 'Actual finish' },
@@ -599,14 +763,14 @@
     const currentActorId = 'lin';
 
     const common = {
-      top: { id:'top', name:'CE_TOP', category:'Controller', reference:'DPJQC', blockOwner:'Yan Sun', schematicOwner:'Ming Zhao', layoutOwner:'Tao He' },
-      core: { id:'core', name:'CORE_ARRAY', category:'Banklogic', reference:'DPKRC', blockOwner:'Lei Wang', schematicOwner:'Han Li', layoutOwner:'Nina Gao' },
-      row: { id:'row', name:'ROW_CTRL', category:'Row+Refresh+RHR', reference:'DPLSA', blockOwner:'Lei Wang', schematicOwner:'Qin Yang', layoutOwner:'Eric Lin' },
-      sense: { id:'sense', name:'SENSE_AMP', category:'Analog', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Ming Zhao', layoutOwner:'Nina Gao' },
-      bitcell: { id:'bitcell', name:'BITCELL', category:'Data path', reference:'DPNQC', blockOwner:'Ming Zhao', schematicOwner:'Han Li', layoutOwner:'Tao He' },
-      io: { id:'io', name:'IO_RING', category:'IO', reference:'', blockOwner:'Yan Sun', schematicOwner:'Ivy Xu', layoutOwner:'Eric Lin' },
-      dft: { id:'dft', name:'MBIST_CTRL', category:'DFT', reference:'DPQTA', blockOwner:'Kai Ding', schematicOwner:'Kai Ding', layoutOwner:'Sora Pan' },
-      pwr: { id:'pwr', name:'DLDO_MAIN', category:'DLDO', reference:'DPMXB', blockOwner:'Rui Jiang', schematicOwner:'Rui Jiang', layoutOwner:'Tao He' }
+      top: { id:'top', name:'CE_TOP', round:'1st\n2nd\n3rd', category:'Controller', reference:'DPJQC', blockOwner:'Yan Sun', schematicOwner:'Ming Zhao', layoutOwner:'Tao He' },
+      core: { id:'core', name:'CORE_ARRAY', round:'1st\n2nd', category:'Banklogic', reference:'DPKRC', blockOwner:'Lei Wang', schematicOwner:'Han Li', layoutOwner:'Nina Gao' },
+      row: { id:'row', name:'ROW_CTRL', round:'1st', category:'Row+Refresh+RHR', reference:'DPLSA', blockOwner:'Lei Wang', schematicOwner:'Qin Yang', layoutOwner:'Eric Lin' },
+      sense: { id:'sense', name:'SENSE_AMP', round:'1st\n2nd', category:'Analog', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Ming Zhao', layoutOwner:'Nina Gao' },
+      bitcell: { id:'bitcell', name:'BITCELL', round:'1st\n2nd\n3rd', category:'Data path', reference:'DPNQC', blockOwner:'Ming Zhao', schematicOwner:'Han Li', layoutOwner:'Tao He' },
+      io: { id:'io', name:'IO_RING', round:'1st', category:'IO', reference:'', blockOwner:'Yan Sun', schematicOwner:'Ivy Xu', layoutOwner:'Eric Lin' },
+      dft: { id:'dft', name:'MBIST_CTRL', round:'', category:'DFT', reference:'DPQTA', blockOwner:'Kai Ding', schematicOwner:'Kai Ding', layoutOwner:'Sora Pan' },
+      pwr: { id:'pwr', name:'DLDO_MAIN', round:'1st\n2nd', category:'DLDO', reference:'DPMXB', blockOwner:'Rui Jiang', schematicOwner:'Rui Jiang', layoutOwner:'Tao He' }
     };
 
     const schematic = [
@@ -656,13 +820,14 @@
       };
     }));
     const detailState = {
+      aiRouting: {},
       spf: {
-        top: { lvsPath:'/proj/ce/lvs/top/run_0824', cdl:'/proj/ce/cdl/CE_TOP.cdl', gds:'/proj/ce/gds/CE_TOP_0824.gds', round:'2nd SPF' },
-        core: { lvsPath:'/proj/ce/lvs/core/run_0819', cdl:'/proj/ce/cdl/CORE_ARRAY.cdl', gds:'/proj/ce/gds/CORE_ARRAY.gds', round:'3rd SPF' },
-        bitcell: { lvsPath:'/proj/ce/lvs/array/latest', cdl:'/proj/ce/cdl/BITCELL_ARRAY.cdl', gds:'', round:'1st SPF' },
-        sense: { lvsPath:'/proj/ce/lvs/peri/run_0821', cdl:'/proj/ce/cdl/SENSE_AMP.cdl', gds:'/proj/ce/gds/SENSE_AMP.gds', round:'1st SPF' },
+        top: { lvsPath:'/proj/ce/lvs/top/run_0824', cdl:'/proj/ce/cdl/CE_TOP.cdl', gds:'/proj/ce/gds/CE_TOP_0824.gds', round:'1st\n2nd\n3rd' },
+        core: { lvsPath:'/proj/ce/lvs/core/run_0819', cdl:'/proj/ce/cdl/CORE_ARRAY.cdl', gds:'/proj/ce/gds/CORE_ARRAY.gds', round:'1st\n2nd' },
+        bitcell: { lvsPath:'/proj/ce/lvs/array/latest', cdl:'/proj/ce/cdl/BITCELL_ARRAY.cdl', gds:'', round:'1st\n2nd\n3rd' },
+        sense: { lvsPath:'/proj/ce/lvs/peri/run_0821', cdl:'/proj/ce/cdl/SENSE_AMP.cdl', gds:'/proj/ce/gds/SENSE_AMP.gds', round:'1st' },
         io: { lvsPath:'', cdl:'/proj/ce/cdl/IO_RING.cdl', gds:'', round:'Not started' },
-        pwr: { lvsPath:'/proj/ce/lvs/dldo/run_0820', cdl:'/proj/ce/cdl/DLDO_MAIN.cdl', gds:'/proj/ce/gds/DLDO_MAIN.gds', round:'2nd SPF' }
+        pwr: { lvsPath:'/proj/ce/lvs/dldo/run_0820', cdl:'/proj/ce/cdl/DLDO_MAIN.cdl', gds:'/proj/ce/gds/DLDO_MAIN.gds', round:'1st\n2nd' }
       }
     };
     const changeHistory = {
@@ -686,6 +851,37 @@
       spf: [changeEvent('eric','新增 Block / Instance','不存在','SENSE_AMP · spf-peri · T3','2026-08-25 15:16')]
     };
     const backupState = {};
+    const tableStateStore = new Map();
+    let activeTableName = 'ChanEdgel';
+    let schematicPlannedReleaseUnlocked = false;
+
+    function captureTableState() {
+      return structuredClone({data,railState,detailState,changeHistory,structureChanges,schematicPlannedReleaseUnlocked});
+    }
+    function restoreTableState(snapshot) {
+      const state=structuredClone(snapshot);
+      ['schematic','layout','spf'].forEach(type=>{
+        data[type].splice(0,data[type].length,...state.data[type]);
+        Object.keys(railState[type]).forEach(key=>delete railState[type][key]);
+        Object.assign(railState[type],state.railState[type]);
+        changeHistory[type]=state.changeHistory[type];
+        structureChanges[type]=state.structureChanges[type];
+      });
+      detailState.spf=state.detailState.spf;
+      detailState.aiRouting=state.detailState.aiRouting||{};
+      schematicPlannedReleaseUnlocked=Boolean(state.schematicPlannedReleaseUnlocked);
+    }
+    function switchPrototypeTable(tableName) {
+      if(tableName===activeTableName)return;
+      tableStateStore.set(activeTableName,captureTableState());
+      if(!tableStateStore.has(tableName))tableStateStore.set(tableName,captureTableState());
+      restoreTableState(tableStateStore.get(tableName));
+      activeTableName=tableName;
+      resetWbsColumnFilters();
+      if(!data[currentHierarchy].length)currentHierarchy=['schematic','layout','spf'].find(type=>data[type].length)||'schematic';
+      setHierarchy(currentHierarchy);renderDashboard();renderDelay();
+      showToast(`已切换到表 ${tableName}`);
+    }
 
     function row(id, def, parent, tier, checks, planned, actual, tierTop=false, instance='') {
       return { id, def, parent, tier, checks, planned, actual, tierTop, instance, expanded:true };
@@ -710,17 +906,23 @@
     function layoutQualifiedStatus(item) { return railFor(item, 'layout').checks.every(Boolean) ? 'Done' : 'Ongoing'; }
     function spfReadyStatus(item) { return railFor(item, 'spf').checks.every(Boolean) ? 'Done' : 'Ongoing'; }
     function spfInfoFor(item) {
-      return detailState.spf[item.def.id] ||= {lvsPath:'',cdl:'',gds:'',round:''};
+      const info=detailState.spf[item.def.id] ||= {lvsPath:'',cdl:'',gds:'',round:''};
+      info.round=normalizeRound(info.round);
+      return info;
     }
-    function calculatedHeader(label, ruleKey, context='') {
-      const rule = calculationRules[ruleKey];
-      const summary = `${rule.intro} ${rule.steps.join('；')}`;
-      return `<span class="calculated-column-title">${context?`<span class="progress-column-context">${esc(context)}</span>`:''}<span>${esc(label)}</span><button class="calculation-info" type="button" data-calculation-rule="${ruleKey}" title="${esc(summary)}" aria-label="查看 ${esc(label)} 计算逻辑" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.1 9a3 3 0 1 1 5.8 1c0 2-2.9 2-2.9 4"></path><path d="M12 17h.01"></path></svg></button></span>`;
+    function calculatedHeader(label, ruleKey) {
+      return `<span class="calculated-column-title"><span>${esc(label)}</span><button class="calculation-info" type="button" data-calculation-rule="${ruleKey}" aria-label="查看 ${esc(label)} 计算逻辑" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.1 9a3 3 0 1 1 5.8 1c0 2-2.9 2-2.9 4"></path><path d="M12 17h.01"></path></svg></button></span>`;
     }
     function optionsHtml(options, selected) { return options.map(value => `<option value="${esc(value)}" ${value === selected ? 'selected' : ''}>${value || '空'}</option>`).join(''); }
     function statusClass(value) { return value.toLowerCase().replaceAll(' ', '-'); }
-    function dateEditorCell(field, value, extraClass='') {
-      return `<td class="${extraClass}"><div class="editable-cell"><div class="cell-display ${value ? '' : 'empty'}">${value ? esc(value) : ''}</div><div class="cell-editor"><input class="cell-input date-input" type="date" data-edit="${field}" value="${esc(value)}"></div></div></td>`;
+    function dateEditorCell(field, value, extraClass='', options={}) {
+      const editable=options.editable!==false;
+      return `<td class="${extraClass} ${editable?'':'planned-release-locked'}"><div class="editable-cell"><div class="cell-display ${value ? '' : 'empty'}">${value ? esc(value) : ''}</div>${editable?`<div class="cell-editor"><input class="cell-input date-input" type="date" data-edit="${field}" value="${esc(value)}"></div>`:''}</div></td>`;
+    }
+    function plannedReleaseHeader() {
+      const unlocked=schematicPlannedReleaseUnlocked;
+      const icon=unlocked?'<svg viewBox="0 0 24 24" aria-hidden="true"><rect width="15" height="11" x="3" y="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>':'<svg viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>';
+      return `<th><span>Planned release</span><button class="planned-lock-toggle ${unlocked?'unlocked':''}" type="button" data-planned-release-lock aria-pressed="${unlocked}" aria-label="Planned release ${unlocked?'已解锁':'已锁定'}" title="${unlocked?'已解锁：所有用户可修改；PL/LPL 可重新上锁':'已锁定：空白可填写一次；仅 PL/LPL 可解锁'}">${icon}</button></th>`;
     }
     function numericEditorCell(field, value) {
       const integerOnly = field === 'planWorkdays' || field === 'actualWorkdays';
@@ -728,6 +930,13 @@
     }
     function textEditorCell(field, value, wide=false) {
       return `<td><div class="editable-cell ${wide ? 'wide' : ''}"><div class="cell-display ${value ? '' : 'empty'}">${value ? esc(value) : ''}</div><div class="cell-editor"><input class="cell-input" type="text" data-edit="${field}" value="${esc(value)}"></div></div></td>`;
+    }
+    function limitRoundLines(value) { return String(value??'').replace(/\r/g,'').split('\n').slice(0,3).join('\n'); }
+    function normalizeRound(value) { return limitRoundLines(value).split('\n').map(line=>line.trim()).filter(Boolean).join('\n'); }
+    function roundEditorCell(value, frozen=false) {
+      const normalized=normalizeRound(value),lines=normalized?normalized.split('\n'):[];
+      const display=lines.length?lines.map(line=>`<span class="spf-round-line" title="${esc(line)}">${esc(line)}</span>`).join(''):'';
+      return `<td class="${frozen?'frozen-column frozen-round-column':''}"><div class="editable-cell spf-round-cell"><div class="cell-display spf-round-display ${lines.length?'':'empty'}"><span class="spf-round-stack ${lines.length?'':'round-empty'}">${display}</span></div><div class="cell-editor"><textarea class="spf-round-editor" data-edit="round" rows="3" aria-label="Round，最多三行">${esc(normalized)}</textarea></div></div></td>`;
     }
     function searchableEditorCell(field, value, list, title, extraClass='') {
       return `<td class="${extraClass}"><div class="editable-cell wide"><div class="cell-display ${value ? '' : 'empty'}">${value ? esc(value) : ''}</div><div class="cell-editor choice"><input class="cell-input" data-edit="${field}" list="${list}" value="${esc(value)}" title="${esc(title)}"></div></div></td>`;
@@ -753,6 +962,11 @@
       const tableName = document.getElementById('tableSelect').value;
       const key = `${tableName}:${type}:${item.def.id}`;
       return backupState[key] ||= {materials:{text:`/project/DDCPC/${tableName}/${item.def.name}/materials`,link:'',attachments:[]},comments:''};
+    }
+    function aiRoutingFor(item) { return Boolean(detailState.aiRouting[item.def.id]); }
+    function aiRoutingHtml(item) {
+      const value=aiRoutingFor(item)?'yes':'no';
+      return `<section class="drawer-section ai-routing-section"><div class="ai-routing-row"><h3>AI Routing</h3><div class="ai-routing-toggle" data-ai-routing-toggle data-value="${value}" role="radiogroup" aria-label="AI Routing"><span class="ai-routing-indicator" aria-hidden="true"></span><button class="ai-routing-option" type="button" role="radio" data-ai-routing="yes" aria-checked="${value==='yes'}">Yes</button><button class="ai-routing-option" type="button" role="radio" data-ai-routing="no" aria-checked="${value==='no'}">No</button></div></div></section>`;
     }
     function materialLink(value) {
       const candidate = String(value || '').trim();
@@ -781,7 +995,7 @@
         : '<div class="attachment-empty">暂无附件</div>';
       return `<fieldset class="materials-group"><legend>Materials</legend><div class="materials-fields"><div class="field"><label>文字说明</label><textarea data-materials-field="text" placeholder="输入 Materials 说明、路径或备注">${esc(backup.materials.text)}</textarea></div><div class="field"><label>链接</label><input data-materials-field="link" type="url" inputmode="url" placeholder="https://example.com/materials" value="${esc(backup.materials.link)}"><div class="materials-link-preview">${linkPreview}</div></div><div class="field"><label>附件</label><div class="attachment-upload"><small>支持 PPT、Excel、Word，可多选</small><label class="attachment-upload-button"><span aria-hidden="true">↑</span>上传附件<input data-materials-upload type="file" multiple accept=".ppt,.pptx,.xls,.xlsx,.doc,.docx,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"></label></div><div class="attachment-list">${attachments}</div></div></div></fieldset>`;
     }
-    function derivedCheckLabel(type) { return type === 'schematic' ? 'Overall check status' : type === 'layout' ? 'Layout qualified' : 'SPF Ready'; }
+    function derivedCheckLabel(type) { return type === 'schematic' ? 'Schematic check status' : type === 'layout' ? 'Layout check status' : 'SPF check status'; }
     function derivedCheckValue(item, type) { return type === 'schematic' ? overallCheckStatus(item,type) : type === 'layout' ? layoutQualifiedStatus(item) : spfReadyStatus(item); }
     const recentChangeFields = {
       schematic: new Set(['Block Category','Reference project','Schematic Owner','Planned release']),
@@ -806,8 +1020,9 @@
     }
 
     let currentHierarchy = 'schematic';
-    let currentView = 'tree';
     let currentDelayCategory = 'schematic';
+    let currentCheckDetailHierarchy = 'schematic';
+    let latestChangeExpanded = false;
     let selectedItem = null;
     let openChangeKey = null;
     let openChangeButton = null;
@@ -815,61 +1030,273 @@
     let addFormRows = [];
     let addFormRowSequence = 0;
 
+    const wbsColumnDefinitions = {
+      schematic: [
+        ['block',165],['round',100],['category',100],['reference',105],['schematicProgress',135],['planned',135],['actual',100],['layoutProgress',120],['schematicOwner',110],['checks',110],['overallCheck',175],['latestChange',220]
+      ],
+      layout: [
+        ['block',165],['round',100],['category',100],['reference',105],['layoutProgress',120],['startDate',95],['planFinish',105],['actualFinish',105],['planWorkdays',88],['actualWorkdays',88],['schematicProgress',135],['layoutOwner',110],['resource',75],['checks',100],['layoutQualified',165],['latestChange',220]
+      ],
+      spf: [
+        ['block',165],['round',100],['schematicOwner',110],['layoutOwner',110],['checks',110],['spfReady',150],['lvsPath',130],['cdl',130],['gds',130],['plannedSpf',110],['actualSpf',110],['latestChange',220]
+      ]
+    };
+    const wbsDateColumnKeys = {
+      schematic:new Set(['planned','actual']),
+      layout:new Set(['startDate','planFinish','actualFinish']),
+      spf:new Set(['plannedSpf','actualSpf'])
+    };
+    const wbsColumnFilters = {schematic:{},layout:{},spf:{}};
+    const blankColumnFilterValue = '__blank__';
+    let openColumnFilterButton = null;
+    let columnFilterDraft = null;
+
+    function isWbsColumnFilterable(type,key) { return !wbsDateColumnKeys[type].has(key); }
+    function wbsColumnFilterValue(item,type,key) {
+      const rail=railFor(item,type),spfInfo=type==='spf'?spfInfoFor(item):null;
+      const counterpart=type==='schematic'?'layout':'schematic';
+      const hasCounterpart=type!=='spf'&&data[counterpart].some(instance=>instance.def.id===item.def.id);
+      const latest=(changeHistory[type][item.def.id]||[])[0];
+      let value='';
+      if(key==='block')value=item.def.name;
+      if(key==='round')value=(type==='spf'?spfInfo?.round:item.def.round||'').replace(/\n/g,' / ');
+      if(key==='category')value=item.def.category;
+      if(key==='reference')value=item.def.reference;
+      if(key==='schematicProgress')value=type==='schematic'?scheduleProgress(item,'schematic'):hasCounterpart?scheduleProgress(item,'schematic'):'';
+      if(key==='layoutProgress')value=type==='layout'?scheduleProgress(item,'layout'):hasCounterpart?scheduleProgress(item,'layout'):'';
+      if(key==='schematicOwner')value=item.def.schematicOwner;
+      if(key==='layoutOwner')value=item.def.layoutOwner;
+      if(key==='checks')value=`${rail.checks.filter(Boolean).length}/${rail.checks.length}`;
+      if(key==='overallCheck')value=overallCheckStatus(item,'schematic');
+      if(key==='layoutQualified')value=layoutQualifiedStatus(item);
+      if(key==='spfReady')value=spfReadyStatus(item);
+      if(key==='planWorkdays')value=rail.planWorkdays;
+      if(key==='actualWorkdays')value=rail.actualWorkdays;
+      if(key==='resource')value=rail.resource;
+      if(key==='lvsPath')value=spfInfo?.lvsPath||'';
+      if(key==='cdl')value=spfInfo?.cdl||'';
+      if(key==='gds')value=spfInfo?.gds||'';
+      if(key==='latestChange')value=latest?`${changeActors[latest.actor]?.name||latest.actor} · ${latest.field}`:'';
+      value=String(value??'').trim();
+      return value||blankColumnFilterValue;
+    }
+    function wbsColumnFilterOptions(type,key) {
+      const values=[...new Set(data[type].map(item=>wbsColumnFilterValue(item,type,key)).filter(value=>value!==blankColumnFilterValue))].sort((a,b)=>a.localeCompare(b,'zh-CN',{numeric:true,sensitivity:'base'}));
+      return [blankColumnFilterValue,...values];
+    }
+    function matchesWbsColumnFilters(item,type) {
+      return Object.entries(wbsColumnFilters[type]).every(([key,selected])=>selected.has(wbsColumnFilterValue(item,type,key)));
+    }
+    function resetWbsColumnFilters() {
+      ['schematic','layout','spf'].forEach(type=>wbsColumnFilters[type]={});
+      closeColumnFilterPopover();
+    }
+    function columnFilterDisplayValue(value) { return value===blankColumnFilterValue?'空白':value; }
+    function renderColumnFilterOptions() {
+      if(!columnFilterDraft)return;
+      const query=document.getElementById('columnFilterSearch').value.trim().toLowerCase();
+      const {values,selected}=columnFilterDraft;
+      const visible=values.filter(value=>!query||columnFilterDisplayValue(value).toLowerCase().includes(query));
+      const allChecked=values.every(value=>selected.has(value));
+      document.getElementById('columnFilterOptions').innerHTML=`<label class="column-filter-option select-all"><input type="checkbox" data-column-filter-all ${allChecked?'checked':''}><span>全选</span></label>${visible.map((value,index)=>`<label class="column-filter-option"><input type="checkbox" data-column-filter-value="${index}" ${selected.has(value)?'checked':''}><span title="${esc(columnFilterDisplayValue(value))}">${esc(columnFilterDisplayValue(value))}</span></label>`).join('')||'<div class="empty" style="padding:22px 8px">没有匹配项</div>'}`;
+      document.querySelector('[data-column-filter-all]')?.addEventListener('change',event=>{columnFilterDraft.selected=event.target.checked?new Set(values):new Set();renderColumnFilterOptions();});
+      document.querySelectorAll('[data-column-filter-value]').forEach((checkbox,index)=>checkbox.addEventListener('change',()=>{const value=visible[index];if(checkbox.checked)columnFilterDraft.selected.add(value);else columnFilterDraft.selected.delete(value);renderColumnFilterOptions();}));
+    }
+    function openColumnFilterPopover(button,type,key,title) {
+      closeChangePopover();closeCalculationPopover();closeColumnFilterPopover();
+      const values=wbsColumnFilterOptions(type,key),active=wbsColumnFilters[type][key];
+      columnFilterDraft={type,key,title,values,selected:active?new Set(active):new Set(values)};
+      openColumnFilterButton=button;button.classList.add('active');button.setAttribute('aria-expanded','true');
+      const search=document.getElementById('columnFilterSearch');
+      search.value='';search.placeholder=title;search.setAttribute('aria-label',`${title}，输入关键词模糊搜索`);
+      renderColumnFilterOptions();
+      const popover=document.getElementById('columnFilterPopover'),rect=button.getBoundingClientRect(),width=260,margin=10;
+      popover.classList.add('open');
+      popover.style.left=`${Math.min(window.innerWidth-width-margin,Math.max(margin,rect.left))}px`;
+      let top=rect.bottom+6;if(top+popover.offsetHeight>window.innerHeight-margin)top=Math.max(margin,rect.top-popover.offsetHeight-6);popover.style.top=`${top}px`;
+      search.focus();
+    }
+    function applyColumnFilter() {
+      if(!columnFilterDraft)return;
+      const {type,key,values,selected}=columnFilterDraft;
+      if(values.every(value=>selected.has(value)))delete wbsColumnFilters[type][key];
+      else wbsColumnFilters[type][key]=new Set(selected);
+      closeColumnFilterPopover();renderWbs();
+    }
+    function clearActiveColumnFilter() {
+      if(!columnFilterDraft)return;
+      columnFilterDraft.selected=new Set(columnFilterDraft.values);
+      applyColumnFilter();
+    }
+    function closeColumnFilterPopover() {
+      document.getElementById('columnFilterPopover')?.classList.remove('open');
+      openColumnFilterButton?.classList.remove('active');openColumnFilterButton?.setAttribute('aria-expanded','false');
+      openColumnFilterButton=null;columnFilterDraft=null;
+    }
+    function loadWbsColumnWidths() {
+      try { return JSON.parse(localStorage.getItem('de-wbs-column-widths-v1') || '{}'); }
+      catch { return {}; }
+    }
+    const wbsColumnWidths = loadWbsColumnWidths();
     const wbsHead = document.getElementById('wbsHead');
     const wbsBody = document.getElementById('wbsBody');
     const tableWrap = document.getElementById('tableWrap');
+    const wbsTable = tableWrap.querySelector('table');
+    const wbsColgroup = document.getElementById('wbsColgroup');
 
-    Object.entries(data).forEach(([type, instances]) => {
-      document.getElementById(type + 'Count').textContent = `${instances.length} instances`;
-    });
+    function saveWbsColumnWidths() {
+      try { localStorage.setItem('de-wbs-column-widths-v1',JSON.stringify(wbsColumnWidths)); }
+      catch { /* Prototype still supports in-session resizing when storage is unavailable. */ }
+    }
+    function currentWbsColumnWidths(type=currentHierarchy) {
+      const saved=wbsColumnWidths[type]||{};
+      return wbsColumnDefinitions[type].map(([key,minimum])=>key==='latestChange'&&!latestChangeExpanded?38:Math.max(minimum,Number(saved[key])||minimum));
+    }
+    function syncWbsColumnLayout(type,definitions,widths) {
+      [...wbsColgroup.children].forEach((column,index)=>{column.style.width=`${widths[index]}px`;});
+      const totalWidth=widths.reduce((sum,width)=>sum+width,0);
+      wbsTable.style.width=`${totalWidth}px`;
+      wbsTable.style.minWidth=`${totalWidth}px`;
+      const blockWidth=widths[0];
+      const roundWidth=widths[1];
+      const categoryWidth=type==='spf'?0:widths[2];
+      tableWrap.querySelectorAll('.frozen-block-column').forEach(cell=>{cell.style.left='0px';});
+      tableWrap.querySelectorAll('.frozen-round-column').forEach(cell=>{cell.style.left=`${blockWidth}px`;});
+      tableWrap.querySelectorAll('.frozen-category-column').forEach(cell=>{cell.style.left=`${blockWidth+roundWidth}px`;});
+      tableWrap.querySelectorAll('.frozen-reference-column').forEach(cell=>{cell.style.left=`${blockWidth+roundWidth+categoryWidth}px`;});
+      const changeWidth=widths[widths.length-1];
+      tableWrap.closest('.workspace').style.setProperty('--wbs-change-width',`${changeWidth}px`);
+      wbsHead.querySelectorAll('.column-resizer').forEach((handle,index)=>handle.setAttribute('aria-valuenow',String(widths[index])));
+    }
+    function applyWbsColumnLayout() {
+      const type=currentHierarchy;
+      const definitions=wbsColumnDefinitions[type];
+      const widths=currentWbsColumnWidths(type);
+      wbsColgroup.innerHTML=definitions.map(([key])=>`<col data-column-key="${key}">`).join('');
+      [...wbsHead.querySelectorAll('th')].forEach((header,index)=>{
+        const [key,minimum]=definitions[index];
+        const headerText=header.innerText.trim();
+        header.dataset.columnKey=key;
+        const content=document.createElement('span');
+        content.className='column-header-content';
+        const label=document.createElement('span');
+        label.className='column-header-label';
+        const calculationButton=header.querySelector('.calculation-info');
+        const plannedLockButton=header.querySelector('.planned-lock-toggle');
+        const structureChangeButton=header.querySelector('#structureChangeButton');
+        const latestChangePanelButton=header.querySelector('[data-latest-change-panel]');
+        calculationButton?.remove();
+        plannedLockButton?.remove();
+        structureChangeButton?.remove();
+        latestChangePanelButton?.remove();
+        while(header.firstChild)label.appendChild(header.firstChild);
+        const filterable=isWbsColumnFilterable(type,key);
+        const filterTitle=key==='latestChange'?'最近修改':headerText;
+        const handle=document.createElement('button');
+        handle.type='button';
+        handle.className=`column-resizer ${wbsColumnFilters[type][key]?'filtered':''}`;
+        if(filterable){handle.dataset.columnFilter=key;handle.setAttribute('aria-haspopup','dialog');handle.setAttribute('aria-expanded','false');}
+        else{handle.setAttribute('role','separator');handle.setAttribute('aria-orientation','vertical');}
+        handle.setAttribute('aria-label',filterable?`${filterTitle}：拖动调整列宽，点击筛选`:`调整 ${headerText} 列宽`);
+        handle.setAttribute('aria-valuemin',String(minimum));
+        handle.setAttribute('aria-valuemax','600');
+        handle.title=filterable?'拖动调整列宽；点击筛选':'拖动调整列宽';
+        const updateWidth=nextWidth=>{
+          widths[index]=Math.min(600,Math.max(minimum,Math.round(nextWidth)));
+          (wbsColumnWidths[type] ||= {})[key]=widths[index];
+          syncWbsColumnLayout(type,definitions,widths);
+        };
+        handle.addEventListener('pointerdown',event=>{
+          event.stopPropagation();
+          const startX=event.clientX,startWidth=widths[index];let didDrag=false;
+          const move=moveEvent=>{const delta=moveEvent.clientX-startX;if(!didDrag&&Math.abs(delta)<4)return;if(!didDrag){didDrag=true;handle.classList.add('active');document.body.classList.add('resizing-wbs-column');}updateWidth(startWidth+delta);};
+          const stop=()=>{handle.classList.remove('active');document.body.classList.remove('resizing-wbs-column');window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',stop);if(didDrag)saveWbsColumnWidths();else if(filterable)openColumnFilterPopover(handle,type,key,filterTitle);};
+          window.addEventListener('pointermove',move);window.addEventListener('pointerup',stop,{once:true});
+        });
+        handle.addEventListener('keydown',event=>{
+          if(['ArrowLeft','ArrowRight'].includes(event.key)){event.preventDefault();updateWidth(widths[index]+(event.key==='ArrowRight'?10:-10));saveWbsColumnWidths();return;}
+          if(filterable&&['Enter',' '].includes(event.key)){event.preventDefault();event.stopPropagation();openColumnFilterPopover(handle,type,key,filterTitle);}
+        });
+        content.append(label);
+        if(calculationButton)content.append(calculationButton);
+        if(plannedLockButton)content.append(plannedLockButton);
+        if(structureChangeButton)content.append(structureChangeButton);
+        if(latestChangePanelButton)content.append(latestChangePanelButton);
+        content.append(handle);
+        header.appendChild(content);
+      });
+      syncWbsColumnLayout(type,definitions,widths);
+    }
+    function canManagePlannedReleaseLock() {
+      const role=changeActors[currentActorId]?.role;
+      return ['Process Leader','PL','LPL'].includes(role);
+    }
+    function bindPlannedReleaseLock() {
+      const button=wbsHead.querySelector('[data-planned-release-lock]');
+      if(!button)return;
+      button.addEventListener('click',event=>{
+        event.preventDefault();event.stopPropagation();
+        if(!canManagePlannedReleaseLock())return showToast('仅项目 PL / LPL 可开锁或关锁');
+        schematicPlannedReleaseUnlocked=!schematicPlannedReleaseUnlocked;
+        renderWbs();
+        showToast(`Planned release 已${schematicPlannedReleaseUnlocked?'解锁，允许修改':'上锁，仅空白可填写一次'}`);
+      });
+    }
 
     function renderWbs() {
       closeChangePopover();
       closeCalculationPopover();
+      closeColumnFilterPopover();
       const meta = hierarchyMeta[currentHierarchy];
       const isLayout = currentHierarchy === 'layout';
       const isSpf = currentHierarchy === 'spf';
       const layoutWorkdaysHeaders = isLayout ? '<th>Plan workdays</th><th>Actual workdays</th>' : '';
       const startDateHeader = isLayout ? '<th>Start date</th>' : '';
-      const overallHeader = currentHierarchy === 'schematic' ? `<th>${calculatedHeader('Overall check status','overallCheck')}</th>` : '';
-      const ownProgressHeader = `<th class="own-progress-column">${calculatedHeader(`${isLayout?'Layout':'Schematic'} Progress`,isLayout?'layoutProgress':'schematicProgress','本表')}</th>`;
-      const relatedProgressHeader = `<th class="related-progress-column">${calculatedHeader(`${isLayout?'Schematic':'Layout'} Progress`,isLayout?'schematicProgress':'layoutProgress','关联')}</th>`;
+      const overallHeader = currentHierarchy === 'schematic' ? `<th>${calculatedHeader('Schematic check status','overallCheck')}</th>` : '';
+      const ownProgressHeader = `<th>${calculatedHeader(`${isLayout?'Layout':'Schematic'} Progress`,isLayout?'layoutProgress':'schematicProgress')}</th>`;
+      const relatedProgressHeader = `<th>${calculatedHeader(`${isLayout?'Schematic':'Layout'} Progress`,isLayout?'schematicProgress':'layoutProgress')}</th>`;
+      const changePanelIcon=latestChangeExpanded?'<path d="m9 18 6-6-6-6"></path>':'<path d="m15 18-6-6 6-6"></path>';
+      const changePanelToggle=`<button class="latest-change-panel-toggle ${wbsColumnFilters[currentHierarchy].latestChange?'filtered':''}" data-latest-change-panel type="button" aria-expanded="${latestChangeExpanded}" title="${latestChangeExpanded?'收起':'展开'}最近修改" aria-label="${latestChangeExpanded?'收起':'展开'}最近修改"><svg viewBox="0 0 24 24" aria-hidden="true">${changePanelIcon}</svg></button>`;
+      const changeHeader = latestChangeExpanded
+        ? `<th class="change-column"><span>最近修改</span><button class="header-structure-change" id="structureChangeButton" type="button" aria-expanded="false">Block变更记录<span class="structure-change-count" id="structureChangeCount"></span></button>${changePanelToggle}</th>`
+        : `<th class="change-column latest-change-collapsed">${changePanelToggle}</th>`;
       const workflowHeaders = isLayout
-        ? `${ownProgressHeader}${startDateHeader}<th>${meta.date}</th><th>${meta.actual}</th>${layoutWorkdaysHeaders}${relatedProgressHeader}<th>${meta.owner}</th><th>Resource</th><th>Check item</th><th>${calculatedHeader('Layout qualified','layoutQualified')}</th>`
-        : `${ownProgressHeader}<th>${meta.date}</th><th>${meta.actual}</th>${relatedProgressHeader}<th>${meta.owner}</th><th>Check item</th>${overallHeader}`;
+        ? `${ownProgressHeader}${startDateHeader}<th>${meta.date}</th><th>${meta.actual}</th>${layoutWorkdaysHeaders}${relatedProgressHeader}<th>${meta.owner}</th><th>Resource</th><th>Check item</th><th>${calculatedHeader('Layout check status','layoutQualified')}</th>`
+        : `${ownProgressHeader}${plannedReleaseHeader()}<th>${meta.actual}</th>${relatedProgressHeader}<th>${meta.owner}</th><th>Check item</th>${overallHeader}`;
       wbsHead.innerHTML = isSpf
-        ? `<tr><th class="frozen-column frozen-block-column last-frozen-column">Block / Instance</th><th>Schematic Owner</th><th>Layout Owner</th><th>SPF round</th><th>LVS path</th><th>cdl</th><th>gds</th><th>Check item</th><th>${calculatedHeader('SPF Ready','spfReady')}</th><th>${meta.date}</th><th>${meta.actual}</th><th class="change-column">最近修改</th></tr>`
-        : `<tr><th class="frozen-column frozen-block-column">Block / Instance</th><th class="frozen-column frozen-category-column">Block Category</th><th class="frozen-column frozen-reference-column last-frozen-column">Reference project</th>${workflowHeaders}<th class="change-column">最近修改</th></tr>`;
+        ? `<tr><th class="frozen-column frozen-block-column">Block</th><th class="frozen-column frozen-round-column last-frozen-column">Round</th><th>Schematic Owner</th><th>Layout Owner</th><th>Check item</th><th>${calculatedHeader('SPF check status','spfReady')}</th><th>LVS path</th><th>cdl</th><th>gds</th><th>${meta.date}</th><th>${meta.actual}</th>${changeHeader}</tr>`
+        : `<tr><th class="frozen-column frozen-block-column">Block</th><th class="frozen-column frozen-round-column">Round</th><th class="frozen-column frozen-category-column">Block Category</th><th class="frozen-column frozen-reference-column last-frozen-column">Reference project</th>${workflowHeaders}${changeHeader}</tr>`;
       const query = document.getElementById('searchInput').value.trim().toLowerCase();
-      const derivedStatusFilter = document.getElementById('derivedStatusFilter').value;
-      const ownProgressFilter = document.getElementById('ownProgressFilter').value;
-      const relatedProgressFilter = document.getElementById('relatedProgressFilter').value;
       const all = data[currentHierarchy];
       const visibleByTree = item => {
-        if (currentView === 'flat') return true;
         let p = item.parent;
         while (p) { const parent = all.find(x => x.id === p); if (!parent || !parent.expanded) return false; p = parent.parent; }
         return true;
       };
       const items = all.filter(item => {
         const hay = `${item.def.name} ${ownerFor(item,currentHierarchy)} ${item.def.reference}`.toLowerCase();
-        const derivedStatus = currentHierarchy === 'schematic'
-          ? checkStatus(item,currentHierarchy)
-          : statusClass(currentHierarchy === 'layout' ? layoutQualifiedStatus(item) : spfReadyStatus(item));
-        const counterpartType = currentHierarchy === 'schematic' ? 'layout' : 'schematic';
-        const hasCounterpart = currentHierarchy !== 'spf' && data[counterpartType].some(instance=>instance.def.id===item.def.id);
-        const ownProgressState = currentHierarchy === 'spf' ? '' : statusClass(scheduleProgress(item,currentHierarchy));
-        const relatedProgressState = hasCounterpart ? statusClass(scheduleProgress(item,counterpartType)) : '';
         return visibleByTree(item)
           && (!query || hay.includes(query))
-          && (derivedStatusFilter === 'all' || derivedStatus === derivedStatusFilter)
-          && (currentHierarchy === 'spf' || ownProgressFilter === 'all' || ownProgressState === ownProgressFilter)
-          && (currentHierarchy === 'spf' || relatedProgressFilter === 'all' || relatedProgressState === relatedProgressFilter);
+          && matchesWbsColumnFilters(item,currentHierarchy);
       });
-      tableWrap.classList.toggle('flat-view', currentView === 'flat');
-      wbsBody.innerHTML = items.length ? items.map(item => rowHtml(item)).join('') : `<tr><td colspan="16"><div class="empty"><strong>没有匹配的 Block</strong>调整搜索词或筛选条件</div></td></tr>`;
-      const repeatedDefinitions = [...new Set(all.filter((item,index)=>all.findIndex(x=>x.def.id===item.def.id)!==index).map(item=>item.def.id))].length;
-      document.getElementById('datasetSummary').innerHTML = `<span>当前完整演示集<strong>${all.length} instances</strong></span><span>对应<strong>${unique(all).length} unique Blocks</strong></span><span>重复例化 Block<strong>${repeatedDefinitions}</strong></span>`;
+      const spfCreateRow=isSpf?`<tr class="spf-create-row" data-spf-create-row tabindex="0" role="button" aria-label="新增 SPF Block" title="点击新增 Block"><td class="frozen-column frozen-block-column"><span class="spf-create-cue"><span class="row-action row-add spf-create-plus" aria-hidden="true">+</span><span class="spf-create-label">新增 Block</span></span></td><td class="frozen-column frozen-round-column last-frozen-column"></td>${Array.from({length:10},()=>'<td></td>').join('')}</tr>`:'';
+      const dataRows=items.length
+        ? items.map(item => rowHtml(item)).join('')
+        : all.length
+          ? `<tr><td colspan="16"><div class="empty"><strong>没有匹配的 Block</strong>调整搜索词或筛选条件</div></td></tr>`
+          : '';
+      wbsBody.innerHTML = spfCreateRow+dataRows;
+      applyWbsColumnLayout();
+      bindPlannedReleaseLock();
+      const spfCreateButton=document.querySelector('[data-spf-create-row]');
+      spfCreateButton?.addEventListener('pointerenter',()=>spfCreateButton.classList.add('create-row-active'));
+      spfCreateButton?.addEventListener('pointerleave',()=>spfCreateButton.classList.remove('create-row-active'));
+      spfCreateButton?.addEventListener('focus',()=>spfCreateButton.classList.add('create-row-active'));
+      spfCreateButton?.addEventListener('blur',()=>spfCreateButton.classList.remove('create-row-active'));
+      spfCreateButton?.addEventListener('click',()=>openAddInstanceModal());
+      spfCreateButton?.addEventListener('keydown',event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();openAddInstanceModal();}});
+      document.querySelector('[data-latest-change-panel]')?.addEventListener('click',event=>{event.stopPropagation();latestChangeExpanded=!latestChangeExpanded;closeChangePopover();renderWbs();});
+      document.getElementById('structureChangeButton')?.addEventListener('click',event=>{event.stopPropagation();openStructureChangeHistory(event.currentTarget);});
       updateStructureChangeSummary();
       bindCalculationRules();
       bindWbsRows();
@@ -881,15 +1308,17 @@
       const state = stateFor(item, type);
       const p = progress(item, type);
       const hasChildren = data[type].some(x => x.parent === item.id);
-      const levelPad = currentView === 'tree' ? (item.tier - 1) * 21 : 0;
+      const levelPad = (item.tier - 1) * 17;
       const late = state === 'delay';
       const siblingCount = data[type].filter(x => x.def.id === item.def.id).length;
       const categoryCell = `<div class="editable-cell"><div class="cell-display ${item.def.category ? '' : 'empty'}">${item.def.category ? esc(item.def.category) : ''}</div><div class="cell-editor choice"><select class="cell-select ${item.def.category ? '' : 'empty-value'}" data-edit="category" aria-label="${esc(item.def.name)} Block Category">${optionsHtml(blockCategories,item.def.category)}</select></div></div>`;
       const ownerList = type === 'schematic' ? 'schematicOwners' : 'layoutOwners';
       const spfInfo = type === 'spf' ? spfInfoFor(item) : null;
+      const roundCell = roundEditorCell(type==='spf'?spfInfo.round:item.def.round,true);
       const genericIdentityCells = `<td class="frozen-column frozen-category-column">${categoryCell}</td>${searchableEditorCell('reference',item.def.reference,'referenceProjects','输入可模糊搜索产品；选择空后单元格留白','frozen-column frozen-reference-column last-frozen-column')}`;
       const ownerCell = type === 'spf' ? '' : searchableEditorCell('owner',ownerFor(item,type),ownerList,'输入可模糊搜索人名；清空表示空');
-      const spfIdentityCells = type === 'spf' ? `${searchableEditorCell('schematicOwner',item.def.schematicOwner,'schematicOwners','输入可模糊搜索 Schematic Owner')}${searchableEditorCell('layoutOwner',item.def.layoutOwner,'layoutOwners','输入可模糊搜索 Layout Owner')}${textEditorCell('spfRound',spfInfo.round)}${textEditorCell('lvsPath',spfInfo.lvsPath,true)}${textEditorCell('cdl',spfInfo.cdl,true)}${textEditorCell('gds',spfInfo.gds,true)}` : '';
+      const spfOwnerCells = type === 'spf' ? `${searchableEditorCell('schematicOwner',item.def.schematicOwner,'schematicOwners','输入可模糊搜索 Schematic Owner')}${searchableEditorCell('layoutOwner',item.def.layoutOwner,'layoutOwners','输入可模糊搜索 Layout Owner')}` : '';
+      const spfFileCells = type === 'spf' ? `${textEditorCell('lvsPath',spfInfo.lvsPath,true)}${textEditorCell('cdl',spfInfo.cdl,true)}${textEditorCell('gds',spfInfo.gds,true)}` : '';
       const layoutWorkdaysCells = type === 'layout' ? `${numericEditorCell('planWorkdays',rail.planWorkdays)}${numericEditorCell('actualWorkdays',rail.actualWorkdays)}` : '';
       const layoutResourceCell = type === 'layout' ? numericEditorCell('resource',rail.resource) : '';
       const layoutQualifiedCell = type === 'layout' ? `<td><span class="status ${layoutQualifiedStatus(item).toLowerCase()}">${layoutQualifiedStatus(item)}</span></td>` : '';
@@ -898,21 +1327,23 @@
       const counterpartType = type === 'schematic' ? 'layout' : 'schematic';
       const counterpartStatus = type !== 'spf' && data[counterpartType].some(instance=>instance.def.id===item.def.id) ? scheduleProgress(item,counterpartType) : '';
       const ownProgressStatus = type === 'spf' ? '' : scheduleProgress(item,type);
-      const ownProgressCell = type === 'spf' ? spfReadyCell : `<td class="own-progress-column"><span class="status ${statusClass(ownProgressStatus)}" title="由 ${type === 'schematic' ? 'Planned release / Actual release' : 'Plan finish / Actual finish'} 自动判定">${esc(ownProgressStatus)}</span></td>`;
-      const counterpartProgressCell = type === 'spf' ? '' : `<td class="related-progress-column">${counterpartStatus ? `<span class="status ${statusClass(counterpartStatus)}" title="来自 ${counterpartType === 'schematic' ? 'Schematic' : 'Layout'} hierarchy，由日期自动判定">${esc(counterpartStatus)}</span>` : ''}</td>`;
+      const ownProgressCell = type === 'spf' ? spfReadyCell : `<td><span class="status ${statusClass(ownProgressStatus)}" title="由 ${type === 'schematic' ? 'Planned release / Actual release' : 'Plan finish / Actual finish'} 自动判定">${esc(ownProgressStatus)}</span></td>`;
+      const counterpartProgressCell = type === 'spf' ? '' : `<td>${counterpartStatus ? `<span class="status ${statusClass(counterpartStatus)}" title="来自 ${counterpartType === 'schematic' ? 'Schematic' : 'Layout'} hierarchy，由日期自动判定">${esc(counterpartStatus)}</span>` : ''}</td>`;
       const overallCell = type === 'schematic' ? `<td><span class="status ${overallCheckStatus(item,type).toLowerCase()}">${overallCheckStatus(item,type)}</span></td>` : '';
       const workflowCells = type === 'schematic'
-        ? `${ownProgressCell}${dateEditorCell('planned',rail.planned,late?'date late':'date')}${dateEditorCell('actual',rail.actual,'date')}${counterpartProgressCell}${ownerCell}${checkItemCell}${overallCell}`
+        ? `${ownProgressCell}${dateEditorCell('planned',rail.planned,late?'date late':'date',{editable:schematicPlannedReleaseUnlocked||!rail.planned})}${dateEditorCell('actual',rail.actual,'date')}${counterpartProgressCell}${ownerCell}${checkItemCell}${overallCell}`
         : type === 'layout'
           ? `${ownProgressCell}${dateEditorCell('startDate',rail.startDate)}${dateEditorCell('planned',rail.planned,late?'date late':'date')}${dateEditorCell('actual',rail.actual,'date')}${layoutWorkdaysCells}${counterpartProgressCell}${ownerCell}${layoutResourceCell}${checkItemCell}${layoutQualifiedCell}`
           : `${checkItemCell}${spfReadyCell}`;
       return `<tr data-id="${item.id}" class="${selectedItem?.id === item.id ? 'selected' : ''}">
-        <td class="frozen-column frozen-block-column ${type==='spf'?'last-frozen-column':''}"><div class="block-cell" style="padding-left:${levelPad}px"><button class="tree-toggle ${hasChildren?'':'hidden'}" title="展开/折叠">${item.expanded?'▾':'▸'}</button><div class="block-main"><div class="block-title-line"><span class="block-name">${esc(item.def.name)}</span>${siblingCount > 1 ? `<button class="instance-mark" title="当前为实例 ${esc(item.instance || item.id)}；同一 Block 在当前 hierarchy 有 ${siblingCount} 个实例。点击查看 Block 详情">${esc(item.instance || '实例')} · ⛓${siblingCount}</button>` : ''}<span class="tier">T${item.tier}${item.tierTop && type==='layout'?' · TOP':''}</span><button class="row-delete" data-delete-instance title="删除 ${esc(item.def.name)} Instance" aria-label="删除 ${esc(item.def.name)} Instance"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6v14H5V6"></path><path d="M10 11v5M14 11v5"></path></svg></button></div></div></div></td>
-        ${type === 'spf' ? spfIdentityCells : genericIdentityCells}
+        <td class="frozen-column frozen-block-column"><div class="block-cell" style="padding-left:${levelPad}px"><button class="tree-toggle ${hasChildren?'':'hidden'}" title="展开/折叠">${item.expanded?'▾':'▸'}</button><div class="block-main"><div class="block-title-line"><span class="block-name-wrap"><span class="block-name">${esc(item.def.name)}</span><span class="row-actions"><button class="row-action row-add" data-add-child type="button" title="新增 Block" aria-label="在 ${esc(item.def.name)} 行新增 Block">+</button><button class="row-action row-delete" data-delete-instance type="button" title="删除 ${esc(item.def.name)} Instance" aria-label="删除 ${esc(item.def.name)} Instance"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6v14H5V6"></path><path d="M10 11v5M14 11v5"></path></svg></button></span></span>${siblingCount > 1 ? `<button class="instance-mark" title="当前为实例 ${esc(item.instance || item.id)}；同一 Block 在当前 hierarchy 有 ${siblingCount} 个实例。点击查看 Block 详情">${esc(item.instance || '实例')} · ⛓${siblingCount}</button>` : ''}<span class="tier">T${item.tier}${item.tierTop && type==='layout'?' · TOP':''}</span></div></div></div></td>
+        ${roundCell}
+        ${type === 'spf' ? spfOwnerCells : genericIdentityCells}
         ${workflowCells}
+        ${spfFileCells}
         ${type === 'spf' ? dateEditorCell('planned',rail.planned,late?'date late':'date') : ''}
         ${type === 'spf' ? dateEditorCell('actual',rail.actual,'date') : ''}
-        <td class="change-column">${latestChangeHtml(item,type)}</td>
+        <td class="change-column ${latestChangeExpanded?'':'latest-change-collapsed'}">${latestChangeHtml(item,type)}</td>
       </tr>`;
     }
 
@@ -922,6 +1353,7 @@
         tr.querySelector('.tree-toggle')?.addEventListener('click', e => { e.stopPropagation(); item.expanded = !item.expanded; renderWbs(); });
         tr.querySelector('.block-name')?.addEventListener('click', e => { e.stopPropagation(); openDrawer(item); });
         tr.querySelector('.instance-mark')?.addEventListener('click', e => { e.stopPropagation(); openDrawer(item); });
+        tr.querySelector('[data-add-child]')?.addEventListener('click', e => { e.stopPropagation(); openAddInstanceModal(item); });
         tr.querySelector('[data-delete-instance]')?.addEventListener('click', e => { e.stopPropagation(); deleteInstance(item); });
         tr.querySelectorAll('[data-check-index]').forEach(button => button.addEventListener('click', e => {
           e.stopPropagation();
@@ -930,6 +1362,7 @@
         }));
         tr.querySelectorAll('[data-edit]').forEach(control => {
           control.addEventListener('click', e => e.stopPropagation());
+          if(control.dataset.edit==='round')control.addEventListener('input',()=>{control.value=limitRoundLines(control.value);});
           control.addEventListener('change', () => updateTableField(item, control.dataset.edit, control.value));
         });
         tr.querySelector('[data-change-history]')?.addEventListener('click', e => { e.stopPropagation(); openRowChangeHistory(item,e.currentTarget); });
@@ -940,16 +1373,17 @@
     function updateTableField(item, field, value) {
       const rail = railFor(item, currentHierarchy);
       const info = currentHierarchy === 'spf' ? spfInfoFor(item) : null;
-      const normalized = field === 'reference' && value === '空' ? '' : value;
+      const normalized = field === 'reference' && value === '空' ? '' : field === 'round' ? normalizeRound(value) : value;
       const oldValue = field === 'category' ? item.def.category
         : field === 'reference' ? item.def.reference
         : field === 'owner' ? item.def[currentHierarchy + 'Owner']
         : field === 'schematicOwner' ? item.def.schematicOwner
         : field === 'layoutOwner' ? item.def.layoutOwner
-        : field === 'spfRound' ? info.round
+        : field === 'round' ? currentHierarchy==='spf'?info.round:item.def.round||''
         : ['lvsPath','cdl','gds'].includes(field) ? info[field]
         : rail[field];
       if (oldValue === normalized) return;
+      if(currentHierarchy==='schematic'&&field==='planned'&&oldValue&&!schematicPlannedReleaseUnlocked){showToast('Planned release 已锁定；仅 PL/LPL 可解锁后修改');renderWbs();return;}
       if (field === 'planWorkdays' || field === 'actualWorkdays' || field === 'resource') {
         const integerOnly = field === 'planWorkdays' || field === 'actualWorkdays';
         const valid = integerOnly ? /^\d*$/.test(normalized) : /^-?\d*(\.\d*)?$/.test(normalized);
@@ -964,14 +1398,17 @@
       if (field === 'owner') item.def[currentHierarchy + 'Owner'] = normalized;
       if (field === 'schematicOwner') item.def.schematicOwner = normalized;
       if (field === 'layoutOwner') item.def.layoutOwner = normalized;
-      if (field === 'spfRound' || field === 'lvsPath' || field === 'cdl' || field === 'gds') {
-        info[field === 'spfRound' ? 'round' : field] = normalized;
+      if (field === 'round') {
+        if(currentHierarchy==='spf')info.round=normalized;else item.def.round=normalized;
+      }
+      if (field === 'lvsPath' || field === 'cdl' || field === 'gds') {
+        info[field] = normalized;
       }
       if (field === 'planWorkdays' || field === 'actualWorkdays' || field === 'resource') {
         rail[field] = normalized;
       }
       if (field === 'planned' || field === 'actual' || field === 'startDate') rail[field] = normalized;
-      const labels = {category:'Block Category',reference:'Reference project',owner:hierarchyMeta[currentHierarchy].owner,schematicOwner:'Schematic Owner',layoutOwner:'Layout Owner',spfRound:'SPF round',lvsPath:'LVS path',cdl:'cdl',gds:'gds',planWorkdays:'Plan workdays',actualWorkdays:'Actual workdays',resource:'Resource',planned:hierarchyMeta[currentHierarchy].date,actual:hierarchyMeta[currentHierarchy].actual,startDate:'Start date'};
+      const labels = {round:'Round',category:'Block Category',reference:'Reference project',owner:hierarchyMeta[currentHierarchy].owner,schematicOwner:'Schematic Owner',layoutOwner:'Layout Owner',lvsPath:'LVS path',cdl:'cdl',gds:'gds',planWorkdays:'Plan workdays',actualWorkdays:'Actual workdays',resource:'Resource',planned:hierarchyMeta[currentHierarchy].date,actual:hierarchyMeta[currentHierarchy].actual,startDate:'Start date'};
       if(field==='category'||field==='reference') recordDefinitionChange(item,['schematic','layout'],labels[field],oldValue,normalized);
       else if(field==='schematicOwner'||(field==='owner'&&currentHierarchy==='schematic')) recordDefinitionChange(item,['schematic','spf'],labels[field],oldValue,normalized);
       else if(field==='layoutOwner'||(field==='owner'&&currentHierarchy==='layout')) recordDefinitionChange(item,['layout','spf'],labels[field],oldValue,normalized);
@@ -1055,7 +1492,7 @@
       data[type].splice(data[type].findIndex(candidate=>candidate.id===item.id),1);
       structureChanges[type].unshift(changeEvent(currentActorId,'删除 Block / Instance',before,'已删除',auditNow()));
       if (selectedItem?.id === item.id) closeDrawer();
-      refreshInstanceCounts(); renderWbs(); renderDashboard(); renderDelay();
+      renderWbs(); renderDashboard(); renderDelay();
       showToast(`${item.def.name} Instance 已删除`);
     }
 
@@ -1087,7 +1524,7 @@
     }
     function openStructureChangeHistory(button) {
       const history = structureChanges[currentHierarchy];
-      openChangePopover(`structure:${currentHierarchy}`,`${currentHierarchy.toUpperCase()} 结构变更`,`新增、删除与层级调整 · ${history.length} 条`,history,button);
+      openChangePopover(`structure:${currentHierarchy}`,`${currentHierarchy.toUpperCase()} Block变更记录`,`新增、删除与层级调整 · ${history.length} 条`,history,button);
     }
     function closeChangePopover() {
       document.getElementById('changePopover')?.classList.remove('open');
@@ -1096,17 +1533,27 @@
       openChangeKey=null; openChangeButton=null;
     }
     function bindCalculationRules() {
-      wbsHead.querySelectorAll('[data-calculation-rule]').forEach(button=>button.addEventListener('click',event=>{
-        event.stopPropagation();
-        openCalculationPopover(button);
-      }));
+      wbsHead.querySelectorAll('[data-calculation-rule]').forEach(button=>{
+        button.addEventListener('pointerenter',()=>showCalculationPopover(button,false));
+        button.addEventListener('pointerleave',closeCalculationHoverPopover);
+        button.addEventListener('focus',()=>showCalculationPopover(button,false));
+        button.addEventListener('blur',closeCalculationHoverPopover);
+        button.addEventListener('click',event=>{
+          event.stopPropagation();
+          const popover=document.getElementById('calculationPopover');
+          if(openCalculationButton===button&&popover.classList.contains('open')&&popover.dataset.mode==='pinned')return closeCalculationPopover();
+          showCalculationPopover(button,true);
+        });
+      });
     }
-    function openCalculationPopover(button) {
+    function showCalculationPopover(button,pinned=false) {
       const popover = document.getElementById('calculationPopover');
-      if (openCalculationButton === button && popover.classList.contains('open')) return closeCalculationPopover();
+      if(popover.dataset.mode==='pinned'&&!pinned&&openCalculationButton!==button)return;
+      if(openCalculationButton===button&&popover.classList.contains('open')){if(pinned)popover.dataset.mode='pinned';return;}
       closeCalculationPopover();
       const rule = calculationRules[button.dataset.calculationRule];
       if (!rule) return;
+      popover.dataset.mode=pinned?'pinned':'hover';
       openCalculationButton = button;
       button.classList.add('open');
       button.setAttribute('aria-expanded','true');
@@ -1121,17 +1568,20 @@
       popover.style.left=`${left}px`;
       popover.style.top=`${top}px`;
     }
+    function closeCalculationHoverPopover() {
+      const popover=document.getElementById('calculationPopover');
+      if(popover.dataset.mode==='hover')closeCalculationPopover();
+    }
     function closeCalculationPopover() {
       document.getElementById('calculationPopover')?.classList.remove('open');
+      delete document.getElementById('calculationPopover')?.dataset.mode;
       openCalculationButton?.classList.remove('open');
       openCalculationButton?.setAttribute('aria-expanded','false');
       openCalculationButton=null;
     }
     function updateStructureChangeSummary() {
-      const history=structureChanges[currentHierarchy], latest=history[0];
-      document.getElementById('structureChangeCount').textContent=history.length;
-      const subject=latest?.field.startsWith('新增')?latest.newValue:latest?.oldValue;
-      document.getElementById('structureChangeLatest').textContent=latest?`${changeActors[latest.actor].name} · ${latest.field} · ${subject}`:'暂无结构变更';
+      const count=document.getElementById('structureChangeCount');
+      if(count)count.textContent=structureChanges[currentHierarchy].length;
     }
 
     function openDrawer(item) {
@@ -1161,7 +1611,7 @@
         <div class="info-grid">
           ${infoFields}
         </div>
-      </section>${specific}
+      </section>${specific}${aiRoutingHtml(item)}
       <section class="drawer-section"><div class="section-title"><h3>Back up</h3></div>${materialsHtml(backup)}<div class="field" style="margin-top:12px"><label>Comments</label><textarea data-backup-field="comments" placeholder="补充说明">${esc(backup.comments)}</textarea></div></section>`;
     }
 
@@ -1178,20 +1628,28 @@
     function layoutDetail(item) {
       const rail = railFor(item, 'layout');
       return `<section class="drawer-section"><div class="section-title"><h3>Layout Schedule</h3><span class="status ${stateFor(item,'layout')}">${statusText(stateFor(item,'layout'))}</span></div>
-        <div class="info-grid"><div class="field"><label>Start date</label><strong>${rail.startDate || '—'}</strong></div><div class="field"><label>Plan workdays</label><strong>${rail.planWorkdays || '—'}</strong></div><div class="field"><label>Actual workdays</label><strong>${rail.actualWorkdays || '—'}</strong></div><div class="field"><label>Resource</label><strong>${rail.resource || '—'}</strong></div><div class="field"><label>Plan finish date</label><strong>${rail.planned || '—'}</strong></div><div class="field"><label>实际完成时间</label><strong>${rail.actual || '—'}</strong></div><div class="field"><label>Layout qualified</label><strong>${layoutQualifiedStatus(item)}</strong></div><div class="field"><label>日期口径</label><strong>无 release date</strong></div></div>
+        <div class="info-grid"><div class="field"><label>Start date</label><strong>${rail.startDate || '—'}</strong></div><div class="field"><label>Plan workdays</label><strong>${rail.planWorkdays || '—'}</strong></div><div class="field"><label>Actual workdays</label><strong>${rail.actualWorkdays || '—'}</strong></div><div class="field"><label>Resource</label><strong>${rail.resource || '—'}</strong></div><div class="field"><label>Plan finish date</label><strong>${rail.planned || '—'}</strong></div><div class="field"><label>实际完成时间</label><strong>${rail.actual || '—'}</strong></div><div class="field"><label>Layout check status</label><strong>${layoutQualifiedStatus(item)}</strong></div><div class="field"><label>日期口径</label><strong>无 release date</strong></div></div>
       </section><section class="drawer-section"><div class="section-title"><h3>Check List (with Layout KR)</h3><small>${progress(item,'layout')}% · Definition rail 共享</small></div>${checksHtml(item,'layout')}</section>${item.tierTop?`<section class="drawer-section"><div class="section-title"><h3>Tier 顶层进度</h3></div><div class="rail-row" style="grid-template-columns:80px 1fr 40px"><span>Own</span><div class="progress"><span style="width:${progress(item,'layout')}%"></span></div><b>${progress(item,'layout')}%</b></div><div class="rail-row" style="grid-template-columns:80px 1fr 40px"><span>Rollup</span><div class="progress green"><span style="width:${Math.min(100,progress(item,'layout')+12)}%"></span></div><b>${Math.min(100,progress(item,'layout')+12)}%</b></div></section>`:''}`;
     }
     function spfDetail(item) {
       const rail = railFor(item, 'spf');
       const v = spfInfoFor(item);
       return `<section class="drawer-section"><div class="section-title"><h3>SPF status</h3></div>
-        <div class="info-grid"><div class="field"><label>SPF round</label><strong>${v.round}</strong></div><div class="field"><label>SPF Ready</label><strong>${spfReadyStatus(item)}</strong></div><div class="field"><label>Planned SPF release</label><strong>${rail.planned}</strong></div></div>
+        <div class="info-grid"><div class="field"><label>Round</label><strong class="spf-round-detail">${esc(v.round)||'—'}</strong></div><div class="field"><label>SPF check status</label><strong>${spfReadyStatus(item)}</strong></div><div class="field"><label>Planned SPF release</label><strong>${rail.planned}</strong></div></div>
         <div class="field" style="margin-top:10px"><label>LVS path</label><input data-spf-field="lvsPath" value="${esc(v.lvsPath)}"></div>
         <div class="info-grid" style="margin-top:10px"><div class="field"><label>cdl</label><input data-spf-field="cdl" value="${esc(v.cdl)}"></div><div class="field"><label>gds</label><input data-spf-field="gds" value="${esc(v.gds)}"></div></div>
       </section><section class="drawer-section"><div class="section-title"><h3>SPF check list</h3><small>${progress(item,'spf')}% · Definition rail 共享</small></div>${checksHtml(item,'spf')}</section>`;
     }
 
     function bindDrawer(item) {
+      document.querySelectorAll('[data-ai-routing]').forEach(button=>button.addEventListener('click',()=>{
+        const enabled=button.dataset.aiRouting==='yes';
+        detailState.aiRouting[item.def.id]=enabled;
+        const toggle=button.closest('[data-ai-routing-toggle]');
+        toggle.dataset.value=enabled?'yes':'no';
+        toggle.querySelectorAll('[data-ai-routing]').forEach(option=>option.setAttribute('aria-checked',String(option.dataset.aiRouting===(enabled?'yes':'no'))));
+        showToast(`AI Routing 已设为 ${enabled?'Yes':'No'}`);
+      }));
       document.querySelectorAll('[data-check]').forEach(input => input.addEventListener('change', () => {
         updateDefinitionCheck(item,currentHierarchy,Number(input.dataset.check),input.checked);
         openDrawer(item); renderDashboard(); renderDelay();
@@ -1244,17 +1702,56 @@
       const layoutDelayed = layUnique.filter(item=>stateFor(item,'layout')==='delay');
       const delayed = [...schematicDelayed.map(item=>[item,'schematic']),...layoutDelayed.map(item=>[item,'layout'])];
       document.getElementById('metricGrid').innerHTML = [
-        ['Overall check status',`${schUnique.filter(i=>progress(i,'schematic')===100).length}/${schUnique.length}`,'5 项 check 自动判定','✓','success'],['Layout Qualified',`${layUnique.filter(i=>progress(i,'layout')===100).length}/${layUnique.length}`,'4 项 KR check 自动判定','◎','success'],['Schematic Delay',schematicDelayed.length,'对比原始 Planned release','!','danger'],['Layout Delay',layoutDelayed.length,'对比 Plan finish date','!','warning']
-      ].map(m=>`<div class="metric ${m[4]}"><div class="metric-top"><span>${m[0]}</span><span class="metric-icon">${m[3]}</span></div><strong>${m[1]}</strong><div class="metric-foot">${m[2]}</div></div>`).join('');
+        ['Schematic check status',`${schUnique.filter(i=>progress(i,'schematic')===100).length}/${schUnique.length}`,'success'],['Layout check status',`${layUnique.filter(i=>progress(i,'layout')===100).length}/${layUnique.length}`,'success'],['Schematic Delay',schematicDelayed.length,'danger'],['Layout Delay',layoutDelayed.length,'warning']
+      ].map(([label,value,tone])=>`<div class="metric ${tone}"><div class="metric-top">${label}</div><strong>${value}</strong></div>`).join('');
       const progressRails = [['Schematic',schUnique,'schematic','blue'],['Layout',layUnique,'layout','green'],['SPF',spfUnique,'spf','cyan']];
       document.getElementById('checkItemProgress').innerHTML = progressRails.map(([name,items,type,color])=>{
         const completed = items.reduce((sum,item)=>sum+railFor(item,type).checks.filter(Boolean).length,0);
         const total = items.reduce((sum,item)=>sum+railFor(item,type).checks.length,0);
         const val = total ? Math.round(completed/total*100) : 0;
-        return `<div class="rail-row"><div class="rail-label"><strong>${name}</strong><small>${completed}/${total} check items</small></div><div class="progress ${color}"><span style="width:${val}%"></span></div><div class="rail-value">${val}%</div></div>`;
+        const breakdown=checkLabels[type].map((label,index)=>`${label} ${items.filter(item=>railFor(item,type).checks[index]).length}/${items.length}`).join(' · ');
+        return `<button type="button" class="rail-row dashboard-check-row" data-check-detail="${type}" title="${esc(breakdown)}" aria-label="查看 ${name} Check item 明细"><span class="rail-label"><strong>${name}</strong><small>${completed}/${total} check items</small></span><span class="progress ${color}"><span style="width:${val}%"></span></span><span class="rail-value">${val}%</span><span class="rail-chevron" aria-hidden="true">›</span></button>`;
       }).join('');
+      document.querySelectorAll('[data-check-detail]').forEach(button=>button.addEventListener('click',()=>openCheckDetails(button.dataset.checkDetail)));
       document.getElementById('issueList').innerHTML = delayed.slice(0,4).map(([i,t],idx)=>{const rail=railFor(i,t);return `<div class="issue"><span class="issue-dot ${idx>1?'amber':''}"></span><div><strong>${i.def.name}</strong><small>${t==='schematic'?'Schematic Planned':'Layout Plan finish'} · ${ownerFor(i,t)}</small></div><time>+${Math.max(1,daysBetween(rail.actual?parseDate(rail.actual):TODAY,parseDate(rail.planned)))}d</time></div>`}).join('');
       document.getElementById('delayBadge').textContent = delayed.length;
+    }
+
+    function checkDetailTotals(type) {
+      const items=unique(data[type]);
+      const completed=items.reduce((sum,item)=>sum+railFor(item,type).checks.filter(Boolean).length,0);
+      const total=items.reduce((sum,item)=>sum+railFor(item,type).checks.length,0);
+      return {completed,total};
+    }
+    function openCheckDetails(type='schematic') {
+      currentCheckDetailHierarchy=type;
+      document.getElementById('checkDetailSearch').value='';
+      document.getElementById('checkDetailStatus').value='all';
+      showPage('checkItems');
+      renderCheckDetails();
+    }
+    function renderCheckDetails() {
+      const type=currentCheckDetailHierarchy,labels=checkLabels[type],allItems=unique(data[type]);
+      const search=document.getElementById('checkDetailSearch').value.trim().toLowerCase();
+      const status=document.getElementById('checkDetailStatus').value;
+      document.querySelectorAll('[data-check-hierarchy]').forEach(button=>button.classList.toggle('active',button.dataset.checkHierarchy===type));
+      ['schematic','layout','spf'].forEach(hierarchy=>{const totals=checkDetailTotals(hierarchy);document.getElementById(`${hierarchy}CheckTabCount`).textContent=`${totals.completed}/${totals.total}`;});
+      const items=allItems.filter(item=>{
+        const rail=railFor(item,type),searchable=[item.def.name,type==='spf'?item.def.schematicOwner:ownerFor(item,type),type==='spf'?item.def.layoutOwner:'',item.def.reference,item.def.category].join(' ').toLowerCase();
+        const completed=rail.checks.every(Boolean);
+        return (!search||searchable.includes(search))&&(status==='all'||(status==='done'&&completed)||(status==='incomplete'&&!completed));
+      });
+      const visibleIndexes=labels.map((_,index)=>index);
+      const ownerHeaders=type==='spf'?'<th class="check-frozen check-owner-column">Schematic Owner</th><th class="check-frozen check-layout-owner-column">Layout Owner</th>':`<th class="check-frozen check-owner-column last-check-frozen">${esc(hierarchyMeta[type].owner)}</th>`;
+      document.getElementById('checkDetailHead').innerHTML=`<tr><th class="check-frozen check-block-column">Block</th><th class="check-frozen check-tier-column">Tier</th>${ownerHeaders}${visibleIndexes.map(index=>`<th><span class="check-column-title"><span>${esc(labels[index])}</span><small>${allItems.filter(item=>railFor(item,type).checks[index]).length}/${allItems.length} completed</small></span></th>`).join('')}<th>完成度</th><th>${esc(derivedCheckLabel(type))}</th></tr>`;
+      document.getElementById('checkDetailBody').innerHTML=items.length?items.map(item=>{
+        const rail=railFor(item,type),completed=rail.checks.filter(Boolean).length;
+        const instances=data[type].filter(instance=>instance.def.id===item.def.id);
+        const tiers=[...new Set(instances.map(instance=>`T${instance.tier}`))].join(', ');
+        const ownerCells=type==='spf'?`<td class="check-frozen check-owner-column">${esc(item.def.schematicOwner||'')}</td><td class="check-frozen check-layout-owner-column">${esc(item.def.layoutOwner||'')}</td>`:`<td class="check-frozen check-owner-column last-check-frozen">${esc(ownerFor(item,type)||'')}</td>`;
+        return `<tr><td class="check-frozen check-block-column"><button class="block-detail-button" data-check-block="${esc(item.def.id)}">${esc(item.def.name)}</button><br><small>${instances.length} instance${instances.length>1?'s':''}</small></td><td class="check-frozen check-tier-column">${esc(tiers)}</td>${ownerCells}${visibleIndexes.map(index=>`<td class="check-matrix-cell"><span class="check-state ${rail.checks[index]?'done':''}" title="${esc(labels[index])}: ${rail.checks[index]?'Done':'Not done'}">${rail.checks[index]?'✓':''}</span></td>`).join('')}<td><span class="check-progress-text">${completed}/${rail.checks.length}</span></td><td><span class="status ${rail.checks.every(Boolean)?'done':'ongoing'}">${esc(derivedCheckValue(item,type))}</span></td></tr>`;
+      }).join(''):`<tr><td colspan="${visibleIndexes.length+(type==='spf'?6:5)}"><div class="empty"><strong>没有符合条件的 Block</strong>请调整搜索或筛选条件</div></td></tr>`;
+      document.querySelectorAll('[data-check-block]').forEach(button=>button.addEventListener('click',()=>{const item=data[type].find(instance=>instance.def.id===button.dataset.checkBlock);setHierarchy(type);openDrawer(item);setTimeout(()=>{const check=document.querySelector('#drawerBody [data-check]');check?.focus();check?.scrollIntoView({block:'center'});},0);}));
     }
 
     function renderDelay() {
@@ -1265,68 +1762,179 @@
       document.getElementById('schematicDelayCount').textContent = allRecords.filter(record=>record.t==='schematic').length;
       document.getElementById('layoutDelayCount').textContent = allRecords.filter(record=>record.t==='layout').length;
       document.querySelectorAll('[data-delay-category]').forEach(button=>button.classList.toggle('active',button.dataset.delayCategory===currentDelayCategory));
+      document.getElementById('delayBaselineHeader').textContent=currentDelayCategory==='schematic'?'Planned release':'Plan finish';
+      document.getElementById('delayActualHeader').textContent=currentDelayCategory==='schematic'?'Actual release':'Actual finish';
       const records = allRecords.filter(record=>record.t===currentDelayCategory);
-      document.getElementById('delayBody').innerHTML = records.length ? records.map(({i,t,rail,days})=>`<tr><td><strong>${i.def.name}</strong><br><small>DEF-${i.def.id}</small></td><td>${t==='schematic'?'Schematic':'Layout'}</td><td>${ownerFor(i,t)}</td><td>${t==='schematic'?'Planned release':'Plan finish'} · ${rail.planned}</td><td>${rail.actual || 'Today · 2026-08-25'}</td><td class="date late">+${days} days</td><td><span class="status delay">Delay</span></td><td><button class="btn" data-delay-id="${i.id}" data-delay-type="${t}">查看 Block</button></td></tr>`).join('') : `<tr><td colspan="8"><div class="empty"><strong>当前分类没有 Delay</strong>状态会随日期和 Progress 更新</div></td></tr>`;
+      document.getElementById('delayBody').innerHTML = records.length ? records.map(({i,t,rail,days})=>`<tr><td><strong>${i.def.name}</strong><br><small>DEF-${i.def.id}</small></td><td>${t==='schematic'?'Schematic':'Layout'}</td><td>${ownerFor(i,t)}</td><td>${rail.planned}</td><td>${rail.actual || 'Today · 2026-08-25'}</td><td class="date late">+${days} days</td><td><span class="status delay">Delay</span></td><td><button class="btn" data-delay-id="${i.id}" data-delay-type="${t}">查看 Block</button></td></tr>`).join('') : `<tr><td colspan="8"><div class="empty"><strong>当前分类没有 Delay</strong>状态会随日期和 Progress 更新</div></td></tr>`;
       document.querySelectorAll('[data-delay-id]').forEach(b=>b.addEventListener('click',()=>{currentHierarchy=b.dataset.delayType; showPage('wbs'); setHierarchy(currentHierarchy); openDrawer(data[currentHierarchy].find(i=>i.id===b.dataset.delayId));}));
     }
 
     function setHierarchy(type) {
       currentHierarchy = type;
       document.querySelectorAll('[data-hierarchy]').forEach(b=>b.classList.toggle('active',b.dataset.hierarchy===type));
-      configureWbsFilters(type);
       tableWrap.scrollLeft = 0;
       renderWbs();
     }
-    function configureWbsFilters(type) {
-      const derived = document.getElementById('derivedStatusFilter');
-      const own = document.getElementById('ownProgressFilter');
-      const related = document.getElementById('relatedProgressFilter');
-      const isSpf = type === 'spf';
-      const derivedLabel = type === 'schematic' ? 'Check status' : type === 'layout' ? 'Layout qualified' : 'SPF Ready';
-      const derivedOptions = type === 'schematic'
-        ? [['all',`全部 ${derivedLabel}`],['not-started','Not started'],['ongoing','Ongoing'],['done','Done']]
-        : [['all',`全部 ${derivedLabel}`],['ongoing','Ongoing'],['done','Done']];
-      derived.innerHTML = derivedOptions.map(([value,label])=>`<option value="${value}">${label}</option>`).join('');
-      derived.setAttribute('aria-label',`按 ${derivedLabel} 筛选`);
-      own.disabled = isSpf;
-      related.disabled = isSpf;
-      if (isSpf) {
-        own.value = 'all'; related.value = 'all';
-        own.options[0].textContent = 'SPF 无 Progress';
-        related.options[0].textContent = 'SPF 无关联 Progress';
-        return;
-      }
-      own.options[0].textContent = `全部 ${type === 'schematic' ? 'Schematic' : 'Layout'} Progress`;
-      related.options[0].textContent = `全部 ${type === 'schematic' ? 'Layout' : 'Schematic'} Progress`;
+    function openEmbeddedExcelImport() {
+      showPage('excelImport');
+      embeddedImportState={step:1,tableName:'ChanRight',excelWorkbook:null,excelFileName:'',workbook:null,fileName:'',templateRows:{schematic:[],layout:[],spf:[]},rows:[],created:false,job:''};
+      renderEmbeddedImport();
     }
-    function refreshInstanceCounts() {
-      Object.entries(data).forEach(([type, instances]) => {
-        document.getElementById(type + 'Count').textContent = `${instances.length} instances`;
+    function embeddedImportSteps() {
+      const labels=[['下载模板','固定三张表'],['上传模板','自动识别字段'],['校验预览','层级与数据'],['完成导入','写入新表']];
+      return `<div class="ei-steps">${labels.map(([title,detail],index)=>`<div class="ei-step ${embeddedImportState.step===index+1?'active':embeddedImportState.step>index+1?'done':''}"><b>${embeddedImportState.step>index+1?'✓':index+1}</b><span><strong>${title}</strong><small>${detail}</small></span></div>`).join('')}</div>`;
+    }
+    function renderEmbeddedImport() {
+      const root=document.getElementById('embeddedExcelImport');
+      root.className='';
+      root.innerHTML=embeddedImportSteps()+({1:embeddedImportSourceHtml,2:embeddedImportMappingHtml,3:embeddedImportReviewHtml,4:embeddedImportCommitHtml}[embeddedImportState.step])();
+      bindEmbeddedImport();
+    }
+    function embeddedImportSourceHtml() {
+      const file=embeddedImportState.excelWorkbook?`<div class="ei-file"><strong>${esc(embeddedImportState.excelFileName)}</strong> · ${Object.keys(embeddedImportState.excelWorkbook).length} 个 Sheet</div>`:'';
+      return `<div class="ei-grid"><section class="ei-card"><div class="ei-card-head"><h2>1. 下载固定模板</h2><small>DDCPC WBS 标准格式</small></div><div class="ei-card-body ei-form"><div class="ei-notice">模板固定包含 Schematic、Layout、SPF 三张 Sheet。请勿修改 Sheet 名称和首行字段；每行只在对应 Tier 列填写一个 Block。</div><button class="btn primary" id="eiDownloadTemplate" type="button">↓ 下载 Excel 模板</button><small style="color:var(--text-3)">下载后填写 Block、Owner、日期及 Check item，再回到这里上传。</small></div></section><section class="ei-card"><div class="ei-card-head"><h2>2. 上传已填写模板</h2><small>.xlsx / .xls</small></div><div class="ei-card-body ei-form"><div class="ei-dropzone"><div><strong>上传已填写的 DDCPC WBS 模板</strong><p>系统自动识别固定字段并校验三张 hierarchy</p><button class="btn" id="eiChooseFile" type="button">选择已填写模板</button><input id="eiFileInput" type="file" accept=".xlsx,.xls" hidden></div></div>${file}<div><label>新表名称</label><input id="eiTableName" value="${esc(embeddedImportState.tableName)}"></div><div class="ei-notice">导入成功后，新表会加入顶部表名称列表，并立即在 WBS Hierarchy 中展示。</div><button class="btn primary" id="eiReadData">检查模板并预览</button></div></section></div>`;
+    }
+    const embeddedTemplateHeaders = {
+      schematic:['Tier1','Tier2','Tier3','Tier4','Tier5','Tier6','Round','Block Category','Reference project','Schematic Owner','Planned release','Actual release',...checkLabels.schematic],
+      layout:['Tier1','Tier2','Tier3','Tier4','Tier5','Tier6','Round','Block Category','Reference project','Layout Owner','Start date','Plan finish','Actual finish','Plan workdays','Actual workdays','Resource',...checkLabels.layout],
+      spf:['Tier1','Tier2','Tier3','Tier4','Round','Schematic Owner','Layout Owner','LVS path','cdl','gds','Planned SPF release','Actual SPF release',...checkLabels.spf]
+    };
+    function downloadEmbeddedTemplate() {
+      if(!window.XLSX)return showToast('Excel 组件未加载，请联网后重试');
+      const workbook=XLSX.utils.book_new();
+      const guide=[['DDCPC WBS Excel 导入模板'],['填写规则'],['1. 不要修改 Schematic、Layout、SPF Sheet 名称或首行字段。'],['2. 每行只在一个 Tier 列填写 Block；子节点可省略重复的上级 Tier。'],['3. 日期格式使用 YYYY-MM-DD；Check item 填 1/0、Yes/No、Done/Ongoing 或 ✓。'],['4. 空 Sheet 允许保留，但至少填写一张 hierarchy。']];
+      XLSX.utils.book_append_sheet(workbook,XLSX.utils.aoa_to_sheet(guide),'填写说明');
+      Object.entries(embeddedTemplateHeaders).forEach(([type,headers])=>XLSX.utils.book_append_sheet(workbook,XLSX.utils.aoa_to_sheet([headers]),type==='schematic'?'Schematic':type==='layout'?'Layout':'SPF'));
+      XLSX.writeFile(workbook,'DDCPC_WBS_Import_Template.xlsx');
+      showToast('模板已下载');
+    }
+    async function readEmbeddedExcel(file) {
+      if(!window.XLSX){showToast('Excel 解析组件未加载；请联网后重试，或使用内置示例');return;}
+      try{
+        const workbook=XLSX.read(await file.arrayBuffer(),{type:'array',cellDates:false});
+        embeddedImportState.excelWorkbook={};
+        workbook.SheetNames.forEach(name=>{embeddedImportState.excelWorkbook[name]=XLSX.utils.sheet_to_json(workbook.Sheets[name],{header:1,defval:'',raw:false});});
+        embeddedImportState.excelFileName=file.name;embeddedImportState.workbook=embeddedImportState.excelWorkbook;embeddedImportState.fileName=file.name;embeddedImportState.configs={};renderEmbeddedImport();showToast(`已读取 ${file.name}`);
+      }catch(error){showToast(`Excel 读取失败：${error.message}`);}
+    }
+    function beginEmbeddedMapping() {
+      embeddedImportState.tableName=document.getElementById('eiTableName').value.trim();
+      if(!embeddedImportState.tableName)return showToast('请填写新表名称');
+      const existing=[...document.querySelectorAll('#tableSelect option')].map(option=>option.value.toLowerCase());
+      if(existing.includes(embeddedImportState.tableName.toLowerCase()))return showToast('表名称已存在，请使用新名称');
+      embeddedImportState.workbook=embeddedImportState.excelWorkbook;
+      if(!embeddedImportState.workbook)return showToast('请先上传已填写模板');
+      const missing=['Schematic','Layout','SPF'].filter(name=>!embeddedImportState.workbook[name]);
+      if(missing.length)return showToast(`模板缺少 Sheet：${missing.join('、')}`);
+      const invalid=[];
+      Object.entries(embeddedTemplateHeaders).forEach(([type,expected])=>{const name=type==='schematic'?'Schematic':type==='layout'?'Layout':'SPF';const actual=(embeddedImportState.workbook[name]?.[0]||[]).map(value=>String(value).trim());if(expected.some((header,index)=>actual[index]!==header))invalid.push(name);});
+      if(invalid.length)return showToast(`模板字段已被修改：${invalid.join('、')}`);
+      embeddedImportState.step=2;renderEmbeddedImport();
+    }
+    function embeddedImportMappingHtml() {
+      const cards=['Schematic','Layout','SPF'].map(name=>{const rows=embeddedImportState.workbook[name]||[],headers=rows[0]||[],filled=rows.slice(1).filter(row=>row.some(value=>String(value??'').trim())).length;const raw=`<div class="ei-raw"><table><thead><tr><th>#</th>${headers.map(value=>`<th>${esc(value)}</th>`).join('')}</tr></thead><tbody>${rows.slice(1,6).map((row,index)=>`<tr><td>${index+1}</td>${headers.map((_,column)=>`<td>${esc(row[column])}</td>`).join('')}</tr>`).join('')||`<tr><td colspan="${headers.length+1}">尚未填写数据</td></tr>`}</tbody></table></div>`;return `<section class="ei-card"><div class="ei-card-head"><h2>${name}</h2><small>${filled} rows</small></div><div class="ei-card-body">${raw}</div></section>`;}).join('');
+      return `<div style="display:grid;gap:12px">${cards}</div><div class="ei-notice" style="margin-top:12px">模板字段已锁定，无需手动映射。系统将根据 Tier 列生成 Parent path，并统一校验三张 hierarchy。</div><div class="ei-actions"><button class="btn" data-ei-step="1">返回上传</button><button class="btn primary" id="eiAnalyze">校验模板数据</button></div>`;
+    }
+    function embeddedPath(path) { return String(path||'').split('/').map(segment=>segment.trim()).filter(Boolean); }
+    function embeddedCheckValue(value) { return ['1','true','yes','y','done','完成','✓','√'].includes(String(value??'').trim().toLowerCase())?1:0; }
+    function parseEmbeddedTemplateHierarchy(type) {
+      const sheetName=type==='schematic'?'Schematic':type==='layout'?'Layout':'SPF';
+      const sourceRows=embeddedImportState.workbook[sheetName]||[],headers=sourceRows[0]||[],tierCount=type==='spf'?4:6,last=[];
+      const fieldNames=type==='schematic'?['Round','Block Category','Reference project','Schematic Owner','Planned release','Actual release']:type==='layout'?['Round','Block Category','Reference project','Layout Owner','Start date','Plan finish','Actual finish','Plan workdays','Actual workdays','Resource']:['Round','Schematic Owner','Layout Owner','LVS path','cdl','gds','Planned SPF release','Actual SPF release'];
+      const cell=(source,field)=>String(source[headers.indexOf(field)]??'').trim();
+      const rows=[];
+      sourceRows.slice(1).forEach((source,index)=>{
+        if(!source.some(value=>String(value??'').trim()))return;
+        const values=[],issues=[];let name='',tier=0,parentPath='';
+        for(let position=1;position<=tierCount;position++){const value=cell(source,`Tier${position}`);if(value){values[position]=value;name=value;tier=position;}}
+        if(tier){for(let current=1;current<tier;current++)if(values[current])last[current]=values[current];parentPath=Array.from({length:tier-1},(_,position)=>values[position+1]||last[position+1]).filter(Boolean).join(' / ');last[tier]=name;last.length=tier+1;}
+        const fields=Object.fromEntries(fieldNames.map(field=>[field,cell(source,field)]));
+        const checks=checkLabels[type].map(label=>embeddedCheckValue(cell(source,label)));
+        if(!name)issues.push('Block name 不能为空');
+        if(!tier)issues.push('Tier 无法识别');
+        if(fields['Block Category']&&!blockCategories.includes(fields['Block Category']))issues.push(`Block Category 无效：${fields['Block Category']}`);
+        ['Schematic Owner','Layout Owner'].forEach(field=>{if(fields[field]&&!embeddedImportOwners.has(fields[field]))issues.push(`${field} 无法匹配：${fields[field]}`);});
+        Object.entries(fields).forEach(([field,value])=>{if(/date|release|finish/i.test(field)&&value&&!/^\d{4}-\d{2}-\d{2}$/.test(value))issues.push(`${field} 格式应为 YYYY-MM-DD`);});
+        ['Plan workdays','Actual workdays'].forEach(field=>{if(fields[field]&&!/^-?\d+$/.test(fields[field]))issues.push(`${field} 必须为整数`);});
+        if(fields.Resource&&!/^-?(?:\d+(?:\.\d*)?|\.\d+)$/.test(fields.Resource))issues.push('Resource 必须为数字');
+        rows.push({index:index+1,hierarchy:type,sheetName,name,tier,parentPath,fields,checks,issues,status:'valid',decision:'import'});
       });
+      const paths=new Map(rows.filter(row=>row.name).map(row=>[[...embeddedPath(row.parentPath),row.name].join('/').toLowerCase(),row.index])),siblings=new Map(),names=new Map();
+      rows.forEach(row=>{const parentKey=embeddedPath(row.parentPath).join('/').toLowerCase();if(row.tier>1&&!paths.has(parentKey))row.issues.push(`Parent path 不存在：${row.parentPath}`);else if(row.tier>1&&paths.get(parentKey)>=row.index)row.issues.push('Parent 必须位于子节点之前');const siblingKey=`${parentKey}|${row.name}|${row.tier}`.toLowerCase();siblings.set(siblingKey,[...(siblings.get(siblingKey)||[]),row]);const nameKey=row.name.toLowerCase();names.set(nameKey,[...(names.get(nameKey)||[]),row]);});
+      siblings.forEach(group=>{if(group.length>1)group.forEach(row=>row.issues.push('相同 Parent path 下重复 Block'));});
+      names.forEach(group=>{if(group.length>1)group.forEach(row=>{if(!row.issues.some(issue=>issue.includes('重复 Block')))row.issues.push(`同名 Block 共 ${group.length} 行，默认共享 Definition`);});});
+      rows.forEach(row=>{const hard=row.issues.some(issue=>/不能为空|无法识别|不存在|无效|无法匹配|格式|必须|重复 Block/.test(issue));row.status=hard?'error':row.issues.length?'warning':'valid';row.decision=hard?'fix':row.status==='warning'?'share':'import';});
+      return rows;
     }
-    function closeAddMethodMenu() {
-      document.getElementById('addMethodMenu').classList.remove('open');
-      document.getElementById('addInstanceBtn').setAttribute('aria-expanded','false');
+    function analyzeEmbeddedImport() {
+      const templateRows={schematic:parseEmbeddedTemplateHierarchy('schematic'),layout:parseEmbeddedTemplateHierarchy('layout'),spf:parseEmbeddedTemplateHierarchy('spf')};
+      const rows=Object.values(templateRows).flat();
+      if(!rows.length)return showToast('模板中没有可导入的数据');
+      embeddedImportState.templateRows=templateRows;
+      embeddedImportState.rows=rows;embeddedImportState.step=3;renderEmbeddedImport();
     }
-    function toggleAddMethodMenu() {
-      const menu=document.getElementById('addMethodMenu'),open=!menu.classList.contains('open');
-      closeAddMethodMenu();
-      if(open){menu.classList.add('open');document.getElementById('addInstanceBtn').setAttribute('aria-expanded','true');}
+    function embeddedImportReviewHtml() {
+      const rows=embeddedImportState.rows,counts={valid:rows.filter(row=>row.status==='valid').length,warning:rows.filter(row=>row.status==='warning').length,error:rows.filter(row=>row.status==='error').length};
+      return `<section class="ei-card"><div class="ei-card-head"><h2>模板校验预览</h2><small>${esc(embeddedImportState.fileName)} · ${rows.length} rows</small></div><div class="ei-card-body"><div class="ei-counts"><span class="ei-count good">可导入 ${counts.valid}</span><span class="ei-count warn">需确认 ${counts.warning}</span><span class="ei-count bad">错误 ${counts.error}</span></div><div class="ei-notice" style="margin-bottom:9px">同一 hierarchy 不同路径的同名 Block 默认共享 Definition；相同路径重复为错误。</div><div class="ei-review"><table><thead><tr><th>Hierarchy</th><th>#</th><th>Block</th><th>Parent path</th><th>Tier</th><th>校验</th><th>处理</th></tr></thead><tbody>${rows.map(row=>`<tr><td>${row.hierarchy.toUpperCase()}</td><td>${row.index}</td><td><strong>${esc(row.name||'—')}</strong></td><td>${esc(row.parentPath||'根节点')}</td><td>T${esc(row.tier||'—')}</td><td><span class="ei-status ${row.status==='valid'?'good':row.status==='warning'?'warn':'bad'}">${row.status==='valid'?'可导入':row.status==='warning'?'需确认':'错误'}</span><div class="ei-issue">${row.issues.map(esc).join('；')||'校验通过'}</div></td><td>${row.status==='error'?'<span style="color:var(--red)">返回修正</span>':row.status==='warning'?`<select class="ei-decision" data-ei-decision="${row.hierarchy}:${row.index}"><option value="share">共享 Definition</option><option value="split">拆分</option><option value="skip">跳过</option></select>`:'导入'}</td></tr>`).join('')}</tbody></table></div></div></section><div class="ei-actions"><button class="btn" data-ei-step="2">返回预览</button><button class="btn primary" id="eiPrepare">检查并继续</button></div>`;
     }
-    function handleAddMethod(method) {
-      closeAddMethodMenu();
-      if(method==='add')return openAddInstanceModal();
-      if(method==='excel')window.location.href='DE-WBS-excel-import-prototype.html';
+    function prepareEmbeddedCommit() {
+      if(embeddedImportState.rows.some(row=>row.status==='error'))return showToast('仍有错误行，请返回修正');
+      embeddedImportState.step=4;renderEmbeddedImport();
     }
-    function openAddInstanceModal() {
-      addFormRows=[newAddFormRow()];
-      document.getElementById('addInstanceHierarchy').textContent=`当前目标：${currentHierarchy.toUpperCase()} hierarchy`;
+    function embeddedImportCommitHtml() {
+      const accepted=embeddedImportState.rows.filter(row=>row.decision!=='skip');const groups=accepted.reduce((map,row)=>{const key=row.name.toLowerCase();map.set(key,[...(map.get(key)||[]),row]);return map;},new Map());const definitions=[...groups.values()].reduce((total,group)=>total+group.filter(row=>row.decision==='split').length+(group.some(row=>row.decision!=='split')?1:0),0);
+      if(embeddedImportState.created)return `<div class="ei-success"><div class="ei-success-mark">✓</div><h2>${esc(embeddedImportState.tableName)} 已创建</h2><p>${accepted.length} 个 Instance、${definitions} 个 Definition 已导入 DDCPC；派生状态已重新计算。</p><div class="ei-actions" style="justify-content:center"><button class="btn" id="eiNewImport">重新导入</button><button class="btn primary" id="eiOpenWbs">打开新表</button></div><div class="ei-notice" style="max-width:600px;margin:18px auto 0;text-align:left">Import Job：${esc(embeddedImportState.job)} · 生产环境支持按本批次整批撤销。</div></div>`;
+      const hierarchyCounts=['schematic','layout','spf'].map(type=>[type.toUpperCase(),accepted.filter(row=>row.hierarchy===type).length]);
+      const summary=[['新表',embeddedImportState.tableName],...hierarchyCounts,['Definitions',definitions],['跳过',embeddedImportState.rows.length-accepted.length],['错误',0]];
+      return `<div class="ei-grid"><section class="ei-card"><div class="ei-card-head"><h2>导入摘要</h2></div><div class="ei-card-body"><div class="ei-summary">${summary.map(([label,value])=>`<div class="ei-summary-item"><label>${esc(label)}</label><strong>${esc(value)}</strong></div>`).join('')}</div></div></section><section class="ei-card"><div class="ei-card-head"><h2>写入新表</h2></div><div class="ei-card-body ei-form"><div class="ei-notice">✓ 创建并选择新表<br>✓ 写入 Schematic / Layout / SPF hierarchy<br>✓ 导入 Owner、日期、Check item 和 SPF 字段<br>✓ 重新计算 Progress 与 check status</div><button class="btn primary" id="eiCreate">导入并创建新表</button></div></section></div><div class="ei-actions"><button class="btn" data-ei-step="3">返回预览</button></div>`;
+    }
+    function commitEmbeddedTemplateImport() {
+      const accepted=embeddedImportState.rows.filter(row=>row.decision!=='skip');
+      const definitions=new Map();let definitionSequence=0,instanceSequence=0;
+      tableStateStore.set(activeTableName,captureTableState());
+      schematicPlannedReleaseUnlocked=false;
+      ['schematic','layout','spf'].forEach(type=>{data[type].splice(0);Object.keys(railState[type]).forEach(key=>delete railState[type][key]);changeHistory[type]={};structureChanges[type]=[];});
+      Object.keys(detailState.spf).forEach(key=>delete detailState.spf[key]);
+      Object.keys(detailState.aiRouting).forEach(key=>delete detailState.aiRouting[key]);
+      const definitionFor=row=>{const sharedKey=row.decision==='split'?`${row.hierarchy}:${row.index}:${row.name.toLowerCase()}`:row.name.toLowerCase();let definition=definitions.get(sharedKey);if(!definition){const slug=row.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'block';definition={id:`import-${slug}-${++definitionSequence}`,name:row.name,round:'',category:'',reference:'',blockOwner:'',schematicOwner:'',layoutOwner:''};definitions.set(sharedKey,definition);}if(row.hierarchy!=='spf'&&row.fields.Round&&!definition.round)definition.round=normalizeRound(row.fields.Round);if(row.fields['Block Category'])definition.category=row.fields['Block Category'];if(row.fields['Reference project'])definition.reference=row.fields['Reference project'];if(row.fields['Schematic Owner'])definition.schematicOwner=row.fields['Schematic Owner'];if(row.fields['Layout Owner'])definition.layoutOwner=row.fields['Layout Owner'];return definition;};
+      ['schematic','layout','spf'].forEach(type=>{const pathToInstance=new Map();accepted.filter(row=>row.hierarchy===type).sort((a,b)=>a.index-b.index).forEach(importRow=>{const definition=definitionFor(importRow),parentKey=embeddedPath(importRow.parentPath).join('/').toLowerCase(),parentId=parentKey?pathToInstance.get(parentKey)||null:null,id=`imp-${type.slice(0,3)}-${++instanceSequence}`,planned=type==='schematic'?importRow.fields['Planned release']:type==='layout'?importRow.fields['Plan finish']:importRow.fields['Planned SPF release'],actual=type==='schematic'?importRow.fields['Actual release']:type==='layout'?importRow.fields['Actual finish']:importRow.fields['Actual SPF release'];const item=row(id,definition,parentId,importRow.tier,importRow.checks,planned||'',actual||'');data[type].push(item);pathToInstance.set([...embeddedPath(importRow.parentPath),importRow.name].join('/').toLowerCase(),id);railState[type][definition.id]||={checks:[...importRow.checks],planned:planned||'',actual:actual||'',startDate:importRow.fields['Start date']||'',planWorkdays:importRow.fields['Plan workdays']||'',actualWorkdays:importRow.fields['Actual workdays']||'',resource:importRow.fields.Resource||'',checkStatus:importRow.checks.every(Boolean)?'Done':importRow.checks.some(Boolean)?'Ongoing':'Not started'};if(type==='spf')detailState.spf[definition.id]={round:normalizeRound(importRow.fields.Round||''),lvsPath:importRow.fields['LVS path']||'',cdl:importRow.fields.cdl||'',gds:importRow.fields.gds||''};});});
+      data.layout.forEach(item=>{item.tierTop=data.layout.some(child=>child.parent===item.id);});
+      const tableSelect=document.getElementById('tableSelect');
+      if(![...tableSelect.options].some(option=>option.value===embeddedImportState.tableName))tableSelect.add(new Option(embeddedImportState.tableName,embeddedImportState.tableName));
+      tableSelect.value=embeddedImportState.tableName;
+      activeTableName=embeddedImportState.tableName;
+      resetWbsColumnFilters();
+      currentHierarchy=['schematic','layout','spf'].find(type=>data[type].length)||'schematic';
+      tableStateStore.set(activeTableName,captureTableState());
+      embeddedImportState.created=true;embeddedImportState.job=`IMP-${new Date().toISOString().slice(0,10).replaceAll('-','')}-${String(Date.now()).slice(-6)}`;
+      renderEmbeddedImport();renderDashboard();
+    }
+    function bindEmbeddedImport() {
+      document.querySelectorAll('[data-ei-step]').forEach(button=>button.addEventListener('click',()=>{embeddedImportState.step=Number(button.dataset.eiStep);renderEmbeddedImport();}));
+      document.getElementById('eiDownloadTemplate')?.addEventListener('click',downloadEmbeddedTemplate);
+      document.getElementById('eiChooseFile')?.addEventListener('click',()=>document.getElementById('eiFileInput').click());
+      document.getElementById('eiFileInput')?.addEventListener('change',event=>{if(event.target.files[0])readEmbeddedExcel(event.target.files[0]);});
+      document.getElementById('eiReadData')?.addEventListener('click',beginEmbeddedMapping);
+      document.getElementById('eiTableName')?.addEventListener('input',event=>{embeddedImportState.tableName=event.target.value;});
+      document.getElementById('eiAnalyze')?.addEventListener('click',analyzeEmbeddedImport);
+      document.querySelectorAll('[data-ei-decision]').forEach(select=>select.addEventListener('change',()=>{const [hierarchy,index]=select.dataset.eiDecision.split(':');const row=embeddedImportState.rows.find(item=>item.hierarchy===hierarchy&&item.index===Number(index));if(row)row.decision=select.value;}));
+      document.getElementById('eiPrepare')?.addEventListener('click',prepareEmbeddedCommit);
+      document.getElementById('eiCreate')?.addEventListener('click',commitEmbeddedTemplateImport);
+      document.getElementById('eiNewImport')?.addEventListener('click',openEmbeddedExcelImport);
+      document.getElementById('eiOpenWbs')?.addEventListener('click',()=>{showPage('wbs');setHierarchy(currentHierarchy);});
+    }
+    function openAddInstanceModal(contextItem=null) {
+      addFormRows=[newAddFormRow(contextItem)];
+      const maxTier=currentHierarchy==='spf'?4:6;
+      const context=contextItem?(contextItem.tier<maxTier?` · Parent：${contextItem.def.name}`:` · 在 ${contextItem.def.name} 同层新增`):'';
+      document.getElementById('addInstanceHierarchy').textContent=`当前目标：${currentHierarchy.toUpperCase()} hierarchy${context}`;
       renderAddFormRows();
       document.getElementById('addInstanceModal').classList.add('open');
     }
     function closeAddInstanceModal() { document.getElementById('addInstanceModal').classList.remove('open'); }
-    function newAddFormRow() {
+    function newAddFormRow(contextItem=null) {
       const maxTier=currentHierarchy==='spf'?4:6;
+      if(contextItem){const childAllowed=contextItem.tier<maxTier;return {id:`add-row-${++addFormRowSequence}`,name:'',tier:childAllowed?contextItem.tier+1:contextItem.tier,parentRef:childAllowed?`existing:${contextItem.id}`:contextItem.parent?`existing:${contextItem.parent}`:'',reuseId:''};}
       const defaultParent=data[currentHierarchy].find(item=>item.tier===2)||data[currentHierarchy][0];
       return {id:`add-row-${++addFormRowSequence}`,name:'',tier:Math.min(maxTier,(defaultParent?.tier||0)+1),parentRef:defaultParent?`existing:${defaultParent.id}`:'',reuseId:''};
     }
@@ -1387,7 +1995,7 @@
       const createdByRowId=new Map();
       valid.forEach(rowData=>{
         let def=rowData.reuse;
-        if(!def){const base=rowData.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||`block-${Date.now()}`;def={id:`${base}-${Date.now().toString().slice(-5)}-${rowData.index+1}`,name:rowData.name,category:'',reference:'',blockOwner:'',schematicOwner:'',layoutOwner:''};}
+        if(!def){const base=rowData.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||`block-${Date.now()}`;def={id:`${base}-${Date.now().toString().slice(-5)}-${rowData.index+1}`,name:rowData.name,round:'',category:'',reference:'',blockOwner:'',schematicOwner:'',layoutOwner:''};}
         const parentId=rowData.parent?.source==='draft'?createdByRowId.get(rowData.parent.id)?.id:rowData.parent?.id||null;
         const sameDefCount=data[currentHierarchy].filter(item=>item.def.id===def.id).length;
         const id=`${currentHierarchy.slice(0,3)}-${def.id}-${data[currentHierarchy].length+1}`;
@@ -1397,14 +2005,31 @@
         reopenCompletedParents(item,currentHierarchy);
         structureChanges[currentHierarchy].unshift(changeEvent(currentActorId,valid.length===1?'新增 Block / Instance':'批量新增 Block / Instance','不存在',`${def.name} · ${item.instance||item.id} · T${item.tier}`,auditNow()));
       });
-      closeAddInstanceModal();refreshInstanceCounts();renderWbs();renderDashboard();
+      closeAddInstanceModal();renderWbs();renderDashboard();
       showToast(`已添加 ${valid.length} 个 Block / Instance`);
     }
     function showPage(name) {
       document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===name+'Page'));
       document.querySelectorAll('.nav button[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===name));
-      if(name==='dashboard') renderDashboard(); if(name==='delay') renderDelay();
+      if(name==='dashboard') renderDashboard(); if(name==='delay') renderDelay(); if(name==='checkItems') renderCheckDetails();
     }
+    function isWbsTableFullscreen() { return document.body.classList.contains('wbs-table-fullscreen'); }
+    function syncWbsTableFullscreen() {
+      const active=isWbsTableFullscreen(),button=document.getElementById('wbsFullscreenToggle');
+      button.setAttribute('aria-pressed',String(active));
+      button.title=active?'退出全屏':'全屏查看表格';
+      button.setAttribute('aria-label',button.title);
+    }
+    function enterWbsTableFullscreen() {
+      closeChangePopover();closeCalculationPopover();closeColumnFilterPopover();
+      document.body.classList.add('wbs-table-fullscreen');
+      syncWbsTableFullscreen();
+    }
+    function exitWbsTableFullscreen() {
+      document.body.classList.remove('wbs-table-fullscreen');
+      syncWbsTableFullscreen();
+    }
+    function toggleWbsTableFullscreen() { return isWbsTableFullscreen()?exitWbsTableFullscreen():enterWbsTableFullscreen(); }
     function closeDrawer() { document.getElementById('drawerBackdrop').classList.remove('open'); document.getElementById('detailDrawer').classList.remove('open'); selectedItem=null; renderWbs(); }
     function setSidebarCollapsed(collapsed) {
       document.body.classList.toggle('sidebar-collapsed', collapsed);
@@ -1422,6 +2047,11 @@
 
     document.querySelectorAll('.nav button[data-page]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
     document.querySelectorAll('[data-delay-category]').forEach(button=>button.addEventListener('click',()=>{currentDelayCategory=button.dataset.delayCategory;renderDelay();}));
+    document.getElementById('viewAllChecks').addEventListener('click',()=>openCheckDetails('schematic'));
+    document.getElementById('backToDashboard').addEventListener('click',()=>showPage('dashboard'));
+    document.querySelectorAll('[data-check-hierarchy]').forEach(button=>button.addEventListener('click',()=>{currentCheckDetailHierarchy=button.dataset.checkHierarchy;renderCheckDetails();}));
+    document.getElementById('checkDetailSearch').addEventListener('input',renderCheckDetails);
+    document.getElementById('checkDetailStatus').addEventListener('change',renderCheckDetails);
     document.getElementById('sidebarToggle').addEventListener('click',()=>setSidebarCollapsed(!document.body.classList.contains('sidebar-collapsed')));
     document.getElementById('notificationBtn').addEventListener('click',()=>{
       document.getElementById('notificationDot').classList.add('read');
@@ -1429,46 +2059,49 @@
       showToast('当前没有新的项目通知');
     });
     document.getElementById('helpBtn').addEventListener('click',()=>showToast('帮助中心为原型占位：可查看字段规则与角色操作说明'));
+    document.getElementById('backFromExcelImport').addEventListener('click',()=>showPage('wbs'));
     document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.go)));
     document.querySelectorAll('[data-hierarchy]').forEach(b=>b.addEventListener('click',()=>setHierarchy(b.dataset.hierarchy)));
-    document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{currentView=b.dataset.view;document.querySelectorAll('[data-view]').forEach(x=>x.classList.toggle('active',x===b));renderWbs();}));
-    ['searchInput','derivedStatusFilter','ownProgressFilter','relatedProgressFilter'].forEach(id=>document.getElementById(id).addEventListener(id==='searchInput'?'input':'change',renderWbs));
-    document.getElementById('structureChangeButton').addEventListener('click',event=>{event.stopPropagation();openStructureChangeHistory(event.currentTarget);});
+    document.getElementById('searchInput').addEventListener('input',renderWbs);
     document.getElementById('changePopoverClose').addEventListener('click',closeChangePopover);
     document.getElementById('calculationPopoverClose').addEventListener('click',closeCalculationPopover);
+    document.getElementById('columnFilterClose').addEventListener('click',closeColumnFilterPopover);
+    document.getElementById('columnFilterSearch').addEventListener('input',renderColumnFilterOptions);
+    document.getElementById('columnFilterClear').addEventListener('click',clearActiveColumnFilter);
+    document.getElementById('columnFilterApply').addEventListener('click',applyColumnFilter);
     document.addEventListener('click',event=>{if(!document.getElementById('changePopover').contains(event.target)&&!event.target.closest('[data-change-history]')&&!event.target.closest('#structureChangeButton'))closeChangePopover();});
     document.addEventListener('click',event=>{if(!document.getElementById('calculationPopover').contains(event.target)&&!event.target.closest('[data-calculation-rule]'))closeCalculationPopover();});
-    tableWrap.addEventListener('scroll',()=>{closeChangePopover();closeCalculationPopover();});
-    window.addEventListener('resize',()=>{closeChangePopover();closeCalculationPopover();});
+    document.addEventListener('click',event=>{if(!document.getElementById('columnFilterPopover').contains(event.target)&&!event.target.closest('[data-column-filter]'))closeColumnFilterPopover();});
+    tableWrap.addEventListener('scroll',()=>{closeChangePopover();closeCalculationPopover();closeColumnFilterPopover();});
+    window.addEventListener('resize',()=>{closeChangePopover();closeCalculationPopover();closeColumnFilterPopover();});
     document.getElementById('drawerClose').addEventListener('click',closeDrawer);
     document.getElementById('drawerBackdrop').addEventListener('click',closeDrawer);
-    document.getElementById('addInstanceBtn').addEventListener('click',event=>{event.stopPropagation();toggleAddMethodMenu();});
-    document.querySelectorAll('[data-add-method]').forEach(button=>button.addEventListener('click',()=>handleAddMethod(button.dataset.addMethod)));
-    document.addEventListener('click',event=>{if(!document.getElementById('addMethodMenu').contains(event.target)&&!event.target.closest('#addInstanceBtn'))closeAddMethodMenu();});
+    document.getElementById('importExcelBtn').addEventListener('click',openEmbeddedExcelImport);
     document.querySelectorAll('[data-close-add-modal]').forEach(b=>b.addEventListener('click',closeAddInstanceModal));
     document.getElementById('addInstanceModal').addEventListener('click',event=>{if(event.target===event.currentTarget)closeAddInstanceModal();});
     document.getElementById('appendAddRow').addEventListener('click',appendAddFormRow);
     document.querySelectorAll('[data-close-check-validation]').forEach(button=>button.addEventListener('click',closeCheckValidationModal));
     document.getElementById('checkValidationModal').addEventListener('click',event=>{if(event.target===event.currentTarget)closeCheckValidationModal();});
     document.getElementById('saveInstance').addEventListener('click',saveAddFormRows);
-    document.getElementById('collapseAll').addEventListener('click',()=>{data[currentHierarchy].forEach(i=>i.expanded=false);renderWbs();showToast('Hierarchy 已折叠到顶层');});
-    document.getElementById('exportBtn').addEventListener('click',()=>showToast('原型演示：已生成当前 hierarchy 导出任务'));
     document.getElementById('refreshDashboard').addEventListener('click',()=>{renderDashboard();showToast('状态已按最新 check 和日期重新计算');});
-    document.getElementById('tableSelect').addEventListener('change',e=>showToast(`已切换到表 ${e.target.value}`));
+    document.getElementById('tableSelect').addEventListener('change',event=>switchPrototypeTable(event.target.value));
+    document.getElementById('wbsFullscreenToggle').addEventListener('click',toggleWbsTableFullscreen);
+    document.getElementById('wbsFullscreenExit').addEventListener('click',exitWbsTableFullscreen);
     document.getElementById('delaySort').addEventListener('click',()=>{renderDelay();showToast('已按延误天数从高到低排序');});
-    document.getElementById('todayLabel').textContent = '2026-08-25 · Project week 34';
     document.addEventListener('keydown', event => {
       if (event.key !== 'Escape') return;
+      if(isWbsTableFullscreen()){exitWbsTableFullscreen();return;}
       closeDrawer();
       closeChangePopover();
       closeCalculationPopover();
+      closeColumnFilterPopover();
       closeAddInstanceModal();
-      closeAddMethodMenu();
       closeCheckValidationModal();
     });
 
-    configureWbsFilters(currentHierarchy);
-    refreshInstanceCounts(); renderWbs(); renderDashboard(); renderDelay();
+    const initialTableState=captureTableState();
+    ['ChanEdgel','ChanLeft','ChanMid'].forEach(tableName=>tableStateStore.set(tableName,structuredClone(initialTableState)));
+    renderWbs(); renderDashboard(); renderDelay();
     setSidebarCollapsed(localStorage.getItem('de-wbs-sidebar-collapsed') === 'true');
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
   </script>
