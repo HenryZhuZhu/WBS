@@ -401,6 +401,10 @@
     .drawer-head p { margin: 4px 0 0; color: var(--text-2); font-size: 12px; }
     .drawer-close { margin-left: auto; border: 0; background: #f0f3f6; border-radius: 5px; width: 30px; height: 30px; color: var(--text-2); }
     .drawer-body { overflow: auto; padding: 0 18px 24px; }
+    .drawer-version-tabs { position: sticky; top: 0; z-index: 4; height: 43px; display: flex; align-items: stretch; gap: 3px; margin: 0 -18px; padding: 0 18px; border-bottom: 1px solid var(--line); background: rgba(255,255,255,.97); }
+    .drawer-version-tabs button { min-width: 54px; border: 0; border-bottom: 2px solid transparent; padding: 0 11px; color: var(--text-2); background: transparent; font-size: 11px; font-weight: 800; }
+    .drawer-version-tabs button:hover, .drawer-version-tabs button:focus-visible { outline: 0; color: var(--blue); background: var(--blue-soft); }
+    .drawer-version-tabs button.active { color: var(--blue); border-bottom-color: var(--blue); background: white; }
     .drawer-section { padding: 17px 0; border-bottom: 1px solid var(--line); }
     .drawer-section:last-child { border-bottom: 0; }
     .section-title { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
@@ -1788,15 +1792,26 @@
       if(count)count.textContent=structureChanges[currentHierarchy].length;
     }
 
-    function openDrawer(item) {
+    function drawerVersionGroup(item,type=currentHierarchy) { return mergedVersionGroup(item,type); }
+    function drawerVersionTabsHtml(item,type=currentHierarchy) {
+      const group=drawerVersionGroup(item,type);
+      if(group.length<=1)return '';
+      return `<nav class="drawer-version-tabs" aria-label="${esc(item.def.name)} Version 切换">${group.map(candidate=>`<button type="button" data-drawer-version-id="${esc(candidate.id)}" class="${candidate.id===item.id?'active':''}" aria-current="${candidate.id===item.id?'page':'false'}">${esc(itemVersion(candidate,type))}</button>`).join('')}</nav>`;
+    }
+    function openDrawer(item,options={}) {
+      const drawerBody=document.getElementById('drawerBody'),scrollTop=options.preserveScroll?drawerBody.scrollTop:0;
       selectedItem = item;
+      const versionGroup=drawerVersionGroup(item,currentHierarchy);
       document.getElementById('drawerTitle').textContent = item.def.name;
-      document.getElementById('drawerSubtitle').textContent = `${currentHierarchy.toUpperCase()} · Tier ${item.tier}`;
+      document.getElementById('drawerSubtitle').textContent = versionGroup.length>1
+        ? `${currentHierarchy.toUpperCase()} · Tier ${item.tier} · ${versionGroup.length} Versions`
+        : `${currentHierarchy.toUpperCase()} · Tier ${item.tier} · Version ${itemVersion(item,currentHierarchy)}`;
       document.getElementById('drawerBody').innerHTML = drawerHtml(item);
       document.getElementById('drawerBackdrop').classList.add('open');
       document.getElementById('detailDrawer').classList.add('open');
       bindDrawerTitle(item);
       bindDrawer(item);
+      if(options.preserveScroll)drawerBody.scrollTop=scrollTop;
       renderWbs();
     }
 
@@ -1811,7 +1826,7 @@
       if (type === 'schematic') specific = schematicDetail(item);
       if (type === 'layout') specific = layoutDetail(item);
       if (type === 'spf') specific = spfDetail(item);
-      return `<section class="drawer-section">
+      return `${drawerVersionTabsHtml(item,type)}<section class="drawer-section">
         <div class="section-title"><h3>Block 信息</h3><span class="status ${state}">${statusText(state)}</span></div>
         <div class="info-grid">
           ${infoFields}
@@ -1854,27 +1869,31 @@
         edit.classList.remove('editing');
         edit.setAttribute('aria-pressed','false');
       };
-      edit.addEventListener('click',()=>{
+      edit.onclick=()=>{
         title.contentEditable='true';
         edit.classList.add('editing');
         edit.setAttribute('aria-pressed','true');
         title.focus();
         const selection=window.getSelection(),range=document.createRange();
         range.selectNodeContents(title);selection.removeAllRanges();selection.addRange(range);
-      });
-      title.addEventListener('keydown',event=>{
+      };
+      title.onkeydown=event=>{
         if(event.key==='Enter'){event.preventDefault();title.blur();}
         if(event.key==='Escape'){event.preventDefault();cancelled=true;title.textContent=item.def.name;title.blur();}
-      });
-      title.addEventListener('blur',()=>{
+      };
+      title.onblur=()=>{
         const nextName=title.textContent;
         stopEditing();
         if(cancelled){cancelled=false;return;}
         updateBlockName(item,nextName);
-      });
+      };
     }
 
     function bindDrawer(item) {
+      document.querySelectorAll('[data-drawer-version-id]').forEach(button=>button.addEventListener('click',()=>{
+        const target=data[currentHierarchy].find(candidate=>candidate.id===button.dataset.drawerVersionId);
+        if(target)openDrawer(target,{preserveScroll:true});
+      }));
       document.querySelectorAll('[data-ai-routing]').forEach(button=>button.addEventListener('click',()=>{
         const enabled=button.dataset.aiRouting==='yes';
         detailState.aiRouting[item.def.id]=enabled;
@@ -1932,11 +1951,13 @@
       const nextName=String(value||'').trim(),oldName=item.def.name;
       if(!nextName){showToast('Block name 不能为空');openDrawer(item);return;}
       if(nextName===oldName)return;
-      const duplicate=Object.entries(data).some(([type,instances])=>instances.some(instance=>instance.def.id===item.def.id&&instances.some(candidate=>candidate.def.id!==item.def.id&&candidate.tier===instance.tier&&candidate.def.name.toLowerCase()===nextName.toLowerCase()&&itemVersion(candidate,type)===itemVersion(instance,type))));
+      const group=drawerVersionGroup(item,currentHierarchy),groupDefinitionIds=new Set(group.map(candidate=>candidate.def.id));
+      const duplicate=Object.entries(data).some(([type,instances])=>instances.some(instance=>groupDefinitionIds.has(instance.def.id)&&instances.some(candidate=>!groupDefinitionIds.has(candidate.def.id)&&candidate.tier===instance.tier&&candidate.def.name.toLowerCase()===nextName.toLowerCase()&&itemVersion(candidate,type)===itemVersion(instance,type))));
       if(duplicate){showToast('同名、同 Tier、同 Version 的 Block 已存在');openDrawer(item);return;}
-      item.def.name=nextName;
+      if(group.length>1&&!confirm(`该 Block 包含 ${group.length} 个 Version：${group.map(candidate=>itemVersion(candidate,currentHierarchy)).join('、')}。修改名称将同步更新整个组，是否继续？`)){openDrawer(item);return;}
+      group.forEach(candidate=>candidate.def.name=nextName);
       renderDashboard();renderDelay();openDrawer(item);
-      showToast(`Block name 已更新：${oldName} → ${nextName}`);
+      showToast(group.length>1?`${group.length} 个 Version 的 Block name 已同步更新`:`Block name 已更新：${oldName} → ${nextName}`);
     }
 
     function renderDashboard() {
