@@ -237,6 +237,15 @@
     th.frozen-column { z-index: 7; }
     td.frozen-column { position: sticky; z-index: 2; background: white; }
     .frozen-block-column { left: 0; padding-left: 3px !important; padding-right: 3px !important; }
+    td.merged-block-cell { vertical-align: middle; border-bottom-color: var(--line); }
+    td.merged-block-cell .block-cell { position: relative; min-height: 48px; justify-content: center; padding: 0 5px !important; }
+    td.merged-block-cell .tree-toggle { position: absolute; left: 4px; }
+    td.merged-block-cell .block-main { position: static; flex: 1; }
+    td.merged-block-cell .block-title-line { justify-content: center; }
+    td.merged-block-cell .tier { position: absolute; right: 5px; margin-left: 0; }
+    td.merged-block-cell.merge-row-hover { background: #f7faff; }
+    td.merged-block-cell.merge-row-selected { background: #eef5ff; }
+    td.merged-block-cell.merge-row-hover .row-actions, td.merged-block-cell .row-actions:focus-within { opacity: 1; pointer-events: auto; }
     .frozen-round-column { background: white; }
     th.frozen-block-column .column-header-content { max-width: calc(100% - 16px); margin-left: 16px; }
     .last-frozen-column { border-right: 1px solid var(--line); box-shadow: 8px 0 14px rgba(26, 39, 52, .08); }
@@ -280,8 +289,6 @@
     .block-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; font-weight: 700; color: #233244; cursor: pointer; }
     .block-name:hover { color: var(--blue); text-decoration: underline; }
     .tier { font-size: 10px; color: var(--text-3); border: 1px solid var(--line); border-radius: 3px; padding: 1px 4px; margin-left: 6px; }
-    .instance-mark { border: 1px solid #b7dfe3; border-radius: 4px; background: var(--cyan-soft); color: var(--cyan); padding: 1px 5px; font-size: 10px; font-weight: 700; }
-    .instance-mark:hover { border-color: var(--cyan); background: #d9f0f2; }
     .status { display: inline-flex; gap: 5px; align-items: center; border-radius: 4px; padding: 3px 7px; font-weight: 700; font-size: 11px; }
     .status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
     .status.done, .status.valid { color: var(--green); background: var(--green-soft); }
@@ -383,7 +390,14 @@
     .drawer { position: fixed; top: 0; bottom: 0; right: 0; width: 520px; background: white; z-index: 45; transform: translateX(100%); transition: transform .25s ease; box-shadow: var(--shadow); display: flex; flex-direction: column; }
     .drawer.open { transform: translateX(0); }
     .drawer-head { min-height: 78px; padding: 16px 18px; border-bottom: 1px solid var(--line); display: flex; align-items: flex-start; gap: 12px; }
-    .drawer-head h2 { margin: 0; font-size: 18px; }
+    .drawer-head-main { min-width: 0; flex: 1; }
+    .drawer-title-row { min-width: 0; display: flex; align-items: center; gap: 5px; }
+    .drawer-head h2 { min-width: 0; max-width: 420px; margin: 0; overflow: hidden; color: var(--text); font-size: 18px; text-overflow: ellipsis; white-space: nowrap; }
+    .drawer-head h2[contenteditable="true"] { min-width: 180px; padding: 1px 2px 2px; overflow: visible; border-bottom: 2px solid var(--blue); outline: 0; text-overflow: clip; white-space: nowrap; }
+    .drawer-title-edit { width: 26px; height: 26px; flex: 0 0 26px; display: grid; place-items: center; border: 0; padding: 0; color: var(--text-3); background: transparent; }
+    .drawer-title-edit:hover, .drawer-title-edit:focus-visible, .drawer-title-edit.editing { outline: 0; color: var(--blue); background: transparent; }
+    .drawer-title-edit:focus-visible { filter: drop-shadow(0 0 3px rgba(30,111,216,.4)); }
+    .drawer-title-edit svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     .drawer-head p { margin: 4px 0 0; color: var(--text-2); font-size: 12px; }
     .drawer-close { margin-left: auto; border: 0; background: #f0f3f6; border-radius: 5px; width: 30px; height: 30px; color: var(--text-2); }
     .drawer-body { overflow: auto; padding: 0 18px 24px; }
@@ -450,7 +464,7 @@
     .multi-add-summary { display: flex; align-items: center; gap: 8px; }
     .multi-add-summary small { color: var(--text-3); }
     .add-form-table { overflow: auto; max-height: 430px; border: 1px solid var(--line); border-radius: 6px; }
-    .add-form-header, .add-form-row { min-width: 850px; display: grid; grid-template-columns: 32px minmax(130px, 1fr) 78px minmax(150px, 1fr) minmax(175px, 1.2fr) minmax(115px, .8fr) 28px; gap: 8px; align-items: center; }
+    .add-form-header, .add-form-row { min-width: 760px; display: grid; grid-template-columns: 32px minmax(160px, 1fr) 78px minmax(180px, 1.2fr) 100px minmax(115px, .8fr) 28px; gap: 8px; align-items: center; }
     .add-form-header { position: sticky; top: 0; z-index: 2; min-height: 36px; padding: 0 9px; border-bottom: 1px solid var(--line); color: var(--text-2); background: var(--surface-alt); font-size: 10px; font-weight: 700; }
     .add-form-list { display: grid; }
     .add-form-row { min-height: 54px; padding: 8px 9px; border-bottom: 1px solid #edf0f3; }
@@ -467,6 +481,19 @@
     .validation-intro { margin: 0; color: var(--text-2); line-height: 1.6; }
     .validation-list { display: grid; gap: 8px; max-height: 300px; overflow: auto; }
     .validation-blocker { border: 1px solid var(--line); border-left: 3px solid var(--red); border-radius: 5px; padding: 9px 10px; background: var(--red-soft); }
+    .validation-blocker > strong, .validation-blocker > small { display: block; }
+    .validation-blocker > small { margin-top: 4px; }
+    .version-delete-list { display: grid; overflow: hidden; border: 1px solid var(--line); border-radius: 6px; }
+    .version-delete-all, .version-delete-option { min-height: 43px; display: grid; grid-template-columns: 18px 62px minmax(0,1fr) auto; gap: 9px; align-items: center; padding: 7px 10px; border-bottom: 1px solid var(--line); background: white; }
+    .version-delete-all { grid-template-columns: 18px 1fr; color: var(--text-2); background: var(--surface-alt); font-weight: 700; }
+    .version-delete-option:last-child { border-bottom: 0; }
+    .version-delete-option input, .version-delete-all input { width: 15px; height: 15px; margin: 0; accent-color: var(--blue); }
+    .version-delete-option strong { font-size: 12px; }
+    .version-delete-option span { overflow: hidden; color: var(--text-2); font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+    .version-delete-option small { color: var(--text-3); font-size: 10px; }
+    .version-delete-option.blocked { color: var(--text-3); background: #f8f9fa; }
+    .version-delete-warning { display: none; margin: 0; padding: 8px 10px; border-left: 3px solid var(--red); color: #8f2f2a; background: var(--red-soft); font-size: 10px; }
+    .version-delete-warning.show { display: block; }
     .validation-block-link { display: inline-flex; align-items: center; gap: 5px; margin: -2px 0 5px -2px; padding: 2px; border: 0; background: transparent; color: var(--blue); font-size: 12px; font-weight: 700; text-align: left; }
     .validation-block-link:hover { color: #0e5cc8; text-decoration: underline; }
     .validation-block-link:focus-visible { outline: 2px solid #9cc1f5; outline-offset: 2px; border-radius: 3px; }
@@ -683,7 +710,7 @@
 
   <div class="drawer-backdrop" id="drawerBackdrop"></div>
   <aside class="drawer" id="detailDrawer" aria-label="Block 详情">
-    <div class="drawer-head"><div><h2 id="drawerTitle">Block</h2><p id="drawerSubtitle"></p></div><button class="drawer-close" id="drawerClose" title="关闭">×</button></div>
+    <div class="drawer-head"><div class="drawer-head-main"><div class="drawer-title-row"><h2 id="drawerTitle">Block</h2><button class="drawer-title-edit" id="drawerTitleEdit" type="button" title="编辑 Block name" aria-label="编辑 Block name"><svg class="lucide lucide-pencil" viewBox="0 0 24 24" aria-hidden="true"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path><path d="m15 5 4 4"></path></svg></button></div><p id="drawerSubtitle"></p></div><button class="drawer-close" id="drawerClose" title="关闭">×</button></div>
     <div class="drawer-body" id="drawerBody"></div>
   </aside>
 
@@ -707,7 +734,7 @@
     <div class="modal multi-add-modal">
       <div class="modal-head"><div><h3 id="addInstanceTitle">添加 Block / Instance</h3><div class="multi-add-summary"><small id="addInstanceHierarchy"></small><small id="addInstanceSummary"></small></div></div><button class="drawer-close" data-close-add-modal aria-label="关闭">×</button></div>
       <div class="modal-body">
-        <div class="add-form-table"><div class="add-form-header"><span>#</span><span>Block name</span><span>Tier</span><span>Parent node</span><span>复用已有 Definition</span><span>校验</span><span></span></div><div class="add-form-list" id="addFormRows"></div></div>
+        <div class="add-form-table"><div class="add-form-header"><span>#</span><span>Block name</span><span>Tier</span><span>Parent node</span><span>Version</span><span>校验</span><span></span></div><div class="add-form-list" id="addFormRows"></div></div>
         <div class="add-row-toolbar"><span>默认一行；需要批量添加时继续新增行。</span><button class="btn" id="appendAddRow" type="button"><span class="symbol">＋</span>新增一行</button></div>
       </div>
       <div class="modal-foot"><button class="btn" data-close-add-modal>取消</button><button class="btn primary" id="saveInstance">添加全部</button></div>
@@ -722,6 +749,40 @@
         <div class="validation-list" id="checkValidationList"></div>
       </div>
       <div class="modal-foot"><button class="btn primary" data-close-check-validation>知道了</button></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="sameTierDuplicateModal" role="alertdialog" aria-modal="true" aria-labelledby="sameTierDuplicateTitle">
+    <div class="modal">
+      <div class="modal-head"><h3 id="sameTierDuplicateTitle">无法新增 Block</h3><button class="drawer-close" data-close-tier-duplicate aria-label="关闭">×</button></div>
+      <div class="modal-body">
+        <p class="validation-intro">同一 hierarchy 中，Block name、Tier、Version 三项完全相同时不允许重复创建。请修改名称、Tier 或 Version 后再创建。</p>
+        <div class="validation-list" id="sameTierDuplicateList"></div>
+      </div>
+      <div class="modal-foot"><button class="btn primary" data-close-tier-duplicate>返回修改</button></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="sameNameCheckModal" role="dialog" aria-modal="true" aria-labelledby="sameNameCheckTitle">
+    <div class="modal">
+      <div class="modal-head"><h3 id="sameNameCheckTitle">同步其他 Tier 的同名 Block？</h3><button class="drawer-close" data-same-name-check-current aria-label="关闭">×</button></div>
+      <div class="modal-body">
+        <p class="validation-intro" id="sameNameCheckIntro"></p>
+        <div class="validation-list" id="sameNameCheckList"></div>
+      </div>
+      <div class="modal-foot"><button class="btn" data-same-name-check-current>仅修改当前 Block</button><button class="btn primary" id="confirmSameNameCheck">确认同步</button></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="versionDeleteModal" role="dialog" aria-modal="true" aria-labelledby="versionDeleteTitle">
+    <div class="modal">
+      <div class="modal-head"><h3 id="versionDeleteTitle">删除 Block Version</h3><button class="drawer-close" data-close-version-delete aria-label="关闭">×</button></div>
+      <div class="modal-body">
+        <p class="validation-intro" id="versionDeleteIntro"></p>
+        <div class="version-delete-list" id="versionDeleteList"></div>
+        <p class="version-delete-warning" id="versionDeleteWarning"></p>
+      </div>
+      <div class="modal-foot"><button class="btn" data-close-version-delete>取消</button><button class="btn primary" id="confirmVersionDelete" disabled>删除所选</button></div>
     </div>
   </div>
 
@@ -752,6 +813,7 @@
       layout: { owner: 'Layout Owner', date: 'Plan finish', actual: 'Actual finish' },
       spf: { owner: 'SPF Owner', date: 'Planned SPF release', actual: 'Actual SPF release' }
     };
+    const versionOptions = ['1st', '2nd', '3rd', '4th', '5th'];
     const blockCategories = ['', 'DFT', 'Analog', 'Fuse', 'Data path', 'DqByte', 'Banklogic', 'Xdec+Ydec', 'Row+Refresh+RHR', 'IO', 'Controller', 'DLDO'];
     const changeActors = {
       lin: { name:'Lin Q.', role:'Process Leader', initials:'LQ' },
@@ -763,14 +825,14 @@
     const currentActorId = 'lin';
 
     const common = {
-      top: { id:'top', name:'CE_TOP', round:'1st\n2nd\n3rd', category:'Controller', reference:'DPJQC', blockOwner:'Yan Sun', schematicOwner:'Ming Zhao', layoutOwner:'Tao He' },
-      core: { id:'core', name:'CORE_ARRAY', round:'1st\n2nd', category:'Banklogic', reference:'DPKRC', blockOwner:'Lei Wang', schematicOwner:'Han Li', layoutOwner:'Nina Gao' },
+      top: { id:'top', name:'CE_TOP', round:'3rd', category:'Controller', reference:'DPJQC', blockOwner:'Yan Sun', schematicOwner:'Ming Zhao', layoutOwner:'Tao He' },
+      core: { id:'core', name:'CORE_ARRAY', round:'2nd', category:'Banklogic', reference:'DPKRC', blockOwner:'Lei Wang', schematicOwner:'Han Li', layoutOwner:'Nina Gao' },
       row: { id:'row', name:'ROW_CTRL', round:'1st', category:'Row+Refresh+RHR', reference:'DPLSA', blockOwner:'Lei Wang', schematicOwner:'Qin Yang', layoutOwner:'Eric Lin' },
-      sense: { id:'sense', name:'SENSE_AMP', round:'1st\n2nd', category:'Analog', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Ming Zhao', layoutOwner:'Nina Gao' },
-      bitcell: { id:'bitcell', name:'BITCELL', round:'1st\n2nd\n3rd', category:'Data path', reference:'DPNQC', blockOwner:'Ming Zhao', schematicOwner:'Han Li', layoutOwner:'Tao He' },
+      sense: { id:'sense', name:'SENSE_AMP', round:'2nd', category:'Analog', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Ming Zhao', layoutOwner:'Nina Gao' },
+      bitcell: { id:'bitcell', name:'BITCELL', round:'3rd', category:'Data path', reference:'DPNQC', blockOwner:'Ming Zhao', schematicOwner:'Han Li', layoutOwner:'Tao He' },
       io: { id:'io', name:'IO_RING', round:'1st', category:'IO', reference:'', blockOwner:'Yan Sun', schematicOwner:'Ivy Xu', layoutOwner:'Eric Lin' },
-      dft: { id:'dft', name:'MBIST_CTRL', round:'', category:'DFT', reference:'DPQTA', blockOwner:'Kai Ding', schematicOwner:'Kai Ding', layoutOwner:'Sora Pan' },
-      pwr: { id:'pwr', name:'DLDO_MAIN', round:'1st\n2nd', category:'DLDO', reference:'DPMXB', blockOwner:'Rui Jiang', schematicOwner:'Rui Jiang', layoutOwner:'Tao He' }
+      dft: { id:'dft', name:'MBIST_CTRL', round:'4th', category:'DFT', reference:'DPQTA', blockOwner:'Kai Ding', schematicOwner:'Kai Ding', layoutOwner:'Sora Pan' },
+      pwr: { id:'pwr', name:'DLDO_MAIN', round:'5th', category:'DLDO', reference:'DPMXB', blockOwner:'Rui Jiang', schematicOwner:'Rui Jiang', layoutOwner:'Tao He' }
     };
 
     const schematic = [
@@ -778,8 +840,7 @@
       row('sch-core', common.core, 'sch-top', 2, [1,1,1,1,0], '2026-08-12', '2026-08-14'),
       row('sch-row', common.row, 'sch-core', 3, [1,1,1,0,0], '2026-08-22', ''),
       row('sch-sense', common.sense, 'sch-core', 3, [1,1,1,1,1], '2026-08-20', '2026-08-19'),
-      row('sch-bit-a', common.bitcell, 'sch-core', 4, [1,1,1,1,1], '2026-08-08', '2026-08-07', false, 'A'),
-      row('sch-bit-b', common.bitcell, 'sch-core', 4, [1,1,1,1,1], '2026-08-08', '2026-08-07', false, 'B'),
+      row('sch-bit', common.bitcell, 'sch-core', 4, [1,1,1,1,1], '2026-08-08', '2026-08-07'),
       row('sch-io', common.io, 'sch-top', 2, [1,1,0,0,0], '2026-09-02', ''),
       row('sch-dft', common.dft, 'sch-top', 2, [0,0,0,0,0], '2026-09-08', ''),
       row('sch-pwr', common.pwr, 'sch-top', 2, [1,1,1,1,0], '2026-08-24', '')
@@ -787,8 +848,7 @@
     const layout = [
       row('lay-top', common.top, null, 1, [1,1,0,0], '2026-09-18', '', true),
       row('lay-core', common.core, 'lay-top', 2, [1,1,1,0], '2026-09-05', '', true),
-      row('lay-bit-a', common.bitcell, 'lay-core', 3, [1,1,1,1], '2026-08-15', '2026-08-17', false, 'A'),
-      row('lay-bit-b', common.bitcell, 'lay-core', 3, [1,1,1,1], '2026-08-15', '2026-08-17', false, 'B'),
+      row('lay-bit', common.bitcell, 'lay-core', 3, [1,1,1,1], '2026-08-15', '2026-08-17'),
       row('lay-sense', common.sense, 'lay-core', 3, [1,1,1,1], '2026-08-21', '2026-08-21'),
       row('lay-row', common.row, 'lay-core', 3, [1,1,0,0], '2026-08-23', ''),
       row('lay-io', common.io, 'lay-top', 2, [1,0,0,0], '2026-09-10', ''),
@@ -822,12 +882,12 @@
     const detailState = {
       aiRouting: {},
       spf: {
-        top: { lvsPath:'/proj/ce/lvs/top/run_0824', cdl:'/proj/ce/cdl/CE_TOP.cdl', gds:'/proj/ce/gds/CE_TOP_0824.gds', round:'1st\n2nd\n3rd' },
-        core: { lvsPath:'/proj/ce/lvs/core/run_0819', cdl:'/proj/ce/cdl/CORE_ARRAY.cdl', gds:'/proj/ce/gds/CORE_ARRAY.gds', round:'1st\n2nd' },
-        bitcell: { lvsPath:'/proj/ce/lvs/array/latest', cdl:'/proj/ce/cdl/BITCELL_ARRAY.cdl', gds:'', round:'1st\n2nd\n3rd' },
+        top: { lvsPath:'/proj/ce/lvs/top/run_0824', cdl:'/proj/ce/cdl/CE_TOP.cdl', gds:'/proj/ce/gds/CE_TOP_0824.gds', round:'3rd' },
+        core: { lvsPath:'/proj/ce/lvs/core/run_0819', cdl:'/proj/ce/cdl/CORE_ARRAY.cdl', gds:'/proj/ce/gds/CORE_ARRAY.gds', round:'2nd' },
+        bitcell: { lvsPath:'/proj/ce/lvs/array/latest', cdl:'/proj/ce/cdl/BITCELL_ARRAY.cdl', gds:'', round:'3rd' },
         sense: { lvsPath:'/proj/ce/lvs/peri/run_0821', cdl:'/proj/ce/cdl/SENSE_AMP.cdl', gds:'/proj/ce/gds/SENSE_AMP.gds', round:'1st' },
-        io: { lvsPath:'', cdl:'/proj/ce/cdl/IO_RING.cdl', gds:'', round:'Not started' },
-        pwr: { lvsPath:'/proj/ce/lvs/dldo/run_0820', cdl:'/proj/ce/cdl/DLDO_MAIN.cdl', gds:'/proj/ce/gds/DLDO_MAIN.gds', round:'1st\n2nd' }
+        io: { lvsPath:'', cdl:'/proj/ce/cdl/IO_RING.cdl', gds:'', round:'4th' },
+        pwr: { lvsPath:'/proj/ce/lvs/dldo/run_0820', cdl:'/proj/ce/cdl/DLDO_MAIN.cdl', gds:'/proj/ce/gds/DLDO_MAIN.gds', round:'5th' }
       }
     };
     const changeHistory = {
@@ -907,7 +967,7 @@
     function spfReadyStatus(item) { return railFor(item, 'spf').checks.every(Boolean) ? 'Done' : 'Ongoing'; }
     function spfInfoFor(item) {
       const info=detailState.spf[item.def.id] ||= {lvsPath:'',cdl:'',gds:'',round:''};
-      info.round=normalizeRound(info.round);
+      info.round=normalizeVersion(info.round);
       return info;
     }
     function calculatedHeader(label, ruleKey) {
@@ -931,12 +991,11 @@
     function textEditorCell(field, value, wide=false) {
       return `<td><div class="editable-cell ${wide ? 'wide' : ''}"><div class="cell-display ${value ? '' : 'empty'}">${value ? esc(value) : ''}</div><div class="cell-editor"><input class="cell-input" type="text" data-edit="${field}" value="${esc(value)}"></div></div></td>`;
     }
-    function limitRoundLines(value) { return String(value??'').replace(/\r/g,'').split('\n').slice(0,3).join('\n'); }
-    function normalizeRound(value) { return limitRoundLines(value).split('\n').map(line=>line.trim()).filter(Boolean).join('\n'); }
-    function roundEditorCell(value, frozen=false) {
-      const normalized=normalizeRound(value),lines=normalized?normalized.split('\n'):[];
-      const display=lines.length?lines.map(line=>`<span class="spf-round-line" title="${esc(line)}">${esc(line)}</span>`).join(''):'';
-      return `<td class="${frozen?'frozen-column frozen-round-column':''}"><div class="editable-cell spf-round-cell"><div class="cell-display spf-round-display ${lines.length?'':'empty'}"><span class="spf-round-stack ${lines.length?'':'round-empty'}">${display}</span></div><div class="cell-editor"><textarea class="spf-round-editor" data-edit="round" rows="3" aria-label="Round，最多三行">${esc(normalized)}</textarea></div></div></td>`;
+    function normalizeVersion(value) { return versionOptions.includes(String(value??'').trim()) ? String(value).trim() : ''; }
+    function versionEditorCell(value, frozen=false) {
+      const normalized=normalizeVersion(value);
+      const options=`<option value="" disabled ${normalized?'':'selected'}>请选择</option>${versionOptions.map(option=>`<option value="${option}" ${option===normalized?'selected':''}>${option}</option>`).join('')}`;
+      return `<td class="${frozen?'frozen-column frozen-round-column':''}"><div class="editable-cell"><div class="cell-display ${normalized?'':'empty'}">${esc(normalized)}</div><div class="cell-editor choice"><select class="cell-select" data-edit="round" aria-label="Version，单选">${options}</select></div></div></td>`;
     }
     function searchableEditorCell(field, value, list, title, extraClass='') {
       return `<td class="${extraClass}"><div class="editable-cell wide"><div class="cell-display ${value ? '' : 'empty'}">${value ? esc(value) : ''}</div><div class="cell-editor choice"><input class="cell-input" data-edit="${field}" list="${list}" value="${esc(value)}" title="${esc(title)}"></div></div></td>`;
@@ -1029,13 +1088,15 @@
     let openCalculationButton = null;
     let addFormRows = [];
     let addFormRowSequence = 0;
+    let pendingSameNameCheck = null;
+    let pendingVersionDelete = null;
 
     const wbsColumnDefinitions = {
       schematic: [
-        ['block',165],['round',100],['category',100],['reference',105],['schematicProgress',135],['planned',135],['actual',100],['layoutProgress',120],['schematicOwner',110],['checks',110],['overallCheck',175],['latestChange',220]
+        ['block',165],['round',100],['category',100],['reference',105],['schematicProgress',135],['planned',135],['actual',100],['schematicOwner',110],['checks',110],['overallCheck',175],['layoutProgress',120],['latestChange',220]
       ],
       layout: [
-        ['block',165],['round',100],['category',100],['reference',105],['layoutProgress',120],['startDate',95],['planFinish',105],['actualFinish',105],['planWorkdays',88],['actualWorkdays',88],['schematicProgress',135],['layoutOwner',110],['resource',75],['checks',100],['layoutQualified',165],['latestChange',220]
+        ['block',165],['round',100],['category',100],['reference',105],['schematicProgress',135],['layoutOwner',110],['planWorkdays',88],['resource',75],['startDate',95],['planFinish',105],['actualFinish',105],['layoutProgress',120],['checks',100],['layoutQualified',165],['latestChange',220]
       ],
       spf: [
         ['block',165],['round',100],['schematicOwner',110],['layoutOwner',110],['checks',110],['spfReady',150],['lvsPath',130],['cdl',130],['gds',130],['plannedSpf',110],['actualSpf',110],['latestChange',220]
@@ -1059,7 +1120,7 @@
       const latest=(changeHistory[type][item.def.id]||[])[0];
       let value='';
       if(key==='block')value=item.def.name;
-      if(key==='round')value=(type==='spf'?spfInfo?.round:item.def.round||'').replace(/\n/g,' / ');
+      if(key==='round')value=type==='spf'?spfInfo?.round:item.def.round||'';
       if(key==='category')value=item.def.category;
       if(key==='reference')value=item.def.reference;
       if(key==='schematicProgress')value=type==='schematic'?scheduleProgress(item,'schematic'):hasCounterpart?scheduleProgress(item,'schematic'):'';
@@ -1269,8 +1330,6 @@
       const meta = hierarchyMeta[currentHierarchy];
       const isLayout = currentHierarchy === 'layout';
       const isSpf = currentHierarchy === 'spf';
-      const layoutWorkdaysHeaders = isLayout ? '<th>Plan workdays</th><th>Actual workdays</th>' : '';
-      const startDateHeader = isLayout ? '<th>Start date</th>' : '';
       const overallHeader = currentHierarchy === 'schematic' ? `<th>${calculatedHeader('Schematic check status','overallCheck')}</th>` : '';
       const ownProgressHeader = `<th>${calculatedHeader(`${isLayout?'Layout':'Schematic'} Progress`,isLayout?'layoutProgress':'schematicProgress')}</th>`;
       const relatedProgressHeader = `<th>${calculatedHeader(`${isLayout?'Schematic':'Layout'} Progress`,isLayout?'schematicProgress':'layoutProgress')}</th>`;
@@ -1280,13 +1339,13 @@
         ? `<th class="change-column"><span>最近修改</span><button class="header-structure-change" id="structureChangeButton" type="button" aria-expanded="false">Block变更记录<span class="structure-change-count" id="structureChangeCount"></span></button>${changePanelToggle}</th>`
         : `<th class="change-column latest-change-collapsed">${changePanelToggle}</th>`;
       const workflowHeaders = isLayout
-        ? `${ownProgressHeader}${startDateHeader}<th>${meta.date}</th><th>${meta.actual}</th>${layoutWorkdaysHeaders}${relatedProgressHeader}<th>${meta.owner}</th><th>Resource</th><th>Check item</th><th>${calculatedHeader('Layout check status','layoutQualified')}</th>`
-        : `${ownProgressHeader}${plannedReleaseHeader()}<th>${meta.actual}</th>${relatedProgressHeader}<th>${meta.owner}</th><th>Check item</th>${overallHeader}`;
+        ? `${relatedProgressHeader}<th>${meta.owner}</th><th>Plan workdays</th><th>Resource</th><th>Start date</th><th>${meta.date}</th><th>${meta.actual}</th>${ownProgressHeader}<th>Check item</th><th>${calculatedHeader('Layout check status','layoutQualified')}</th>`
+        : `${ownProgressHeader}${plannedReleaseHeader()}<th>${meta.actual}</th><th>${meta.owner}</th><th>Check item</th>${overallHeader}${relatedProgressHeader}`;
       wbsHead.innerHTML = isSpf
-        ? `<tr><th class="frozen-column frozen-block-column">Block</th><th class="frozen-column frozen-round-column last-frozen-column">Round</th><th>Schematic Owner</th><th>Layout Owner</th><th>Check item</th><th>${calculatedHeader('SPF check status','spfReady')}</th><th>LVS path</th><th>cdl</th><th>gds</th><th>${meta.date}</th><th>${meta.actual}</th>${changeHeader}</tr>`
-        : `<tr><th class="frozen-column frozen-block-column">Block</th><th class="frozen-column frozen-round-column">Round</th><th class="frozen-column frozen-category-column">Block Category</th><th class="frozen-column frozen-reference-column last-frozen-column">Reference project</th>${workflowHeaders}${changeHeader}</tr>`;
+        ? `<tr><th class="frozen-column frozen-block-column">Block</th><th class="frozen-column frozen-round-column last-frozen-column">Version</th><th>Schematic Owner</th><th>Layout Owner</th><th>Check item</th><th>${calculatedHeader('SPF check status','spfReady')}</th><th>LVS path</th><th>cdl</th><th>gds</th><th>${meta.date}</th><th>${meta.actual}</th>${changeHeader}</tr>`
+        : `<tr><th class="frozen-column frozen-block-column">Block</th><th class="frozen-column frozen-round-column">Version</th><th class="frozen-column frozen-category-column">Block Category</th><th class="frozen-column frozen-reference-column last-frozen-column">Reference project</th>${workflowHeaders}${changeHeader}</tr>`;
       const query = document.getElementById('searchInput').value.trim().toLowerCase();
-      const all = data[currentHierarchy];
+      const all = hierarchyOrderedItems(currentHierarchy);
       const visibleByTree = item => {
         let p = item.parent;
         while (p) { const parent = all.find(x => x.id === p); if (!parent || !parent.expanded) return false; p = parent.parent; }
@@ -1299,8 +1358,9 @@
           && matchesWbsColumnFilters(item,currentHierarchy);
       });
       const spfCreateRow=isSpf?`<tr class="spf-create-row" data-spf-create-row tabindex="0" role="button" aria-label="新增 SPF Block" title="点击新增 Block"><td class="frozen-column frozen-block-column"><span class="spf-create-cue"><span class="row-action row-add spf-create-plus" aria-hidden="true">+</span><span class="spf-create-label">新增 Block</span></span></td><td class="frozen-column frozen-round-column last-frozen-column"></td>${Array.from({length:10},()=>'<td></td>').join('')}</tr>`:'';
+      const mergeSpans=blockMergeSpans(items,currentHierarchy);
       const dataRows=items.length
-        ? items.map(item => rowHtml(item)).join('')
+        ? items.map(item => rowHtml(item,mergeSpans.get(item.id)??1)).join('')
         : all.length
           ? `<tr><td colspan="16"><div class="empty"><strong>没有匹配的 Block</strong>调整搜索词或筛选条件</div></td></tr>`
           : '';
@@ -1321,7 +1381,43 @@
       bindWbsRows();
     }
 
-    function rowHtml(item) {
+    function hierarchyOrderedItems(type) {
+      const instances=data[type],ordered=[],visited=new Set();
+      const appendChildren=parentId=>{
+        const siblings=instances.filter(item=>(item.parent||null)===parentId);
+        for(let index=0;index<siblings.length;){
+          const key=blockMergeKey(siblings[index]);
+          let end=index+1;
+          while(end<siblings.length&&blockMergeKey(siblings[end])===key)end++;
+          siblings.slice(index,end).sort((left,right)=>versionRank(left,type)-versionRank(right,type)).forEach(item=>{
+            if(visited.has(item.id))return;
+            visited.add(item.id);ordered.push(item);appendChildren(item.id);
+          });
+          index=end;
+        }
+      };
+      appendChildren(null);
+      instances.forEach(item=>{if(!visited.has(item.id)){visited.add(item.id);ordered.push(item);appendChildren(item.id);}});
+      return ordered;
+    }
+
+    function itemVersion(item,type) { return type==='spf'?spfInfoFor(item).round:item.def.round||''; }
+    function versionRank(item,type) { const rank=versionOptions.indexOf(itemVersion(item,type));return rank<0?versionOptions.length:rank; }
+    function blockMergeKey(item) { return `${item.def.name.trim().toLowerCase()}|${item.tier}`; }
+    function blockMergeSpans(items,type) {
+      const spans=new Map();
+      for(let index=0;index<items.length;){
+        const key=blockMergeKey(items[index]);
+        let end=index+1;
+        while(end<items.length&&blockMergeKey(items[end])===key)end++;
+        spans.set(items[index].id,end-index);
+        for(let current=index+1;current<end;current++)spans.set(items[current].id,0);
+        index=end;
+      }
+      return spans;
+    }
+
+    function rowHtml(item,blockSpan=1) {
       const type = currentHierarchy;
       const rail = railFor(item, type);
       const state = stateFor(item, type);
@@ -1329,16 +1425,15 @@
       const hasChildren = data[type].some(x => x.parent === item.id);
       const levelPad = (item.tier - 1) * 17;
       const late = state === 'delay';
-      const siblingCount = data[type].filter(x => x.def.id === item.def.id).length;
       const categoryCell = `<div class="editable-cell"><div class="cell-display ${item.def.category ? '' : 'empty'}">${item.def.category ? esc(item.def.category) : ''}</div><div class="cell-editor choice"><select class="cell-select ${item.def.category ? '' : 'empty-value'}" data-edit="category" aria-label="${esc(item.def.name)} Block Category">${optionsHtml(blockCategories,item.def.category)}</select></div></div>`;
       const ownerList = type === 'schematic' ? 'schematicOwners' : 'layoutOwners';
       const spfInfo = type === 'spf' ? spfInfoFor(item) : null;
-      const roundCell = roundEditorCell(type==='spf'?spfInfo.round:item.def.round,true);
+      const roundCell = versionEditorCell(type==='spf'?spfInfo.round:item.def.round,true);
       const genericIdentityCells = `<td class="frozen-column frozen-category-column">${categoryCell}</td>${searchableEditorCell('reference',item.def.reference,'referenceProjects','输入可模糊搜索产品；选择空后单元格留白','frozen-column frozen-reference-column last-frozen-column')}`;
       const ownerCell = type === 'spf' ? '' : searchableEditorCell('owner',ownerFor(item,type),ownerList,'输入可模糊搜索人名；清空表示空');
       const spfOwnerCells = type === 'spf' ? `${searchableEditorCell('schematicOwner',item.def.schematicOwner,'schematicOwners','输入可模糊搜索 Schematic Owner')}${searchableEditorCell('layoutOwner',item.def.layoutOwner,'layoutOwners','输入可模糊搜索 Layout Owner')}` : '';
       const spfFileCells = type === 'spf' ? `${textEditorCell('lvsPath',spfInfo.lvsPath,true)}${textEditorCell('cdl',spfInfo.cdl,true)}${textEditorCell('gds',spfInfo.gds,true)}` : '';
-      const layoutWorkdaysCells = type === 'layout' ? `${numericEditorCell('planWorkdays',rail.planWorkdays)}${numericEditorCell('actualWorkdays',rail.actualWorkdays)}` : '';
+      const layoutPlanWorkdaysCell = type === 'layout' ? numericEditorCell('planWorkdays',rail.planWorkdays) : '';
       const layoutResourceCell = type === 'layout' ? numericEditorCell('resource',rail.resource) : '';
       const layoutQualifiedCell = type === 'layout' ? `<td><span class="status ${layoutQualifiedStatus(item).toLowerCase()}">${layoutQualifiedStatus(item)}</span></td>` : '';
       const spfReadyCell = type === 'spf' ? `<td><span class="status ${spfReadyStatus(item).toLowerCase()}">${spfReadyStatus(item)}</span></td>` : '';
@@ -1350,12 +1445,13 @@
       const counterpartProgressCell = type === 'spf' ? '' : `<td>${counterpartStatus ? `<span class="status ${statusClass(counterpartStatus)}" title="来自 ${counterpartType === 'schematic' ? 'Schematic' : 'Layout'} hierarchy，由日期自动判定">${esc(counterpartStatus)}</span>` : ''}</td>`;
       const overallCell = type === 'schematic' ? `<td><span class="status ${overallCheckStatus(item,type).toLowerCase()}">${overallCheckStatus(item,type)}</span></td>` : '';
       const workflowCells = type === 'schematic'
-        ? `${ownProgressCell}${dateEditorCell('planned',rail.planned,late?'date late':'date',{editable:schematicPlannedReleaseUnlocked||!rail.planned})}${dateEditorCell('actual',rail.actual,'date')}${counterpartProgressCell}${ownerCell}${checkItemCell}${overallCell}`
+        ? `${ownProgressCell}${dateEditorCell('planned',rail.planned,late?'date late':'date',{editable:schematicPlannedReleaseUnlocked||!rail.planned})}${dateEditorCell('actual',rail.actual,'date')}${ownerCell}${checkItemCell}${overallCell}${counterpartProgressCell}`
         : type === 'layout'
-          ? `${ownProgressCell}${dateEditorCell('startDate',rail.startDate)}${dateEditorCell('planned',rail.planned,late?'date late':'date')}${dateEditorCell('actual',rail.actual,'date')}${layoutWorkdaysCells}${counterpartProgressCell}${ownerCell}${layoutResourceCell}${checkItemCell}${layoutQualifiedCell}`
+          ? `${counterpartProgressCell}${ownerCell}${layoutPlanWorkdaysCell}${layoutResourceCell}${dateEditorCell('startDate',rail.startDate)}${dateEditorCell('planned',rail.planned,late?'date late':'date')}${dateEditorCell('actual',rail.actual,'date')}${ownProgressCell}${checkItemCell}${layoutQualifiedCell}`
           : `${checkItemCell}${spfReadyCell}`;
-      return `<tr data-id="${item.id}" class="${selectedItem?.id === item.id ? 'selected' : ''}">
-        <td class="frozen-column frozen-block-column"><div class="block-cell" style="padding-left:${levelPad}px"><button class="tree-toggle ${hasChildren?'':'hidden'}" title="展开/折叠">${item.expanded?'▾':'▸'}</button><div class="block-main"><div class="block-title-line"><span class="block-name-wrap"><span class="block-name">${esc(item.def.name)}</span><span class="row-actions"><button class="row-action row-add" data-add-child type="button" title="新增 Block" aria-label="在 ${esc(item.def.name)} 行新增 Block">+</button><button class="row-action row-delete" data-delete-instance type="button" title="删除 ${esc(item.def.name)} Instance" aria-label="删除 ${esc(item.def.name)} Instance"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6v14H5V6"></path><path d="M10 11v5M14 11v5"></path></svg></button></span></span>${siblingCount > 1 ? `<button class="instance-mark" title="当前为实例 ${esc(item.instance || item.id)}；同一 Block 在当前 hierarchy 有 ${siblingCount} 个实例。点击查看 Block 详情">${esc(item.instance || '实例')} · ⛓${siblingCount}</button>` : ''}<span class="tier">T${item.tier}${item.tierTop && type==='layout'?' · TOP':''}</span></div></div></div></td>
+      const blockCell=blockSpan===0?'':`<td rowspan="${blockSpan}" class="frozen-column frozen-block-column ${blockSpan>1?'merged-block-cell':''}" data-block-merge-key="${esc(blockMergeKey(item))}"><div class="block-cell" style="${blockSpan>1?'':`padding-left:${levelPad}px`}"><button class="tree-toggle ${hasChildren?'':'hidden'}" title="展开/折叠">${item.expanded?'▾':'▸'}</button><div class="block-main"><div class="block-title-line"><span class="block-name-wrap"><span class="block-name">${esc(item.def.name)}</span><span class="row-actions"><button class="row-action row-add" data-add-child type="button" title="新增 Block" aria-label="在 ${esc(item.def.name)} 行新增 Block">+</button><button class="row-action row-delete" data-delete-instance type="button" title="删除 ${esc(item.def.name)} Block" aria-label="删除 ${esc(item.def.name)} Block"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6v14H5V6"></path><path d="M10 11v5M14 11v5"></path></svg></button></span></span><span class="tier">T${item.tier}${item.tierTop && type==='layout'?' · TOP':''}</span></div></div></div></td>`;
+      return `<tr data-id="${item.id}" data-block-merge-key="${esc(blockMergeKey(item))}" class="${selectedItem?.id === item.id ? 'selected' : ''}">
+        ${blockCell}
         ${roundCell}
         ${type === 'spf' ? spfOwnerCells : genericIdentityCells}
         ${workflowCells}
@@ -1371,9 +1467,8 @@
         const item = data[currentHierarchy].find(x => x.id === tr.dataset.id);
         tr.querySelector('.tree-toggle')?.addEventListener('click', e => { e.stopPropagation(); item.expanded = !item.expanded; renderWbs(); });
         tr.querySelector('.block-name')?.addEventListener('click', e => { e.stopPropagation(); openDrawer(item); });
-        tr.querySelector('.instance-mark')?.addEventListener('click', e => { e.stopPropagation(); openDrawer(item); });
         tr.querySelector('[data-add-child]')?.addEventListener('click', e => { e.stopPropagation(); openAddInstanceModal(item); });
-        tr.querySelector('[data-delete-instance]')?.addEventListener('click', e => { e.stopPropagation(); deleteInstance(item); });
+        tr.querySelector('[data-delete-instance]')?.addEventListener('click', e => { e.stopPropagation(); requestDeleteInstance(item); });
         tr.querySelectorAll('[data-check-index]').forEach(button => button.addEventListener('click', e => {
           e.stopPropagation();
           const index = Number(button.dataset.checkIndex);
@@ -1381,10 +1476,11 @@
         }));
         tr.querySelectorAll('[data-edit]').forEach(control => {
           control.addEventListener('click', e => e.stopPropagation());
-          if(control.dataset.edit==='round')control.addEventListener('input',()=>{control.value=limitRoundLines(control.value);});
           control.addEventListener('change', () => updateTableField(item, control.dataset.edit, control.value));
         });
         tr.querySelector('[data-change-history]')?.addEventListener('click', e => { e.stopPropagation(); openRowChangeHistory(item,e.currentTarget); });
+        tr.addEventListener('mouseenter',()=>wbsBody.querySelector(`td.merged-block-cell[data-block-merge-key="${CSS.escape(tr.dataset.blockMergeKey)}"]`)?.classList.add('merge-row-hover'));
+        tr.addEventListener('mouseleave',()=>wbsBody.querySelector(`td.merged-block-cell[data-block-merge-key="${CSS.escape(tr.dataset.blockMergeKey)}"]`)?.classList.remove('merge-row-hover'));
         tr.addEventListener('click', () => { selectedItem = item; renderWbs(); });
       });
     }
@@ -1392,7 +1488,7 @@
     function updateTableField(item, field, value) {
       const rail = railFor(item, currentHierarchy);
       const info = currentHierarchy === 'spf' ? spfInfoFor(item) : null;
-      const normalized = field === 'reference' && value === '空' ? '' : field === 'round' ? normalizeRound(value) : value;
+      const normalized = field === 'reference' && value === '空' ? '' : field === 'round' ? normalizeVersion(value) : value;
       const oldValue = field === 'category' ? item.def.category
         : field === 'reference' ? item.def.reference
         : field === 'owner' ? item.def[currentHierarchy + 'Owner']
@@ -1402,6 +1498,7 @@
         : ['lvsPath','cdl','gds'].includes(field) ? info[field]
         : rail[field];
       if (oldValue === normalized) return;
+      if(field==='round'&&data[currentHierarchy].some(candidate=>candidate.def.id!==item.def.id&&candidate.tier===item.tier&&candidate.def.name.trim().toLowerCase()===item.def.name.trim().toLowerCase()&&itemVersion(candidate,currentHierarchy)===normalized)){showToast('同名、同 Tier、同 Version 的 Block 已存在');renderWbs();return;}
       if(currentHierarchy==='schematic'&&field==='planned'&&oldValue&&!schematicPlannedReleaseUnlocked){showToast('Planned release 已锁定；仅 PL/LPL 可解锁后修改');renderWbs();return;}
       if (field === 'planWorkdays' || field === 'actualWorkdays' || field === 'resource') {
         const integerOnly = field === 'planWorkdays' || field === 'actualWorkdays';
@@ -1427,7 +1524,7 @@
         rail[field] = normalized;
       }
       if (field === 'planned' || field === 'actual' || field === 'startDate') rail[field] = normalized;
-      const labels = {round:'Round',category:'Block Category',reference:'Reference project',owner:hierarchyMeta[currentHierarchy].owner,schematicOwner:'Schematic Owner',layoutOwner:'Layout Owner',lvsPath:'LVS path',cdl:'cdl',gds:'gds',planWorkdays:'Plan workdays',actualWorkdays:'Actual workdays',resource:'Resource',planned:hierarchyMeta[currentHierarchy].date,actual:hierarchyMeta[currentHierarchy].actual,startDate:'Start date'};
+      const labels = {round:'Version',category:'Block Category',reference:'Reference project',owner:hierarchyMeta[currentHierarchy].owner,schematicOwner:'Schematic Owner',layoutOwner:'Layout Owner',lvsPath:'LVS path',cdl:'cdl',gds:'gds',planWorkdays:'Plan workdays',actualWorkdays:'Actual workdays',resource:'Resource',planned:hierarchyMeta[currentHierarchy].date,actual:hierarchyMeta[currentHierarchy].actual,startDate:'Start date'};
       if(field==='category'||field==='reference') recordDefinitionChange(item,['schematic','layout'],labels[field],oldValue,normalized);
       else if(field==='schematicOwner'||(field==='owner'&&currentHierarchy==='schematic')) recordDefinitionChange(item,['schematic','spf'],labels[field],oldValue,normalized);
       else if(field==='layoutOwner'||(field==='owner'&&currentHierarchy==='layout')) recordDefinitionChange(item,['layout','spf'],labels[field],oldValue,normalized);
@@ -1436,23 +1533,63 @@
       showToast(`${labels[field]} 已更新`);
     }
 
-    function updateDefinitionCheck(item, type, index, checked) {
+    function updateDefinitionCheck(item, type, index, checked, reopenDrawer=false) {
       const rail = railFor(item,type);
       const completesParent = checked && rail.checks.every((value,checkIndex)=>checkIndex===index || Boolean(value));
       if (completesParent) {
         const blockers = incompleteDirectChildren(item,type);
-        if (blockers.length) return openCheckValidationModal(item,type,blockers);
+        if (blockers.length) {
+          if(reopenDrawer)openDrawer(item);
+          return openCheckValidationModal(item,type,blockers);
+        }
       }
-      const beforeDerived = derivedCheckValue(item,type);
-      const oldValue = rail.checks[index] ? '完成' : '未完成';
-      rail.checks[index] = checked ? 1 : 0;
-      rail.checkStatus = rail.checks.every(Boolean) ? 'Done' : rail.checks.some(Boolean) ? 'Ongoing' : 'Not started';
-      const afterDerived = derivedCheckValue(item,type);
-      const effect = beforeDerived === afterDerived ? '' : `${derivedCheckLabel(type)}：${beforeDerived} → ${afterDerived}`;
-      recordChange(item,type,checkLabels[type][index],oldValue,checked?'完成':'未完成',effect);
-      const reopenedParents = checked ? [] : reopenCompletedParents(item,type);
-      renderWbs(); renderDashboard(); renderDelay();
-      showToast(reopenedParents.length ? `${checkLabels[type][index]} 已取消；${reopenedParents.join('、')} 已回退为未完成` : `${checkLabels[type][index]} 已${checked?'完成':'取消'}`);
+      const peers=sameNameDifferentTierItems(item,type,index,checked);
+      if(peers.length)return openSameNameCheckModal({item,type,index,checked,reopenDrawer,peers});
+      applyCheckChanges({item,type,index,checked,reopenDrawer,peers:[]});
+    }
+    function sameNameDifferentTierItems(item,type,index,checked) {
+      const peers=data[type].filter(candidate=>candidate.def.id!==item.def.id&&candidate.tier!==item.tier&&candidate.def.name.trim().toLowerCase()===item.def.name.trim().toLowerCase()&&Boolean(railFor(candidate,type).checks[index])!==checked);
+      return [...new Map(peers.map(candidate=>[candidate.def.id,candidate])).values()];
+    }
+    function openSameNameCheckModal(pending) {
+      pendingSameNameCheck=pending;
+      const action=pending.checked?'完成':'取消';
+      document.getElementById('sameNameCheckIntro').textContent=`${pending.item.def.name} · T${pending.item.tier} 的「${checkLabels[pending.type][pending.index]}」将改为${action}。是否同时修改其他 Tier 的同名 Block？`;
+      document.getElementById('sameNameCheckList').innerHTML=pending.peers.map(peer=>`<div class="validation-blocker"><strong>${esc(peer.def.name)} · T${peer.tier}</strong><small>当前：${railFor(peer,pending.type).checks[pending.index]?'完成':'未完成'} → ${action}</small></div>`).join('');
+      document.getElementById('sameNameCheckModal').classList.add('open');
+      document.getElementById('confirmSameNameCheck').focus();
+    }
+    function resolveSameNameCheck(syncPeers) {
+      if(!pendingSameNameCheck)return closeSameNameCheckModal();
+      const pending=pendingSameNameCheck;
+      pendingSameNameCheck=null;
+      closeSameNameCheckModal();
+      applyCheckChanges({...pending,peers:syncPeers?pending.peers:[]});
+    }
+    function closeSameNameCheckModal() { document.getElementById('sameNameCheckModal').classList.remove('open'); }
+    function applyCheckChanges({item,type,index,checked,reopenDrawer,peers}) {
+      const targets=[item,...peers];
+      if(checked)targets.sort((left,right)=>right.tier-left.tier);
+      const reopenedParents=new Set(),blocked=[];
+      targets.forEach(target=>{
+        const targetRail=railFor(target,type);
+        if(Boolean(targetRail.checks[index])===checked)return;
+        const completesTarget=checked&&targetRail.checks.every((value,checkIndex)=>checkIndex===index||Boolean(value));
+        if(completesTarget&&incompleteDirectChildren(target,type).length){blocked.push(`T${target.tier}`);return;}
+        const beforeDerived=derivedCheckValue(target,type),oldValue=targetRail.checks[index]?'完成':'未完成';
+        targetRail.checks[index]=checked?1:0;
+        targetRail.checkStatus=targetRail.checks.every(Boolean)?'Done':targetRail.checks.some(Boolean)?'Ongoing':'Not started';
+        const afterDerived=derivedCheckValue(target,type);
+        const effect=beforeDerived===afterDerived?'':`${derivedCheckLabel(type)}：${beforeDerived} → ${afterDerived}`;
+        recordChange(target,type,checkLabels[type][index],oldValue,checked?'完成':'未完成',effect);
+        if(!checked)reopenCompletedParents(target,type).forEach(name=>reopenedParents.add(name));
+      });
+      renderWbs();renderDashboard();renderDelay();
+      if(reopenDrawer&&document.getElementById('detailDrawer').classList.contains('open'))openDrawer(item);
+      const synced=peers.length?`；已同步 ${peers.length-blocked.length} 个其他 Tier Block`:'';
+      const blockedText=blocked.length?`；${blocked.map(tier=>`T${tier}`).join('、')} 因子节点未完成而未同步`:'';
+      const reopenedText=reopenedParents.size?`；${[...reopenedParents].join('、')} 已回退为未完成`:'';
+      showToast(`${checkLabels[type][index]} 已${checked?'完成':'取消'}${synced}${blockedText}${reopenedText}`);
     }
 
     function hierarchyInstancesForDefinition(item, type) {
@@ -1470,7 +1607,7 @@
     }
     function openCheckValidationModal(item, type, blockers) {
       document.getElementById('checkValidationIntro').textContent = `${item.def.name} 还有 ${blockers.length} 个直接子节点未完成校验。请先完成以下 Check item，再勾选父节点最后一项。`;
-      document.getElementById('checkValidationList').innerHTML = blockers.map(({child,missing})=>`<div class="validation-blocker"><button class="validation-block-link" data-validation-child-id="${esc(child.id)}" type="button">${esc(child.def.name)} · T${child.tier}${child.instance?` · ${esc(child.instance)}`:''}</button><small>未完成：${missing.map(esc).join('、')}</small></div>`).join('');
+      document.getElementById('checkValidationList').innerHTML = blockers.map(({child,missing})=>`<div class="validation-blocker"><button class="validation-block-link" data-validation-child-id="${esc(child.id)}" type="button">${esc(child.def.name)} · T${child.tier}</button><small>未完成：${missing.map(esc).join('、')}</small></div>`).join('');
       document.querySelectorAll('[data-validation-child-id]').forEach(button=>button.addEventListener('click',()=>{
         const child = data[type].find(instance=>instance.id===button.dataset.validationChildId);
         if (!child) return;
@@ -1503,16 +1640,64 @@
       return [...reopened].map(definitionId=>data[type].find(instance=>instance.def.id===definitionId)?.def.name).filter(Boolean);
     }
 
-    function deleteInstance(item) {
+    function mergedVersionGroup(item,type=currentHierarchy) {
+      return data[type].filter(candidate=>(candidate.parent||null)===(item.parent||null)&&blockMergeKey(candidate)===blockMergeKey(item)).sort((left,right)=>versionRank(left,type)-versionRank(right,type));
+    }
+    function requestDeleteInstance(item) {
+      const group=mergedVersionGroup(item);
+      if(group.length>1)return openVersionDeleteModal(item,group);
+      deleteInstance(item);
+    }
+    function deleteInstance(item,skipConfirm=false) {
       const type = currentHierarchy;
       if (data[type].some(child=>child.parent===item.id)) return showToast('请先删除或移动该节点的子 Instance');
-      if (!confirm(`确认删除 ${item.def.name} · ${item.instance || item.id}？`)) return;
-      const before = `${item.def.name} · ${item.instance || item.id} · T${item.tier}`;
+      const version=itemVersion(item,type);
+      if (!skipConfirm&&!confirm(`确认删除 ${item.def.name} · T${item.tier} · ${version}？`)) return;
+      const before = `${item.def.name} · T${item.tier} · ${version}`;
       data[type].splice(data[type].findIndex(candidate=>candidate.id===item.id),1);
-      structureChanges[type].unshift(changeEvent(currentActorId,'删除 Block / Instance',before,'已删除',auditNow()));
+      structureChanges[type].unshift(changeEvent(currentActorId,'删除 Block Version',before,'已删除',auditNow()));
       if (selectedItem?.id === item.id) closeDrawer();
-      renderWbs(); renderDashboard(); renderDelay();
-      showToast(`${item.def.name} Instance 已删除`);
+      if(!skipConfirm){renderWbs();renderDashboard();renderDelay();showToast(`${item.def.name} · ${version} 已删除`);}
+    }
+    function openVersionDeleteModal(item,group) {
+      pendingVersionDelete={item,type:currentHierarchy,group,selected:new Set()};
+      document.getElementById('versionDeleteTitle').textContent=`删除 ${item.def.name} · T${item.tier}`;
+      document.getElementById('versionDeleteIntro').textContent='请选择需要删除的 Version，可多选。仅删除选中行，其他 Version 不受影响。';
+      renderVersionDeleteOptions();
+      document.getElementById('versionDeleteModal').classList.add('open');
+      document.querySelector('#versionDeleteModal [data-version-delete-id]:not(:disabled)')?.focus();
+    }
+    function versionDeleteOwner(item,type) { return type==='spf'?[item.def.schematicOwner,item.def.layoutOwner].filter(Boolean).join(' / '):ownerFor(item,type); }
+    function renderVersionDeleteOptions() {
+      if(!pendingVersionDelete)return;
+      const {type,group,selected}=pendingVersionDelete;
+      const deletable=group.filter(item=>!data[type].some(child=>child.parent===item.id));
+      const allSelected=deletable.length>0&&deletable.every(item=>selected.has(item.id));
+      document.getElementById('versionDeleteList').innerHTML=`<label class="version-delete-all"><input type="checkbox" data-version-delete-all ${allSelected?'checked':''} ${deletable.length?'':'disabled'}><span>全选可删除项</span></label>${group.map(item=>{const children=data[type].filter(child=>child.parent===item.id),blocked=children.length>0;return `<label class="version-delete-option ${blocked?'blocked':''}"><input type="checkbox" data-version-delete-id="${esc(item.id)}" ${selected.has(item.id)?'checked':''} ${blocked?'disabled':''}><strong>${esc(itemVersion(item,type))}</strong><span>${esc(versionDeleteOwner(item,type)||'Owner 未填写')} · ${esc(derivedCheckValue(item,type))}</span><small>${blocked?`有 ${children.length} 个子 Block`:''}</small></label>`;}).join('')}`;
+      const wholeGroup=group.length>0&&group.every(item=>selected.has(item.id));
+      const warning=document.getElementById('versionDeleteWarning');
+      warning.textContent=wholeGroup?`已选择全部 ${group.length} 个 Version，确认后将删除整个 Block。`:'';
+      warning.classList.toggle('show',wholeGroup);
+      const confirmButton=document.getElementById('confirmVersionDelete');
+      confirmButton.disabled=selected.size===0;
+      confirmButton.textContent=wholeGroup?'删除整个 Block':'删除所选';
+      document.querySelector('[data-version-delete-all]')?.addEventListener('change',event=>{pendingVersionDelete.selected=event.target.checked?new Set(deletable.map(item=>item.id)):new Set();renderVersionDeleteOptions();});
+      document.querySelectorAll('[data-version-delete-id]').forEach(input=>input.addEventListener('change',()=>{if(input.checked)selected.add(input.dataset.versionDeleteId);else selected.delete(input.dataset.versionDeleteId);renderVersionDeleteOptions();}));
+    }
+    function confirmVersionDelete() {
+      if(!pendingVersionDelete?.selected.size)return;
+      const {item,type,group,selected}=pendingVersionDelete,targets=group.filter(candidate=>selected.has(candidate.id));
+      const wholeGroup=targets.length===group.length;
+      if(wholeGroup&&!confirm(`确认删除 ${item.def.name} · T${item.tier} 的全部 ${group.length} 个 Version？`))return;
+      pendingVersionDelete=null;
+      document.getElementById('versionDeleteModal').classList.remove('open');
+      targets.forEach(target=>deleteInstance(target,true));
+      renderWbs();renderDashboard();renderDelay();
+      showToast(wholeGroup?`${item.def.name} 整个 Block 已删除`:`已删除 ${targets.map(target=>itemVersion(target,type)).join('、')}`);
+    }
+    function closeVersionDeleteModal() {
+      document.getElementById('versionDeleteModal').classList.remove('open');
+      pendingVersionDelete=null;
     }
 
     function changeRecordHtml(change) {
@@ -1606,10 +1791,11 @@
     function openDrawer(item) {
       selectedItem = item;
       document.getElementById('drawerTitle').textContent = item.def.name;
-      document.getElementById('drawerSubtitle').textContent = `${currentHierarchy.toUpperCase()} · Tier ${item.tier}${item.instance ? ` · Instance ${item.instance}` : ''}`;
+      document.getElementById('drawerSubtitle').textContent = `${currentHierarchy.toUpperCase()} · Tier ${item.tier}`;
       document.getElementById('drawerBody').innerHTML = drawerHtml(item);
       document.getElementById('drawerBackdrop').classList.add('open');
       document.getElementById('detailDrawer').classList.add('open');
+      bindDrawerTitle(item);
       bindDrawer(item);
       renderWbs();
     }
@@ -1654,10 +1840,38 @@
       const rail = railFor(item, 'spf');
       const v = spfInfoFor(item);
       return `<section class="drawer-section"><div class="section-title"><h3>SPF status</h3></div>
-        <div class="info-grid"><div class="field"><label>Round</label><strong class="spf-round-detail">${esc(v.round)||'—'}</strong></div><div class="field"><label>SPF check status</label><strong>${spfReadyStatus(item)}</strong></div><div class="field"><label>Planned SPF release</label><strong>${rail.planned}</strong></div></div>
+        <div class="info-grid"><div class="field"><label>Version</label><strong>${esc(v.round)||'—'}</strong></div><div class="field"><label>SPF check status</label><strong>${spfReadyStatus(item)}</strong></div><div class="field"><label>Planned SPF release</label><strong>${rail.planned}</strong></div></div>
         <div class="field" style="margin-top:10px"><label>LVS path</label><input data-spf-field="lvsPath" value="${esc(v.lvsPath)}"></div>
         <div class="info-grid" style="margin-top:10px"><div class="field"><label>cdl</label><input data-spf-field="cdl" value="${esc(v.cdl)}"></div><div class="field"><label>gds</label><input data-spf-field="gds" value="${esc(v.gds)}"></div></div>
       </section><section class="drawer-section"><div class="section-title"><h3>SPF check list</h3><small>${progress(item,'spf')}% · Definition rail 共享</small></div>${checksHtml(item,'spf')}</section>`;
+    }
+
+    function bindDrawerTitle(item) {
+      const title=document.getElementById('drawerTitle'),edit=document.getElementById('drawerTitleEdit');
+      let cancelled=false;
+      const stopEditing=()=>{
+        title.contentEditable='false';
+        edit.classList.remove('editing');
+        edit.setAttribute('aria-pressed','false');
+      };
+      edit.addEventListener('click',()=>{
+        title.contentEditable='true';
+        edit.classList.add('editing');
+        edit.setAttribute('aria-pressed','true');
+        title.focus();
+        const selection=window.getSelection(),range=document.createRange();
+        range.selectNodeContents(title);selection.removeAllRanges();selection.addRange(range);
+      });
+      title.addEventListener('keydown',event=>{
+        if(event.key==='Enter'){event.preventDefault();title.blur();}
+        if(event.key==='Escape'){event.preventDefault();cancelled=true;title.textContent=item.def.name;title.blur();}
+      });
+      title.addEventListener('blur',()=>{
+        const nextName=title.textContent;
+        stopEditing();
+        if(cancelled){cancelled=false;return;}
+        updateBlockName(item,nextName);
+      });
     }
 
     function bindDrawer(item) {
@@ -1670,8 +1884,7 @@
         showToast(`AI Routing 已设为 ${enabled?'Yes':'No'}`);
       }));
       document.querySelectorAll('[data-check]').forEach(input => input.addEventListener('change', () => {
-        updateDefinitionCheck(item,currentHierarchy,Number(input.dataset.check),input.checked);
-        openDrawer(item); renderDashboard(); renderDelay();
+        updateDefinitionCheck(item,currentHierarchy,Number(input.dataset.check),input.checked,true);
       }));
       document.querySelectorAll('[data-spf-field]').forEach(input => input.addEventListener('change', () => {
         const v = spfInfoFor(item), field=input.dataset.spfField, oldValue=v[field];
@@ -1713,6 +1926,17 @@
         recordChange(item,currentHierarchy,'Comments',oldValue,input.value);
         showToast('Comments 已更新'); openDrawer(item);
       }));
+    }
+
+    function updateBlockName(item, value) {
+      const nextName=String(value||'').trim(),oldName=item.def.name;
+      if(!nextName){showToast('Block name 不能为空');openDrawer(item);return;}
+      if(nextName===oldName)return;
+      const duplicate=Object.entries(data).some(([type,instances])=>instances.some(instance=>instance.def.id===item.def.id&&instances.some(candidate=>candidate.def.id!==item.def.id&&candidate.tier===instance.tier&&candidate.def.name.toLowerCase()===nextName.toLowerCase()&&itemVersion(candidate,type)===itemVersion(instance,type))));
+      if(duplicate){showToast('同名、同 Tier、同 Version 的 Block 已存在');openDrawer(item);return;}
+      item.def.name=nextName;
+      renderDashboard();renderDelay();openDrawer(item);
+      showToast(`Block name 已更新：${oldName} → ${nextName}`);
     }
 
     function renderDashboard() {
@@ -1814,14 +2038,14 @@
       return `<div class="ei-grid"><section class="ei-card"><div class="ei-card-head"><h2>1. 下载固定模板</h2><small>DDCPC WBS 标准格式</small></div><div class="ei-card-body ei-form"><div class="ei-notice">模板固定包含 Schematic、Layout、SPF 三张 Sheet。请勿修改 Sheet 名称和首行字段；每行只在对应 Tier 列填写一个 Block。</div><button class="btn primary" id="eiDownloadTemplate" type="button">↓ 下载 Excel 模板</button><small style="color:var(--text-3)">下载后填写 Block、Owner、日期及 Check item，再回到这里上传。</small></div></section><section class="ei-card"><div class="ei-card-head"><h2>2. 上传已填写模板</h2><small>.xlsx / .xls</small></div><div class="ei-card-body ei-form"><div class="ei-dropzone"><div><strong>上传已填写的 DDCPC WBS 模板</strong><p>系统自动识别固定字段并校验三张 hierarchy</p><button class="btn" id="eiChooseFile" type="button">选择已填写模板</button><input id="eiFileInput" type="file" accept=".xlsx,.xls" hidden></div></div>${file}<div><label>新表名称</label><input id="eiTableName" value="${esc(embeddedImportState.tableName)}"></div><div class="ei-notice">导入成功后，新表会加入顶部表名称列表，并立即在 WBS Hierarchy 中展示。</div><button class="btn primary" id="eiReadData">检查模板并预览</button></div></section></div>`;
     }
     const embeddedTemplateHeaders = {
-      schematic:['Tier1','Tier2','Tier3','Tier4','Tier5','Tier6','Round','Block Category','Reference project','Schematic Owner','Planned release','Actual release',...checkLabels.schematic],
-      layout:['Tier1','Tier2','Tier3','Tier4','Tier5','Tier6','Round','Block Category','Reference project','Layout Owner','Start date','Plan finish','Actual finish','Plan workdays','Actual workdays','Resource',...checkLabels.layout],
-      spf:['Tier1','Tier2','Tier3','Tier4','Round','Schematic Owner','Layout Owner','LVS path','cdl','gds','Planned SPF release','Actual SPF release',...checkLabels.spf]
+      schematic:['Tier1','Tier2','Tier3','Tier4','Tier5','Tier6','Version','Block Category','Reference project','Schematic Owner','Planned release','Actual release',...checkLabels.schematic],
+      layout:['Tier1','Tier2','Tier3','Tier4','Tier5','Tier6','Version','Block Category','Reference project','Layout Owner','Start date','Plan finish','Actual finish','Plan workdays','Actual workdays','Resource',...checkLabels.layout],
+      spf:['Tier1','Tier2','Tier3','Tier4','Version','Schematic Owner','Layout Owner','LVS path','cdl','gds','Planned SPF release','Actual SPF release',...checkLabels.spf]
     };
     function downloadEmbeddedTemplate() {
       if(!window.XLSX)return showToast('Excel 组件未加载，请联网后重试');
       const workbook=XLSX.utils.book_new();
-      const guide=[['DDCPC WBS Excel 导入模板'],['填写规则'],['1. 不要修改 Schematic、Layout、SPF Sheet 名称或首行字段。'],['2. 每行只在一个 Tier 列填写 Block；子节点可省略重复的上级 Tier。'],['3. 日期格式使用 YYYY-MM-DD；Check item 填 1/0、Yes/No、Done/Ongoing 或 ✓。'],['4. 空 Sheet 允许保留，但至少填写一张 hierarchy。']];
+      const guide=[['DDCPC WBS Excel 导入模板'],['填写规则'],['1. 不要修改 Schematic、Layout、SPF Sheet 名称或首行字段。'],['2. 每行只在一个 Tier 列填写 Block；子节点可省略重复的上级 Tier。'],['3. Version 仅填写 1st、2nd、3rd、4th、5th 之一。'],['4. 日期格式使用 YYYY-MM-DD；Check item 填 1/0、Yes/No、Done/Ongoing 或 ✓。'],['5. 空 Sheet 允许保留，但至少填写一张 hierarchy。']];
       XLSX.utils.book_append_sheet(workbook,XLSX.utils.aoa_to_sheet(guide),'填写说明');
       Object.entries(embeddedTemplateHeaders).forEach(([type,headers])=>XLSX.utils.book_append_sheet(workbook,XLSX.utils.aoa_to_sheet([headers]),type==='schematic'?'Schematic':type==='layout'?'Layout':'SPF'));
       XLSX.writeFile(workbook,'DDCPC_WBS_Import_Template.xlsx');
@@ -1859,7 +2083,7 @@
     function parseEmbeddedTemplateHierarchy(type) {
       const sheetName=type==='schematic'?'Schematic':type==='layout'?'Layout':'SPF';
       const sourceRows=embeddedImportState.workbook[sheetName]||[],headers=sourceRows[0]||[],tierCount=type==='spf'?4:6,last=[];
-      const fieldNames=type==='schematic'?['Round','Block Category','Reference project','Schematic Owner','Planned release','Actual release']:type==='layout'?['Round','Block Category','Reference project','Layout Owner','Start date','Plan finish','Actual finish','Plan workdays','Actual workdays','Resource']:['Round','Schematic Owner','Layout Owner','LVS path','cdl','gds','Planned SPF release','Actual SPF release'];
+      const fieldNames=type==='schematic'?['Version','Block Category','Reference project','Schematic Owner','Planned release','Actual release']:type==='layout'?['Version','Block Category','Reference project','Layout Owner','Start date','Plan finish','Actual finish','Plan workdays','Actual workdays','Resource']:['Version','Schematic Owner','Layout Owner','LVS path','cdl','gds','Planned SPF release','Actual SPF release'];
       const cell=(source,field)=>String(source[headers.indexOf(field)]??'').trim();
       const rows=[];
       sourceRows.slice(1).forEach((source,index)=>{
@@ -1871,6 +2095,7 @@
         const checks=checkLabels[type].map(label=>embeddedCheckValue(cell(source,label)));
         if(!name)issues.push('Block name 不能为空');
         if(!tier)issues.push('Tier 无法识别');
+        if(fields.Version&&!versionOptions.includes(fields.Version))issues.push('Version 只能选择 1st、2nd、3rd、4th、5th');
         if(fields['Block Category']&&!blockCategories.includes(fields['Block Category']))issues.push(`Block Category 无效：${fields['Block Category']}`);
         ['Schematic Owner','Layout Owner'].forEach(field=>{if(fields[field]&&!embeddedImportOwners.has(fields[field]))issues.push(`${field} 无法匹配：${fields[field]}`);});
         Object.entries(fields).forEach(([field,value])=>{if(/date|release|finish/i.test(field)&&value&&!/^\d{4}-\d{2}-\d{2}$/.test(value))issues.push(`${field} 格式应为 YYYY-MM-DD`);});
@@ -1915,8 +2140,8 @@
       ['schematic','layout','spf'].forEach(type=>{data[type].splice(0);Object.keys(railState[type]).forEach(key=>delete railState[type][key]);changeHistory[type]={};structureChanges[type]=[];});
       Object.keys(detailState.spf).forEach(key=>delete detailState.spf[key]);
       Object.keys(detailState.aiRouting).forEach(key=>delete detailState.aiRouting[key]);
-      const definitionFor=row=>{const sharedKey=row.decision==='split'?`${row.hierarchy}:${row.index}:${row.name.toLowerCase()}`:row.name.toLowerCase();let definition=definitions.get(sharedKey);if(!definition){const slug=row.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'block';definition={id:`import-${slug}-${++definitionSequence}`,name:row.name,round:'',category:'',reference:'',blockOwner:'',schematicOwner:'',layoutOwner:''};definitions.set(sharedKey,definition);}if(row.hierarchy!=='spf'&&row.fields.Round&&!definition.round)definition.round=normalizeRound(row.fields.Round);if(row.fields['Block Category'])definition.category=row.fields['Block Category'];if(row.fields['Reference project'])definition.reference=row.fields['Reference project'];if(row.fields['Schematic Owner'])definition.schematicOwner=row.fields['Schematic Owner'];if(row.fields['Layout Owner'])definition.layoutOwner=row.fields['Layout Owner'];return definition;};
-      ['schematic','layout','spf'].forEach(type=>{const pathToInstance=new Map();accepted.filter(row=>row.hierarchy===type).sort((a,b)=>a.index-b.index).forEach(importRow=>{const definition=definitionFor(importRow),parentKey=embeddedPath(importRow.parentPath).join('/').toLowerCase(),parentId=parentKey?pathToInstance.get(parentKey)||null:null,id=`imp-${type.slice(0,3)}-${++instanceSequence}`,planned=type==='schematic'?importRow.fields['Planned release']:type==='layout'?importRow.fields['Plan finish']:importRow.fields['Planned SPF release'],actual=type==='schematic'?importRow.fields['Actual release']:type==='layout'?importRow.fields['Actual finish']:importRow.fields['Actual SPF release'];const item=row(id,definition,parentId,importRow.tier,importRow.checks,planned||'',actual||'');data[type].push(item);pathToInstance.set([...embeddedPath(importRow.parentPath),importRow.name].join('/').toLowerCase(),id);railState[type][definition.id]||={checks:[...importRow.checks],planned:planned||'',actual:actual||'',startDate:importRow.fields['Start date']||'',planWorkdays:importRow.fields['Plan workdays']||'',actualWorkdays:importRow.fields['Actual workdays']||'',resource:importRow.fields.Resource||'',checkStatus:importRow.checks.every(Boolean)?'Done':importRow.checks.some(Boolean)?'Ongoing':'Not started'};if(type==='spf')detailState.spf[definition.id]={round:normalizeRound(importRow.fields.Round||''),lvsPath:importRow.fields['LVS path']||'',cdl:importRow.fields.cdl||'',gds:importRow.fields.gds||''};});});
+      const definitionFor=row=>{const sharedKey=row.decision==='split'?`${row.hierarchy}:${row.index}:${row.name.toLowerCase()}`:row.name.toLowerCase();let definition=definitions.get(sharedKey);if(!definition){const slug=row.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'block';definition={id:`import-${slug}-${++definitionSequence}`,name:row.name,round:'',category:'',reference:'',blockOwner:'',schematicOwner:'',layoutOwner:''};definitions.set(sharedKey,definition);}if(row.hierarchy!=='spf'&&row.fields.Version&&!definition.round)definition.round=normalizeVersion(row.fields.Version);if(row.fields['Block Category'])definition.category=row.fields['Block Category'];if(row.fields['Reference project'])definition.reference=row.fields['Reference project'];if(row.fields['Schematic Owner'])definition.schematicOwner=row.fields['Schematic Owner'];if(row.fields['Layout Owner'])definition.layoutOwner=row.fields['Layout Owner'];return definition;};
+      ['schematic','layout','spf'].forEach(type=>{const pathToInstance=new Map();accepted.filter(row=>row.hierarchy===type).sort((a,b)=>a.index-b.index).forEach(importRow=>{const definition=definitionFor(importRow),parentKey=embeddedPath(importRow.parentPath).join('/').toLowerCase(),parentId=parentKey?pathToInstance.get(parentKey)||null:null,id=`imp-${type.slice(0,3)}-${++instanceSequence}`,planned=type==='schematic'?importRow.fields['Planned release']:type==='layout'?importRow.fields['Plan finish']:importRow.fields['Planned SPF release'],actual=type==='schematic'?importRow.fields['Actual release']:type==='layout'?importRow.fields['Actual finish']:importRow.fields['Actual SPF release'];const item=row(id,definition,parentId,importRow.tier,importRow.checks,planned||'',actual||'');data[type].push(item);pathToInstance.set([...embeddedPath(importRow.parentPath),importRow.name].join('/').toLowerCase(),id);railState[type][definition.id]||={checks:[...importRow.checks],planned:planned||'',actual:actual||'',startDate:importRow.fields['Start date']||'',planWorkdays:importRow.fields['Plan workdays']||'',actualWorkdays:importRow.fields['Actual workdays']||'',resource:importRow.fields.Resource||'',checkStatus:importRow.checks.every(Boolean)?'Done':importRow.checks.some(Boolean)?'Ongoing':'Not started'};if(type==='spf')detailState.spf[definition.id]={round:normalizeVersion(importRow.fields.Version||''),lvsPath:importRow.fields['LVS path']||'',cdl:importRow.fields.cdl||'',gds:importRow.fields.gds||''};});});
       data.layout.forEach(item=>{item.tierTop=data.layout.some(child=>child.parent===item.id);});
       const tableSelect=document.getElementById('tableSelect');
       if(![...tableSelect.options].some(option=>option.value===embeddedImportState.tableName))tableSelect.add(new Option(embeddedImportState.tableName,embeddedImportState.tableName));
@@ -1953,23 +2178,22 @@
     function closeAddInstanceModal() { document.getElementById('addInstanceModal').classList.remove('open'); }
     function newAddFormRow(contextItem=null) {
       const maxTier=currentHierarchy==='spf'?4:6;
-      if(contextItem){const childAllowed=contextItem.tier<maxTier;return {id:`add-row-${++addFormRowSequence}`,name:'',tier:childAllowed?contextItem.tier+1:contextItem.tier,parentRef:childAllowed?`existing:${contextItem.id}`:contextItem.parent?`existing:${contextItem.parent}`:'',reuseId:''};}
+      if(contextItem){const childAllowed=contextItem.tier<maxTier;return {id:`add-row-${++addFormRowSequence}`,name:'',tier:childAllowed?contextItem.tier+1:contextItem.tier,parentRef:childAllowed?`existing:${contextItem.id}`:contextItem.parent?`existing:${contextItem.parent}`:'',version:''};}
       const defaultParent=data[currentHierarchy].find(item=>item.tier===2)||data[currentHierarchy][0];
-      return {id:`add-row-${++addFormRowSequence}`,name:'',tier:Math.min(maxTier,(defaultParent?.tier||0)+1),parentRef:defaultParent?`existing:${defaultParent.id}`:'',reuseId:''};
+      return {id:`add-row-${++addFormRowSequence}`,name:'',tier:Math.min(maxTier,(defaultParent?.tier||0)+1),parentRef:defaultParent?`existing:${defaultParent.id}`:'',version:''};
     }
-    function addDefinitions() { return unique([...schematic,...layout,...spf]).map(item=>item.def); }
     function addParentOptions(row,index) {
       const existing=data[currentHierarchy].map(item=>`<option value="existing:${item.id}" ${row.parentRef===`existing:${item.id}`?'selected':''}>T${item.tier} · ${esc(item.def.name)}</option>`).join('');
       const drafts=addFormRows.slice(0,index).map(item=>`<option value="draft:${item.id}" ${row.parentRef===`draft:${item.id}`?'selected':''}>本次 · T${item.tier} · ${esc(item.name||'未命名')}</option>`).join('');
       return `<option value="" ${row.parentRef?'':'selected'}>无 Parent（根节点）</option>${existing}${drafts}`;
     }
     function validateAddFormRows() {
-      const maxTier=currentHierarchy==='spf'?4:6,definitions=addDefinitions(),validated=[];
+      const maxTier=currentHierarchy==='spf'?4:6,validated=[];
       addFormRows.forEach((row,index)=>{
-        const errors=[],reuse=definitions.find(definition=>definition.id===row.reuseId)||null;
-        const name=(reuse?.name||row.name).trim(),tier=Number(row.tier);
+        const errors=[],name=row.name.trim(),tier=Number(row.tier),version=normalizeVersion(row.version);
         if(!name)errors.push('Block name 必填');
         if(!Number.isInteger(tier)||tier<1||tier>maxTier)errors.push(`Tier 必须为 1–${maxTier}`);
+        if(!version)errors.push('Version 必选');
         let parent=null,parentId='';
         if(row.parentRef.startsWith('existing:')){parentId=row.parentRef.slice(9);parent=data[currentHierarchy].find(item=>item.id===parentId)||null;}
         if(row.parentRef.startsWith('draft:')){const draftId=row.parentRef.slice(6);parent=validated.find(item=>item.id===draftId)||null;parentId=draftId;}
@@ -1977,15 +2201,15 @@
         if(row.parentRef&&!parent)errors.push('Parent 不存在或必须位于当前行之前');
         if(parent&&Number(parent.tier)>=tier)errors.push('Parent Tier 必须小于当前 Tier');
         const resolvedParentId=parent?.source==='draft'?`draft:${parent.id}`:parent?.id||'';
-        if(data[currentHierarchy].some(item=>(item.parent||'')===(parent?.id||'')&&item.def.name.toLowerCase()===name.toLowerCase()))errors.push('当前 Parent 下已存在同名 Block');
-        if(validated.some(item=>item.resolvedParentId===resolvedParentId&&item.name.toLowerCase()===name.toLowerCase()))errors.push('本次添加中存在同名兄弟 Block');
-        validated.push({...row,index,name,tier,reuse,parent,source:'draft',resolvedParentId,errors});
+        if(data[currentHierarchy].some(item=>item.tier===tier&&item.def.name.toLowerCase()===name.toLowerCase()&&itemVersion(item,currentHierarchy)===version))errors.push(`T${tier} · ${version} 已存在同名 Block`);
+        if(validated.some(item=>item.tier===tier&&item.version===version&&item.name.toLowerCase()===name.toLowerCase()))errors.push(`本次添加中 T${tier} · ${version} 存在同名 Block`);
+        validated.push({...row,index,name,tier,version,parent,source:'draft',resolvedParentId,errors});
       });
       return validated;
     }
     function renderAddFormRows() {
-      const maxTier=currentHierarchy==='spf'?4:6,definitions=addDefinitions();
-      document.getElementById('addFormRows').innerHTML=addFormRows.map((row,index)=>`<div class="add-form-row" data-add-row="${row.id}"><span class="add-row-number">${index+1}</span><input data-add-field="name" value="${esc(row.name)}" placeholder="例如 COLUMN_CTRL" aria-label="第 ${index+1} 行 Block name"><select data-add-field="tier" aria-label="第 ${index+1} 行 Tier">${Array.from({length:maxTier},(_,position)=>`<option value="${position+1}" ${Number(row.tier)===position+1?'selected':''}>T${position+1}</option>`).join('')}</select><select data-add-field="parentRef" aria-label="第 ${index+1} 行 Parent node">${addParentOptions(row,index)}</select><select data-add-field="reuseId" aria-label="第 ${index+1} 行复用 Definition"><option value="">创建新的 Block</option>${definitions.map(definition=>`<option value="${definition.id}" ${row.reuseId===definition.id?'selected':''}>${esc(definition.name)}</option>`).join('')}</select><span class="add-row-status" data-add-status></span><button class="remove-add-row" type="button" data-remove-add-row title="删除第 ${index+1} 行" aria-label="删除第 ${index+1} 行">×</button></div>`).join('');
+      const maxTier=currentHierarchy==='spf'?4:6;
+      document.getElementById('addFormRows').innerHTML=addFormRows.map((row,index)=>`<div class="add-form-row" data-add-row="${row.id}"><span class="add-row-number">${index+1}</span><input data-add-field="name" value="${esc(row.name)}" placeholder="例如 COLUMN_CTRL" aria-label="第 ${index+1} 行 Block name"><select data-add-field="tier" aria-label="第 ${index+1} 行 Tier">${Array.from({length:maxTier},(_,position)=>`<option value="${position+1}" ${Number(row.tier)===position+1?'selected':''}>T${position+1}</option>`).join('')}</select><select data-add-field="parentRef" aria-label="第 ${index+1} 行 Parent node">${addParentOptions(row,index)}</select><select data-add-field="version" aria-label="第 ${index+1} 行 Version"><option value="" ${row.version?'':'selected'} disabled>请选择</option>${versionOptions.map(version=>`<option value="${version}" ${row.version===version?'selected':''}>${version}</option>`).join('')}</select><span class="add-row-status" data-add-status></span><button class="remove-add-row" type="button" data-remove-add-row title="删除第 ${index+1} 行" aria-label="删除第 ${index+1} 行">×</button></div>`).join('');
       document.querySelectorAll('[data-add-row]').forEach(element=>{
         const row=addFormRows.find(item=>item.id===element.dataset.addRow);
         element.querySelectorAll('[data-add-field]').forEach(control=>{
@@ -2004,29 +2228,69 @@
       validated.forEach(row=>{const status=document.querySelector(`[data-add-row="${row.id}"] [data-add-status]`);if(!status)return;status.textContent=row.errors.length?row.errors.join('；'):'可添加';status.classList.toggle('error',Boolean(row.errors.length));});
       const errors=validated.filter(row=>row.errors.length).length;
       document.getElementById('addInstanceSummary').textContent=`${validated.length} 行 · ${errors?`${errors} 行需修正`:'全部可添加'}`;
-      document.getElementById('saveInstance').disabled=!validated.length||Boolean(errors);
+      document.getElementById('saveInstance').disabled=!validated.length;
       return validated;
     }
     function appendAddFormRow() { addFormRows.push(newAddFormRow());renderAddFormRows(); }
+    function insertBlockAtParentFront(item, lastCreatedByParent, lastCreatedByGroup) {
+      const instances=data[currentHierarchy],parentKey=item.parent||'__root__';
+      const groupKey=`${parentKey}|${blockMergeKey(item)}`;
+      const previousGroupItem=lastCreatedByGroup.get(groupKey);
+      if(previousGroupItem){
+        const previousIndex=instances.findIndex(candidate=>candidate.id===previousGroupItem.id);
+        instances.splice(previousIndex+1,0,item);
+        lastCreatedByGroup.set(groupKey,item);
+        lastCreatedByParent.set(parentKey,item);
+        return;
+      }
+      const firstMatchingIndex=instances.findIndex(candidate=>(candidate.parent||null)===(item.parent||null)&&blockMergeKey(candidate)===blockMergeKey(item));
+      if(firstMatchingIndex>=0){
+        instances.splice(firstMatchingIndex,0,item);
+        lastCreatedByGroup.set(groupKey,item);
+        lastCreatedByParent.set(parentKey,item);
+        return;
+      }
+      const previousCreated=lastCreatedByParent.get(parentKey);
+      if(previousCreated){
+        const previousIndex=instances.findIndex(candidate=>candidate.id===previousCreated.id);
+        instances.splice(previousIndex+1,0,item);
+      } else {
+        const firstChildIndex=instances.findIndex(candidate=>(candidate.parent||null)===(item.parent||null));
+        if(firstChildIndex<0)instances.push(item);else instances.splice(firstChildIndex,0,item);
+      }
+      lastCreatedByGroup.set(groupKey,item);
+      lastCreatedByParent.set(parentKey,item);
+    }
     function saveAddFormRows() {
       const valid=refreshAddFormValidation();
-      if(!valid.length||valid.some(row=>row.errors.length))return showToast('请先修正所有行');
+      if(!valid.length)return;
+      const duplicateRows=valid.filter(row=>row.errors.some(error=>error.includes('同名 Block')));
+      if(duplicateRows.length)return openSameTierDuplicateModal(duplicateRows);
+      if(valid.some(row=>row.errors.length))return showToast('请先修正所有行');
       const createdByRowId=new Map();
+      const lastCreatedByParent=new Map();
+      const lastCreatedByGroup=new Map();
       valid.forEach(rowData=>{
-        let def=rowData.reuse;
-        if(!def){const base=rowData.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||`block-${Date.now()}`;def={id:`${base}-${Date.now().toString().slice(-5)}-${rowData.index+1}`,name:rowData.name,round:'',category:'',reference:'',blockOwner:'',schematicOwner:'',layoutOwner:''};}
+        const base=rowData.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||`block-${Date.now()}`;
+        const def={id:`${base}-${Date.now().toString().slice(-5)}-${rowData.index+1}`,name:rowData.name,round:currentHierarchy==='spf'?'':rowData.version,category:'',reference:'',blockOwner:'',schematicOwner:'',layoutOwner:''};
         const parentId=rowData.parent?.source==='draft'?createdByRowId.get(rowData.parent.id)?.id:rowData.parent?.id||null;
-        const sameDefCount=data[currentHierarchy].filter(item=>item.def.id===def.id).length;
         const id=`${currentHierarchy.slice(0,3)}-${def.id}-${data[currentHierarchy].length+1}`;
-        const item=row(id,def,parentId,rowData.tier,Array(checkLabels[currentHierarchy].length).fill(0),'','',false,sameDefCount?`I${sameDefCount+1}`:'');
-        data[currentHierarchy].push(item);createdByRowId.set(rowData.id,item);
+        const item=row(id,def,parentId,rowData.tier,Array(checkLabels[currentHierarchy].length).fill(0),'','');
+        insertBlockAtParentFront(item,lastCreatedByParent,lastCreatedByGroup);createdByRowId.set(rowData.id,item);
         railState[currentHierarchy][def.id]||={checks:Array(checkLabels[currentHierarchy].length).fill(0),planned:'',actual:'',startDate:'',planWorkdays:'',actualWorkdays:'',resource:'',checkStatus:'Not started'};
+        if(currentHierarchy==='spf')detailState.spf[def.id]={round:rowData.version,lvsPath:'',cdl:'',gds:''};
         reopenCompletedParents(item,currentHierarchy);
-        structureChanges[currentHierarchy].unshift(changeEvent(currentActorId,valid.length===1?'新增 Block / Instance':'批量新增 Block / Instance','不存在',`${def.name} · ${item.instance||item.id} · T${item.tier}`,auditNow()));
+        structureChanges[currentHierarchy].unshift(changeEvent(currentActorId,valid.length===1?'新增 Block':'批量新增 Block','不存在',`${def.name} · T${item.tier}`,auditNow()));
       });
       closeAddInstanceModal();renderWbs();renderDashboard();
       showToast(`已添加 ${valid.length} 个 Block / Instance`);
     }
+    function openSameTierDuplicateModal(rows) {
+      document.getElementById('sameTierDuplicateList').innerHTML=rows.map(row=>`<div class="validation-blocker"><strong>${esc(row.name)} · T${row.tier} · ${esc(row.version)}</strong><small>${row.errors.filter(error=>error.includes('同名 Block')).map(esc).join('、')}</small></div>`).join('');
+      document.getElementById('sameTierDuplicateModal').classList.add('open');
+      document.querySelector('#sameTierDuplicateModal [data-close-tier-duplicate]')?.focus();
+    }
+    function closeSameTierDuplicateModal() { document.getElementById('sameTierDuplicateModal').classList.remove('open'); }
     function showPage(name) {
       document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===name+'Page'));
       document.querySelectorAll('.nav button[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===name));
@@ -2104,6 +2368,14 @@
     document.getElementById('appendAddRow').addEventListener('click',appendAddFormRow);
     document.querySelectorAll('[data-close-check-validation]').forEach(button=>button.addEventListener('click',closeCheckValidationModal));
     document.getElementById('checkValidationModal').addEventListener('click',event=>{if(event.target===event.currentTarget)closeCheckValidationModal();});
+    document.querySelectorAll('[data-close-tier-duplicate]').forEach(button=>button.addEventListener('click',closeSameTierDuplicateModal));
+    document.getElementById('sameTierDuplicateModal').addEventListener('click',event=>{if(event.target===event.currentTarget)closeSameTierDuplicateModal();});
+    document.querySelectorAll('[data-same-name-check-current]').forEach(button=>button.addEventListener('click',()=>resolveSameNameCheck(false)));
+    document.getElementById('confirmSameNameCheck').addEventListener('click',()=>resolveSameNameCheck(true));
+    document.getElementById('sameNameCheckModal').addEventListener('click',event=>{if(event.target===event.currentTarget)resolveSameNameCheck(false);});
+    document.querySelectorAll('[data-close-version-delete]').forEach(button=>button.addEventListener('click',closeVersionDeleteModal));
+    document.getElementById('versionDeleteModal').addEventListener('click',event=>{if(event.target===event.currentTarget)closeVersionDeleteModal();});
+    document.getElementById('confirmVersionDelete').addEventListener('click',confirmVersionDelete);
     document.getElementById('saveInstance').addEventListener('click',saveAddFormRows);
     document.getElementById('refreshDashboard').addEventListener('click',()=>{renderDashboard();showToast('状态已按最新 check 和日期重新计算');});
     document.getElementById('tableSelect').addEventListener('change',event=>switchPrototypeTable(event.target.value));
@@ -2113,12 +2385,18 @@
     document.addEventListener('keydown', event => {
       if (event.key !== 'Escape') return;
       if(isWbsTableFullscreen()){exitWbsTableFullscreen();return;}
+      if(document.getElementById('versionDeleteModal').classList.contains('open')){closeVersionDeleteModal();return;}
+      if(document.getElementById('sameNameCheckModal').classList.contains('open')){resolveSameNameCheck(false);return;}
+      if(document.getElementById('sameTierDuplicateModal').classList.contains('open')){closeSameTierDuplicateModal();return;}
+      if(document.getElementById('checkValidationModal').classList.contains('open')){closeCheckValidationModal();return;}
+      if(document.getElementById('addInstanceModal').classList.contains('open')){closeAddInstanceModal();return;}
       closeDrawer();
       closeChangePopover();
       closeCalculationPopover();
       closeColumnFilterPopover();
       closeAddInstanceModal();
       closeCheckValidationModal();
+      closeSameTierDuplicateModal();
     });
 
     const initialTableState=captureTableState();
