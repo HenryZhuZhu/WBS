@@ -341,13 +341,13 @@
     .empty-change { color: var(--text-3); font-size: 10px; padding-left: 7px; }
     .change-chevron { color: var(--text-3); font-size: 13px; }
 
-    .change-popover { position: fixed; z-index: 70; width: 420px; max-height: 430px; display: none; overflow: hidden; border: 1px solid #c7d2dd; border-radius: 7px; background: white; box-shadow: var(--shadow); }
+    .change-popover { position: fixed; z-index: 120; width: 420px; max-height: 430px; display: none; overflow: hidden; border: 1px solid #c7d2dd; border-radius: 7px; background: white; box-shadow: var(--shadow); }
     .change-popover.open { display: block; animation: enter .14s ease-out; }
     .change-popover-head { min-height: 50px; padding: 8px 12px; border-bottom: 1px solid var(--line); display: flex; align-items: center; }
     .change-popover-head strong { display: block; }
     .change-popover-head small { color: var(--text-3); }
     .change-popover-close { margin-left: auto; width: 30px; height: 30px; border: 0; border-radius: 4px; background: transparent; color: var(--text-2); font-size: 19px; }
-    .calculation-popover { position: fixed; z-index: 72; width: 350px; display: none; overflow: hidden; border: 1px solid #b9cadb; border-radius: 7px; background: white; box-shadow: var(--shadow); }
+    .calculation-popover { position: fixed; z-index: 122; width: 350px; display: none; overflow: hidden; border: 1px solid #b9cadb; border-radius: 7px; background: white; box-shadow: var(--shadow); }
     .calculation-popover.open { display: block; animation: enter .14s ease-out; }
     .calculation-popover-head { min-height: 48px; padding: 8px 12px; border-bottom: 1px solid var(--line); display: flex; align-items: center; }
     .calculation-popover-head strong { font-size: 13px; }
@@ -356,7 +356,7 @@
     .calculation-popover-body p { margin: 0 0 9px; color: var(--text-2); font-size: 11px; line-height: 1.55; }
     .calculation-steps { margin: 0; padding-left: 20px; color: var(--text); font-size: 11px; line-height: 1.6; }
     .calculation-steps li + li { margin-top: 4px; }
-    .column-filter-popover { position: fixed; z-index: 74; width: 260px; display: none; overflow: hidden; border: 1px solid #b9cadb; border-radius: 7px; background: white; box-shadow: var(--shadow); }
+    .column-filter-popover { position: fixed; z-index: 124; width: 260px; display: none; overflow: hidden; border: 1px solid #b9cadb; border-radius: 7px; background: white; box-shadow: var(--shadow); }
     .column-filter-popover.open { display: block; animation: enter .12s ease-out; }
     .column-filter-head { min-height: 40px; padding: 5px 9px 3px; display: flex; align-items: center; gap: 8px; }
     .column-filter-title-input { appearance: none; min-width: 0; flex: 1; height: 30px; border: 0 !important; border-radius: 0; outline: 0 !important; box-shadow: none !important; padding: 0 3px; color: #566273; background: transparent !important; font-size: 11px; font-weight: 400; caret-color: var(--blue); }
@@ -385,9 +385,9 @@
     .change-record-new { color: var(--green); font-weight: 800; }
     .change-record-effect { margin-top: 5px; padding: 5px 7px; border-radius: 4px; color: #315979; background: var(--blue-soft); font-size: 9px; }
 
-    .drawer-backdrop { position: fixed; inset: 0; background: rgba(20, 31, 42, .28); opacity: 0; pointer-events: none; z-index: 40; transition: opacity .2s; }
+    .drawer-backdrop { position: fixed; inset: 0; background: rgba(20, 31, 42, .28); opacity: 0; pointer-events: none; z-index: 140; transition: opacity .2s; }
     .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
-    .drawer { position: fixed; top: 0; bottom: 0; right: 0; width: 520px; background: white; z-index: 45; transform: translateX(100%); transition: transform .25s ease; box-shadow: var(--shadow); display: flex; flex-direction: column; }
+    .drawer { position: fixed; top: 0; bottom: 0; right: 0; width: 520px; background: white; z-index: 145; transform: translateX(100%); transition: transform .25s ease; box-shadow: var(--shadow); display: flex; flex-direction: column; }
     .drawer.open { transform: translateX(0); }
     .drawer-head { min-height: 78px; padding: 16px 18px; border-bottom: 1px solid var(--line); display: flex; align-items: flex-start; gap: 12px; }
     .drawer-head-main { min-width: 0; flex: 1; }
@@ -457,31 +457,53 @@
     .date-box.actual-box { border-color: var(--green); }
     .date-box small { display: block; color: var(--text-3); }
     .date-box strong { font-size: 12px; }
-    .modal-backdrop { position: fixed; inset: 0; background: rgba(20, 31, 42, .4); display: none; place-items: center; z-index: 60; }
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(20, 31, 42, .4); display: none; place-items: center; z-index: 160; }
     .modal-backdrop.open { display: grid; }
     .modal { width: 440px; background: white; border-radius: 7px; box-shadow: var(--shadow); }
-    .modal.multi-add-modal { width: min(960px, calc(100vw - 48px)); }
     .modal-head { padding: 15px 17px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
     .modal-head h3 { margin: 0; font-size: 15px; }
     .modal-body { padding: 17px; display: grid; gap: 12px; }
     .modal-foot { padding: 12px 17px; background: var(--surface-alt); border-top: 1px solid var(--line); display: flex; justify-content: flex-end; gap: 8px; }
-    .multi-add-summary { display: flex; align-items: center; gap: 8px; }
-    .multi-add-summary small { color: var(--text-3); }
-    .add-form-table { overflow: auto; max-height: 430px; border: 1px solid var(--line); border-radius: 6px; }
-    .add-form-header, .add-form-row { min-width: 760px; display: grid; grid-template-columns: 32px minmax(160px, 1fr) 78px minmax(180px, 1.2fr) 100px minmax(115px, .8fr) 28px; gap: 8px; align-items: center; }
-    .add-form-header { position: sticky; top: 0; z-index: 2; min-height: 36px; padding: 0 9px; border-bottom: 1px solid var(--line); color: var(--text-2); background: var(--surface-alt); font-size: 10px; font-weight: 700; }
-    .add-form-list { display: grid; }
-    .add-form-row { min-height: 54px; padding: 8px 9px; border-bottom: 1px solid #edf0f3; }
-    .add-form-row:last-child { border-bottom: 0; }
-    .add-form-row input, .add-form-row select { width: 100%; height: 32px; border: 1px solid var(--line-strong); border-radius: 5px; padding: 0 8px; color: var(--text); background: white; }
-    .add-form-row input:focus, .add-form-row select:focus { outline: 2px solid #bed7f8; border-color: var(--blue); }
-    .add-row-number { color: var(--text-3); text-align: center; }
-    .add-row-status { overflow: hidden; color: var(--green); font-size: 10px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
-    .add-row-status.error { color: var(--red); white-space: normal; line-height: 1.35; }
-    .remove-add-row { width: 28px; height: 28px; padding: 0; border: 1px solid transparent; border-radius: 4px; color: var(--text-3); background: transparent; font-size: 18px; }
-    .remove-add-row:hover { color: var(--red); border-color: #efb7b4; background: var(--red-soft); }
-    .add-row-toolbar { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
-    .add-row-toolbar span { color: var(--text-3); font-size: 10px; }
+    .inline-add-menu { position: fixed; z-index: 125; width: 250px; display: none; overflow: hidden; border: 1px solid #b9c7d5; border-radius: 6px; background: white; box-shadow: var(--shadow); }
+    .inline-add-menu.open { display: grid; }
+    .inline-add-menu button { min-height: 54px; display: grid; grid-template-columns: 32px 1fr; grid-template-rows: auto auto; column-gap: 8px; border: 0; border-bottom: 1px solid var(--line); padding: 9px 11px; color: var(--text); background: white; text-align: left; }
+    .inline-add-menu button:last-child { border-bottom: 0; }
+    .inline-add-menu button:hover, .inline-add-menu button:focus-visible { outline: 0; color: var(--blue); background: var(--blue-soft); }
+    .inline-add-menu button:disabled { color: var(--text-3); background: var(--surface-alt); cursor: not-allowed; }
+    .inline-add-menu-icon { grid-row: 1 / 3; width: 32px; align-self: stretch; display: grid; place-items: center; color: var(--blue); font-size: 22px; font-weight: 600; line-height: 1; }
+    .inline-add-menu button:hover .inline-add-menu-icon, .inline-add-menu button:focus-visible .inline-add-menu-icon { color: var(--blue-dark); }
+    .inline-add-menu button:disabled .inline-add-menu-icon { color: var(--text-3); }
+    .inline-add-menu strong { font-size: 11px; }
+    .inline-add-menu small { margin-top: 2px; color: var(--text-3); font-size: 9px; }
+    .inline-draft-row td { height: 54px; border-top: 1px solid #aac9ee; border-bottom: 1px solid #aac9ee; background: #edf5ff; }
+    .inline-draft-row.version-draft td { border-color: #9acbb4; background: #f0f8f4; }
+    .inline-draft-row .frozen-column { background: #edf5ff; }
+    .inline-draft-row.version-draft .frozen-column { background: #f0f8f4; }
+    .inline-draft-row input, .inline-draft-row select { width: 100%; height: 30px; border: 1px solid #9fbde3; border-radius: 5px; padding: 0 8px; color: var(--text); background: white; font-size: 10px; outline: 0; }
+    .inline-draft-row.version-draft input, .inline-draft-row.version-draft select { border-color: #83bfa2; }
+    .inline-draft-row input:focus, .inline-draft-row select:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(23,111,216,.12); }
+    .inline-draft-block { overflow: visible; }
+    .inline-draft-block .block-cell { min-width: 0; }
+    .inline-draft-name { position: relative; min-width: 72px; flex: 1; }
+    .inline-draft-name::before, .inline-draft-row.version-draft .inline-version-cell::before { content: "*"; position: absolute; z-index: 4; color: var(--red); font-size: 10px; font-weight: 800; pointer-events: none; }
+    .inline-draft-name::before { top: 4px; left: 7px; }
+    .inline-draft-name input { padding-left: 19px; }
+    .inline-draft-row.version-draft .inline-version-cell { position: sticky; }
+    .inline-draft-row.version-draft .inline-version-cell::before { top: 14px; left: 12px; }
+    .inline-draft-row.version-draft .inline-version-cell select { padding-left: 18px; }
+    .inline-draft-locked-name { min-width: 70px; overflow: hidden; font-weight: 800; text-overflow: ellipsis; }
+    .inline-tier-select, .inline-tier-static { width: 90px; flex: 0 0 90px; height: 30px; margin-left: 5px; border: 1px solid #b8c5d3; border-radius: 5px; color: #405165; background: white; font-size: 10px; font-weight: 700; }
+    .inline-tier-select { padding: 0 5px; }
+    .inline-tier-static { display: flex; align-items: center; padding: 0 8px; }
+    .inline-draft-actions { display: flex; flex: 0 0 auto; gap: 2px; margin-left: 5px; }
+    .inline-draft-action { width: 25px; height: 25px; display: grid; place-items: center; border: 1px solid transparent; border-radius: 4px; padding: 0; background: transparent; }
+    .inline-draft-action.confirm { color: var(--green); }
+    .inline-draft-action.confirm:hover { border-color: #87c6ab; background: var(--green-soft); }
+    .inline-draft-action.cancel { color: var(--red); }
+    .inline-draft-action.cancel:hover { border-color: #e6aaa6; background: var(--red-soft); }
+    .inline-draft-action svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .inline-draft-readonly { color: var(--text-3); font-size: 10px; }
+    .inline-invalid { border-color: var(--red) !important; box-shadow: 0 0 0 2px rgba(199,66,58,.13) !important; }
     .validation-intro { margin: 0; color: var(--text-2); line-height: 1.6; }
     .validation-list { display: grid; gap: 8px; max-height: 300px; overflow: auto; }
     .validation-blocker { border: 1px solid var(--line); border-left: 3px solid var(--red); border-radius: 5px; padding: 9px 10px; background: var(--red-soft); }
@@ -569,7 +591,7 @@
     .ei-summary-item strong { display: block; margin-top: 6px; font-size: 21px; }
     .ei-success { padding: 55px 20px; text-align: center; }
     .ei-success-mark { width: 58px; height: 58px; display: grid; place-items: center; margin: 0 auto 12px; border-radius: 50%; color: white; background: var(--green); font-size: 28px; }
-    .toast { position: fixed; right: 24px; bottom: 24px; background: #172531; color: white; border-radius: 6px; padding: 11px 14px; box-shadow: var(--shadow); z-index: 80; opacity: 0; transform: translateY(8px); pointer-events: none; transition: .2s; }
+    .toast { position: fixed; right: 24px; bottom: 24px; background: #172531; color: white; border-radius: 6px; padding: 11px 14px; box-shadow: var(--shadow); z-index: 180; opacity: 0; transform: translateY(8px); pointer-events: none; transition: .2s; }
     .toast.show { opacity: 1; transform: none; }
     .empty { padding: 70px 20px; text-align: center; color: var(--text-3); }
     .empty strong { display: block; color: var(--text-2); margin-bottom: 4px; }
@@ -734,16 +756,10 @@
     <div class="column-filter-foot"><button class="btn" id="columnFilterClear">清除筛选</button><button class="btn primary" id="columnFilterApply">应用</button></div>
   </aside>
 
-  <div class="modal-backdrop" id="addInstanceModal" role="dialog" aria-modal="true" aria-labelledby="addInstanceTitle">
-    <div class="modal multi-add-modal">
-      <div class="modal-head"><div><h3 id="addInstanceTitle">添加 Block / Instance</h3><div class="multi-add-summary"><small id="addInstanceHierarchy"></small><small id="addInstanceSummary"></small></div></div><button class="drawer-close" data-close-add-modal aria-label="关闭">×</button></div>
-      <div class="modal-body">
-        <div class="add-form-table"><div class="add-form-header"><span>#</span><span>Block name</span><span>Tier</span><span>Parent node</span><span>Version</span><span>校验</span><span></span></div><div class="add-form-list" id="addFormRows"></div></div>
-        <div class="add-row-toolbar"><span>默认一行；需要批量添加时继续新增行。</span><button class="btn" id="appendAddRow" type="button"><span class="symbol">＋</span>新增一行</button></div>
-      </div>
-      <div class="modal-foot"><button class="btn" data-close-add-modal>取消</button><button class="btn primary" id="saveInstance">添加全部</button></div>
-    </div>
-  </div>
+  <aside class="inline-add-menu" id="inlineAddMenu" role="menu" aria-label="新增 Block 或 Version">
+    <button id="inlineAddVersion" type="button" role="menuitem"><span class="inline-add-menu-icon">+</span><strong>添加 Version</strong><small id="inlineAddVersionHint">为当前 Block 增加版本</small></button>
+    <button id="inlineAddBlock" type="button" role="menuitem"><span class="inline-add-menu-icon">+</span><strong>添加 Block</strong><small>选择添加为同级或下一级 Block</small></button>
+  </aside>
 
   <div class="modal-backdrop" id="checkValidationModal" role="dialog" aria-modal="true" aria-labelledby="checkValidationTitle">
     <div class="modal">
@@ -832,7 +848,11 @@
       top: { id:'top', name:'CE_TOP', round:'3rd', category:'Controller', reference:'DPJQC', blockOwner:'Yan Sun', schematicOwner:'Ming Zhao', layoutOwner:'Tao He' },
       core: { id:'core', name:'CORE_ARRAY', round:'2nd', category:'Banklogic', reference:'DPKRC', blockOwner:'Lei Wang', schematicOwner:'Han Li', layoutOwner:'Nina Gao' },
       row: { id:'row', name:'ROW_CTRL', round:'1st', category:'Row+Refresh+RHR', reference:'DPLSA', blockOwner:'Lei Wang', schematicOwner:'Qin Yang', layoutOwner:'Eric Lin' },
+      senseV1: { id:'sense-v1', name:'SENSE_AMP', round:'1st', category:'Analog', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Ming Zhao', layoutOwner:'Nina Gao' },
       sense: { id:'sense', name:'SENSE_AMP', round:'2nd', category:'Analog', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Ming Zhao', layoutOwner:'Nina Gao' },
+      senseT4: { id:'sense-t4', name:'SENSE_AMP', round:'3rd', category:'Analog', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Qin Yang', layoutOwner:'Eric Lin' },
+      senseSpfV2: { id:'sense-spf-v2', name:'SENSE_AMP', round:'2nd', category:'Analog', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Han Li', layoutOwner:'Tao He' },
+      senseSpfT4: { id:'sense-spf-t4', name:'SENSE_AMP', round:'3rd', category:'Analog', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Qin Yang', layoutOwner:'Eric Lin' },
       bitcell: { id:'bitcell', name:'BITCELL', round:'3rd', category:'Data path', reference:'DPNQC', blockOwner:'Ming Zhao', schematicOwner:'Han Li', layoutOwner:'Tao He' },
       io: { id:'io', name:'IO_RING', round:'1st', category:'IO', reference:'', blockOwner:'Yan Sun', schematicOwner:'Ivy Xu', layoutOwner:'Eric Lin' },
       dft: { id:'dft', name:'MBIST_CTRL', round:'4th', category:'DFT', reference:'DPQTA', blockOwner:'Kai Ding', schematicOwner:'Kai Ding', layoutOwner:'Sora Pan' },
@@ -843,7 +863,9 @@
       row('sch-top', common.top, null, 1, [1,1,1,1,0], '2026-08-18', '', true),
       row('sch-core', common.core, 'sch-top', 2, [1,1,1,1,0], '2026-08-12', '2026-08-14'),
       row('sch-row', common.row, 'sch-core', 3, [1,1,1,0,0], '2026-08-22', ''),
+      row('sch-sense-v1', common.senseV1, 'sch-core', 3, [1,1,1,0,0], '2026-08-18', ''),
       row('sch-sense', common.sense, 'sch-core', 3, [1,1,1,1,1], '2026-08-20', '2026-08-19'),
+      row('sch-sense-t4', common.senseT4, 'sch-sense', 4, [0,0,0,0,0], '2026-09-05', ''),
       row('sch-bit', common.bitcell, 'sch-core', 4, [1,1,1,1,1], '2026-08-08', '2026-08-07'),
       row('sch-io', common.io, 'sch-top', 2, [1,1,0,0,0], '2026-09-02', ''),
       row('sch-dft', common.dft, 'sch-top', 2, [0,0,0,0,0], '2026-09-08', ''),
@@ -852,9 +874,11 @@
     const layout = [
       row('lay-top', common.top, null, 1, [1,1,0,0], '2026-09-18', '', true),
       row('lay-core', common.core, 'lay-top', 2, [1,1,1,0], '2026-09-05', '', true),
-      row('lay-bit', common.bitcell, 'lay-core', 3, [1,1,1,1], '2026-08-15', '2026-08-17'),
-      row('lay-sense', common.sense, 'lay-core', 3, [1,1,1,1], '2026-08-21', '2026-08-21'),
       row('lay-row', common.row, 'lay-core', 3, [1,1,0,0], '2026-08-23', ''),
+      row('lay-sense-v1', common.senseV1, 'lay-core', 3, [1,1,0,0], '2026-08-18', ''),
+      row('lay-sense', common.sense, 'lay-core', 3, [1,1,1,1], '2026-08-21', '2026-08-21'),
+      row('lay-sense-t4', common.senseT4, 'lay-sense', 4, [0,0,0,0], '2026-09-05', ''),
+      row('lay-bit', common.bitcell, 'lay-core', 4, [1,1,1,1], '2026-08-15', '2026-08-17'),
       row('lay-io', common.io, 'lay-top', 2, [1,0,0,0], '2026-09-10', ''),
       row('lay-dft', common.dft, 'lay-top', 2, [0,0,0,0], '2026-09-16', ''),
       row('lay-pwr', common.pwr, 'lay-top', 2, [1,1,1,0], '2026-08-30', '', true)
@@ -864,6 +888,8 @@
       row('spf-core', common.core, 'spf-top', 2, [1,1,1,1], '2026-09-12', '2026-09-11'),
       row('spf-array', common.bitcell, 'spf-core', 3, [1,1,1,0], '2026-09-06', ''),
       row('spf-peri', common.sense, 'spf-core', 3, [1,0,0,0], '2026-09-08', ''),
+      row('spf-peri-v2', common.senseSpfV2, 'spf-core', 3, [1,1,1,0,0], '2026-09-15', ''),
+      row('spf-peri-t4', common.senseSpfT4, 'spf-peri-v2', 4, [0,0,0,0,0], '2026-09-22', ''),
       row('spf-io', common.io, 'spf-top', 2, [0,0,0,0], '2026-09-18', ''),
       row('spf-pwr', common.pwr, 'spf-top', 2, [1,1,1,1], '2026-09-03', '')
     ];
@@ -890,6 +916,8 @@
         core: { lvsPath:'/proj/ce/lvs/core/run_0819', cdl:'/proj/ce/cdl/CORE_ARRAY.cdl', gds:'/proj/ce/gds/CORE_ARRAY.gds', round:'2nd' },
         bitcell: { lvsPath:'/proj/ce/lvs/array/latest', cdl:'/proj/ce/cdl/BITCELL_ARRAY.cdl', gds:'', round:'3rd' },
         sense: { lvsPath:'/proj/ce/lvs/peri/run_0821', cdl:'/proj/ce/cdl/SENSE_AMP.cdl', gds:'/proj/ce/gds/SENSE_AMP.gds', round:'1st' },
+        'sense-spf-v2': { lvsPath:'/proj/ce/lvs/peri/run_0901', cdl:'/proj/ce/cdl/SENSE_AMP_2.cdl', gds:'/proj/ce/gds/SENSE_AMP_2.gds', round:'2nd' },
+        'sense-spf-t4': { lvsPath:'/proj/ce/lvs/peri/sub/run_0901', cdl:'/proj/ce/cdl/SENSE_AMP_SUB.cdl', gds:'', round:'3rd' },
         io: { lvsPath:'', cdl:'/proj/ce/cdl/IO_RING.cdl', gds:'', round:'4th' },
         pwr: { lvsPath:'/proj/ce/lvs/dldo/run_0820', cdl:'/proj/ce/cdl/DLDO_MAIN.cdl', gds:'/proj/ce/gds/DLDO_MAIN.gds', round:'5th' }
       }
@@ -933,6 +961,7 @@
       });
       detailState.spf=state.detailState.spf;
       detailState.aiRouting=state.detailState.aiRouting||{};
+      synchronizeSchematicLayoutIdentityRows();
       schematicPlannedReleaseUnlocked=Boolean(state.schematicPlannedReleaseUnlocked);
     }
     function switchPrototypeTable(tableName) {
@@ -949,6 +978,48 @@
 
     function row(id, def, parent, tier, checks, planned, actual, tierTop=false, instance='') {
       return { id, def, parent, tier, checks, planned, actual, tierTop, instance, expanded:true };
+    }
+    function sharedIdentityTypes(type) { return ['schematic','layout'].includes(type)?['schematic','layout']:[type]; }
+    function identityCounterpart(item,targetType) { return data[targetType].find(candidate=>candidate.def.id===item.def.id)||null; }
+    function blankRail(type) { return {checks:Array(checkLabels[type].length).fill(0),planned:'',actual:'',startDate:'',planWorkdays:'',actualWorkdays:'',resource:'',checkStatus:'Not started'}; }
+    function identityRowKey(item,type) { return `${item.def.name.trim().toLowerCase()}|${item.tier}|${itemVersion(item,type)}`; }
+    function synchronizeSchematicLayoutIdentityRows() {
+      const descriptors=[],descriptorByKey=new Map();
+      ['schematic','layout'].forEach(type=>hierarchyOrderedItems(type).forEach(item=>{
+        const key=identityRowKey(item,type);
+        if(descriptorByKey.has(key))return;
+        const parent=data[type].find(candidate=>candidate.id===item.parent);
+        const descriptor={key,def:item.def,tier:item.tier,parentKey:parent?identityRowKey(parent,type):null,expanded:item.expanded};
+        descriptorByKey.set(key,descriptor);descriptors.push(descriptor);
+      }));
+      const rowsByType={};
+      ['schematic','layout'].forEach(type=>{
+        const existingByKey=new Map(data[type].map(item=>[identityRowKey(item,type),item]));
+        rowsByType[type]=descriptors.map((descriptor,index)=>{
+          let item=existingByKey.get(descriptor.key);
+          if(!item)item=row(`sync-${type.slice(0,3)}-${descriptor.def.id}-${index+1}`,descriptor.def,null,descriptor.tier,Array(checkLabels[type].length).fill(0),'','');
+          if(item.def.id!==descriptor.def.id){
+            const oldDefinition=item.def,oldId=oldDefinition.id;
+            if(!descriptor.def.schematicOwner)descriptor.def.schematicOwner=oldDefinition.schematicOwner;
+            if(!descriptor.def.layoutOwner)descriptor.def.layoutOwner=oldDefinition.layoutOwner;
+            if(!descriptor.def.category)descriptor.def.category=oldDefinition.category;
+            if(!descriptor.def.reference)descriptor.def.reference=oldDefinition.reference;
+            railState[type][descriptor.def.id]=railState[type][oldId]||blankRail(type);
+            delete railState[type][oldId];
+            if(changeHistory[type][oldId]){changeHistory[type][descriptor.def.id]=[...(changeHistory[type][descriptor.def.id]||[]),...changeHistory[type][oldId]];delete changeHistory[type][oldId];}
+            item.def=descriptor.def;
+          }
+          item.tier=descriptor.tier;item.expanded=descriptor.expanded;
+          railState[type][descriptor.def.id]||=blankRail(type);
+          return item;
+        });
+        data[type].splice(0,data[type].length,...rowsByType[type]);
+      });
+      ['schematic','layout'].forEach(type=>{
+        const byKey=new Map(rowsByType[type].map(item=>[identityRowKey(item,type),item]));
+        rowsByType[type].forEach((item,index)=>item.parent=descriptors[index].parentKey?byKey.get(descriptors[index].parentKey)?.id||null:null);
+      });
+      data.layout.forEach(item=>item.tierTop=data.layout.some(child=>child.parent===item.id));
     }
     function changeEvent(actor, field, oldValue, newValue, time, effect='') { return {actor,field,oldValue,newValue,time,effect}; }
     function parseDate(value) { return value ? new Date(value + 'T12:00:00') : null; }
@@ -1061,8 +1132,8 @@
     function derivedCheckLabel(type) { return type === 'schematic' ? 'Schematic check status' : type === 'layout' ? 'Layout check status' : 'SPF check status'; }
     function derivedCheckValue(item, type) { return type === 'schematic' ? overallCheckStatus(item,type) : type === 'layout' ? layoutQualifiedStatus(item) : spfReadyStatus(item); }
     const recentChangeFields = {
-      schematic: new Set(['Block Category','Reference project','Schematic Owner','Planned release']),
-      layout: new Set(['Block Category','Reference project','Layout Owner','Plan finish']),
+      schematic: new Set(['Block','Version','Block Category','Reference project','Schematic Owner','Planned release']),
+      layout: new Set(['Block','Version','Block Category','Reference project','Layout Owner','Plan finish']),
       spf: new Set(['Schematic Owner','Layout Owner'])
     };
     function recordChange(item, type, field, oldValue, newValue, effect='') {
@@ -1090,8 +1161,8 @@
     let openChangeKey = null;
     let openChangeButton = null;
     let openCalculationButton = null;
-    let addFormRows = [];
-    let addFormRowSequence = 0;
+    let inlineAddDraft = null;
+    let inlineAddAnchor = null;
     let pendingSameNameCheck = null;
     let pendingVersionDelete = null;
 
@@ -1184,8 +1255,11 @@
     function applyColumnFilter() {
       if(!columnFilterDraft)return;
       const {type,key,values,selected}=columnFilterDraft;
-      if(values.every(value=>selected.has(value)))delete wbsColumnFilters[type][key];
-      else wbsColumnFilters[type][key]=new Set(selected);
+      const filterTypes=['schematic','layout'].includes(type)&&sharedFrozenColumnKeys.has(key)?['schematic','layout']:[type];
+      filterTypes.forEach(filterType=>{
+        if(values.every(value=>selected.has(value)))delete wbsColumnFilters[filterType][key];
+        else wbsColumnFilters[filterType][key]=new Set(selected);
+      });
       closeColumnFilterPopover();renderWbs();
     }
     function clearActiveColumnFilter() {
@@ -1213,9 +1287,13 @@
       try { localStorage.setItem('de-wbs-column-widths-v1',JSON.stringify(wbsColumnWidths)); }
       catch { /* Prototype still supports in-session resizing when storage is unavailable. */ }
     }
+    const sharedFrozenColumnKeys=new Set(['block','round','category','reference']);
+    function savedWbsColumnWidth(type,key) {
+      if(['schematic','layout'].includes(type)&&sharedFrozenColumnKeys.has(key))return wbsColumnWidths.schematic?.[key]??wbsColumnWidths.layout?.[key];
+      return wbsColumnWidths[type]?.[key];
+    }
     function currentWbsColumnWidths(type=currentHierarchy) {
-      const saved=wbsColumnWidths[type]||{};
-      return wbsColumnDefinitions[type].map(([key,minimum])=>key==='latestChange'&&!latestChangeExpanded?38:Math.max(minimum,Number(saved[key])||minimum));
+      return wbsColumnDefinitions[type].map(([key,minimum])=>key==='latestChange'&&!latestChangeExpanded?38:Math.max(minimum,Number(savedWbsColumnWidth(type,key))||minimum));
     }
     function displayedWbsColumnWidths(definitions,widths) {
       if(!isWbsTableFullscreen())return [...widths];
@@ -1236,6 +1314,7 @@
     }
     function syncWbsColumnLayout(type,definitions,widths) {
       const displayedWidths=displayedWbsColumnWidths(definitions,widths);
+      if(inlineAddDraft?.hierarchy===type)displayedWidths[0]=Math.max(displayedWidths[0],330);
       [...wbsColgroup.children].forEach((column,index)=>{column.style.width=`${displayedWidths[index]}px`;});
       const totalWidth=displayedWidths.reduce((sum,width)=>sum+width,0);
       wbsTable.style.width=`${totalWidth}px`;
@@ -1287,7 +1366,8 @@
         handle.title=filterable?'拖动调整列宽；点击筛选':'拖动调整列宽';
         const updateWidth=nextWidth=>{
           widths[index]=Math.min(600,Math.max(minimum,Math.round(nextWidth)));
-          (wbsColumnWidths[type] ||= {})[key]=widths[index];
+          const preferenceTypes=['schematic','layout'].includes(type)&&sharedFrozenColumnKeys.has(key)?['schematic','layout']:[type];
+          preferenceTypes.forEach(preferenceType=>(wbsColumnWidths[preferenceType] ||= {})[key]=widths[index]);
           syncWbsColumnLayout(type,definitions,widths);
         };
         handle.addEventListener('pointerdown',event=>{
@@ -1327,6 +1407,139 @@
       });
     }
 
+    function closeInlineAddMenu() {
+      document.getElementById('inlineAddMenu').classList.remove('open');
+      inlineAddAnchor=null;
+    }
+    function inlineVersionGroup(item,type=currentHierarchy) {
+      if(!item)return[];
+      return data[type].filter(candidate=>(candidate.parent||null)===(item.parent||null)&&blockMergeKey(candidate)===blockMergeKey(item)).sort((left,right)=>versionRank(left,type)-versionRank(right,type));
+    }
+    function availableInlineVersions(item,type=currentHierarchy) {
+      const existing=new Set(inlineVersionGroup(item,type).map(candidate=>itemVersion(candidate,type)));
+      return versionOptions.filter(version=>!existing.has(version));
+    }
+    function openInlineAddMenu(item,button) {
+      if(inlineAddDraft){inlineAddDraft=null;renderWbs();}
+      inlineAddAnchor=item;
+      const available=availableInlineVersions(item),menu=document.getElementById('inlineAddMenu'),rect=button.getBoundingClientRect();
+      document.getElementById('inlineAddVersion').disabled=!available.length;
+      document.getElementById('inlineAddVersionHint').textContent=available.length?`可添加：${available.join('、')}`:'已包含全部 Version';
+      menu.style.left=`${Math.min(window.innerWidth-262,rect.left)}px`;
+      menu.style.top=`${Math.min(window.innerHeight-125,rect.bottom+5)}px`;
+      menu.classList.add('open');
+    }
+    function inlineDraftBase(anchor=null) {
+      return {hierarchy:currentHierarchy,anchorId:anchor?.id||null,name:'',version:'',tier:anchor?.tier||1,parent:anchor?.parent||null,category:'',reference:'',schematicOwner:'',layoutOwner:'',planned:'',actual:'',startDate:'',planWorkdays:'',resource:'',lvsPath:'',cdl:'',gds:'',focus:true};
+    }
+    function startInlineBlockDraft(anchor=null) {
+      inlineAddDraft={...inlineDraftBase(anchor),mode:'block'};
+      closeInlineAddMenu();renderWbs();
+    }
+    function startInlineVersionDraft(anchor) {
+      inlineAddDraft={...inlineDraftBase(anchor),mode:'version',name:anchor.def.name,tier:anchor.tier,parent:anchor.parent,category:anchor.def.category,reference:anchor.def.reference};
+      closeInlineAddMenu();renderWbs();
+    }
+    function inlineDraftAnchor(type=currentHierarchy) {
+      if(!inlineAddDraft?.anchorId)return null;
+      return data[type].find(item=>item.id===inlineAddDraft.anchorId)||null;
+    }
+    function inlineDraftSameLevel() {
+      const anchor=inlineDraftAnchor();
+      return Boolean(anchor&&inlineAddDraft?.mode==='block'&&inlineAddDraft.tier===anchor.tier);
+    }
+    function inlineDraftIndex(items) {
+      if(!inlineAddDraft||inlineAddDraft.hierarchy!==currentHierarchy)return-1;
+      const name=inlineAddDraft.name.trim().toLowerCase();
+      const matching=items.filter(item=>(item.parent||null)===(inlineAddDraft.parent||null)&&item.tier===inlineAddDraft.tier&&item.def.name.trim().toLowerCase()===name);
+      if(name&&matching.length)return items.indexOf(matching[matching.length-1])+1;
+      const anchor=inlineDraftAnchor();
+      if(inlineAddDraft.mode==='version'||inlineDraftSameLevel()){
+        const group=anchor?items.filter(item=>blockMergeGroupKey(item)===blockMergeGroupKey(anchor)):[];
+        if(group.length)return items.indexOf(group[group.length-1])+1;
+      }
+      const firstSameTier=items.findIndex(item=>item.tier===inlineAddDraft.tier);
+      if(firstSameTier>=0)return firstSameTier;
+      const firstDeeper=items.findIndex(item=>item.tier>inlineAddDraft.tier);
+      return firstDeeper<0?items.length:firstDeeper;
+    }
+    function inlineTierControl() {
+      const draft=inlineAddDraft,anchor=inlineDraftAnchor(),maxTier=currentHierarchy==='spf'?4:6;
+      if(!anchor||anchor.tier>=maxTier)return`<span class="inline-tier-static">T${draft.tier}${anchor?'（同级）':''}</span>`;
+      return `<select class="inline-tier-select" id="inlineDraftTier" aria-label="Tier"><option value="${anchor.tier}" ${draft.tier===anchor.tier?'selected':''}>T${anchor.tier}（同级）</option><option value="${anchor.tier+1}" ${draft.tier===anchor.tier+1?'selected':''}>T${anchor.tier+1}（下一级）</option></select>`;
+    }
+    function inlineDraftActions() {
+      return `<span class="inline-draft-actions"><button class="inline-draft-action confirm" id="confirmInlineDraft" type="button" title="确认创建" aria-label="确认创建"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"></path></svg></button><button class="inline-draft-action cancel" id="cancelInlineDraft" type="button" title="取消" aria-label="取消"><svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"></path></svg></button></span>`;
+    }
+    function inlineDraftInput(field,value='',attributes='') { return `<input data-inline-field="${field}" value="${esc(value)}" ${attributes}>`; }
+    function inlineDraftSelect(field,values,value='') { return `<select data-inline-field="${field}">${values.map(option=>`<option value="${esc(option)}" ${option===value?'selected':''}>${option||'空'}</option>`).join('')}</select>`; }
+    function inlineDraftBusinessCells() {
+      const draft=inlineAddDraft,readonly='<span class="inline-draft-readonly">确认后生成</span>';
+      if(currentHierarchy==='schematic')return `<td class="frozen-column frozen-category-column">${draft.mode==='version'?esc(draft.category||''):inlineDraftSelect('category',blockCategories,draft.category)}</td><td class="frozen-column frozen-reference-column last-frozen-column">${draft.mode==='version'?esc(draft.reference||''):inlineDraftInput('reference',draft.reference,'list="referenceProjects" placeholder="Reference project"')}</td><td>${readonly}</td><td>${inlineDraftInput('planned',draft.planned,'type="date"')}</td><td>${inlineDraftInput('actual',draft.actual,'type="date"')}</td><td>${inlineDraftInput('schematicOwner',draft.schematicOwner,'list="schematicOwners" placeholder="Schematic Owner"')}</td><td>${readonly}</td><td>${readonly}</td><td>${readonly}</td><td class="change-column">${readonly}</td>`;
+      if(currentHierarchy==='layout')return `<td class="frozen-column frozen-category-column">${draft.mode==='version'?esc(draft.category||''):inlineDraftSelect('category',blockCategories,draft.category)}</td><td class="frozen-column frozen-reference-column last-frozen-column">${draft.mode==='version'?esc(draft.reference||''):inlineDraftInput('reference',draft.reference,'list="referenceProjects" placeholder="Reference project"')}</td><td>${readonly}</td><td>${inlineDraftInput('layoutOwner',draft.layoutOwner,'list="layoutOwners" placeholder="Layout Owner"')}</td><td>${inlineDraftInput('planWorkdays',draft.planWorkdays,'inputmode="numeric" placeholder="整数"')}</td><td>${inlineDraftInput('resource',draft.resource,'inputmode="decimal" placeholder="数值"')}</td><td>${inlineDraftInput('startDate',draft.startDate,'type="date"')}</td><td>${inlineDraftInput('planned',draft.planned,'type="date"')}</td><td>${inlineDraftInput('actual',draft.actual,'type="date"')}</td><td>${readonly}</td><td>${readonly}</td><td>${readonly}</td><td class="change-column">${readonly}</td>`;
+      return `<td>${inlineDraftInput('schematicOwner',draft.schematicOwner,'list="schematicOwners" placeholder="Schematic Owner"')}</td><td>${inlineDraftInput('layoutOwner',draft.layoutOwner,'list="layoutOwners" placeholder="Layout Owner"')}</td><td>${readonly}</td><td>${readonly}</td><td>${inlineDraftInput('lvsPath',draft.lvsPath,'placeholder="LVS path"')}</td><td>${inlineDraftInput('cdl',draft.cdl,'placeholder="cdl"')}</td><td>${inlineDraftInput('gds',draft.gds,'placeholder="gds"')}</td><td>${inlineDraftInput('planned',draft.planned,'type="date"')}</td><td>${inlineDraftInput('actual',draft.actual,'type="date"')}</td><td class="change-column">${readonly}</td>`;
+    }
+    function inlineDraftRowHtml() {
+      const draft=inlineAddDraft,versionRequired=draft.mode==='version',available=versionRequired?availableInlineVersions(inlineDraftAnchor()):versionOptions;
+      const blockMain=draft.mode==='version'?`<span class="inline-draft-locked-name">${esc(draft.name)}</span><span class="tier">T${draft.tier}</span>`:`<span class="inline-draft-name">${inlineDraftInput('name',draft.name,'id="inlineDraftName" placeholder="输入 Block 名称"')}</span>${inlineTierControl()}`;
+      const versionOptionsHtml=`<option value="">选择 Version</option>${available.map(version=>`<option value="${version}" ${draft.version===version?'selected':''}>${version}</option>`).join('')}`;
+      return `<tr class="inline-draft-row ${versionRequired?'version-draft':''}" data-inline-draft><td class="frozen-column frozen-block-column inline-draft-block"><div class="block-cell" style="padding-left:${(draft.tier-1)*17}px"><span class="tree-toggle hidden"></span>${blockMain}${inlineDraftActions()}</div></td><td class="frozen-column frozen-round-column inline-version-cell ${currentHierarchy==='spf'?'last-frozen-column':''}"><select id="inlineDraftVersion" data-inline-field="version">${versionOptionsHtml}</select></td>${inlineDraftBusinessCells()}</tr>`;
+    }
+    function inlineDraftValidation() {
+      const draft=inlineAddDraft,errors=[];
+      if(!draft?.name.trim())errors.push('Block 名称必填');
+      if(draft?.mode==='version'&&!normalizeVersion(draft.version))errors.push('Version 必选');
+      const version=normalizeVersion(draft?.version);
+      if(draft&&data[currentHierarchy].some(item=>item.def.name.trim().toLowerCase()===draft.name.trim().toLowerCase()&&item.tier===draft.tier&&itemVersion(item,currentHierarchy)===version))errors.push(`${draft.name} · T${draft.tier} · ${version||'空'} 已存在`);
+      return errors;
+    }
+    function applyInlineDraftTier(tier) {
+      const anchor=inlineDraftAnchor();
+      if(!anchor)return;
+      inlineAddDraft.tier=tier;
+      inlineAddDraft.parent=tier===anchor.tier?anchor.parent:anchor.id;
+    }
+    function bindInlineDraft() {
+      if(!inlineAddDraft||inlineAddDraft.hierarchy!==currentHierarchy)return;
+      document.querySelectorAll('[data-inline-field]').forEach(control=>{
+        control.addEventListener('click',event=>event.stopPropagation());
+        control.addEventListener('input',()=>{inlineAddDraft[control.dataset.inlineField]=control.value;});
+        control.addEventListener('change',()=>{inlineAddDraft[control.dataset.inlineField]=control.value;});
+      });
+      document.getElementById('inlineDraftTier')?.addEventListener('change',event=>{applyInlineDraftTier(Number(event.target.value));renderWbs();});
+      document.getElementById('confirmInlineDraft')?.addEventListener('click',event=>{event.stopPropagation();confirmInlineDraft();});
+      document.getElementById('cancelInlineDraft')?.addEventListener('click',event=>{event.stopPropagation();cancelInlineDraft();});
+      if(inlineAddDraft.focus){inlineAddDraft.focus=false;requestAnimationFrame(()=>document.getElementById(inlineAddDraft.mode==='version'?'inlineDraftVersion':'inlineDraftName')?.focus());}
+    }
+    function cancelInlineDraft(notify=true) { inlineAddDraft=null;renderWbs();if(notify)showToast('已取消草稿'); }
+    function insertInlineItem(item,type,anchor,mode) {
+      const instances=data[type],matching=instances.filter(candidate=>(candidate.parent||null)===(item.parent||null)&&blockMergeKey(candidate)===blockMergeKey(item));
+      if(matching.length){instances.splice(instances.indexOf(matching[matching.length-1])+1,0,item);return;}
+      if(mode==='block'&&anchor&&item.tier===anchor.tier){const group=instances.filter(candidate=>blockMergeGroupKey(candidate)===blockMergeGroupKey(anchor));instances.splice(instances.indexOf(group[group.length-1])+1,0,item);return;}
+      const firstTarget=instances.findIndex(candidate=>candidate.tier===item.tier);
+      instances.splice(firstTarget<0?instances.length:firstTarget,0,item);
+    }
+    function confirmInlineDraft() {
+      const errors=inlineDraftValidation(),draft=inlineAddDraft;
+      document.getElementById('inlineDraftName')?.classList.toggle('inline-invalid',errors.some(error=>error.includes('名称')||error.includes('已存在')));
+      document.getElementById('inlineDraftVersion')?.classList.toggle('inline-invalid',errors.some(error=>error.includes('Version')||error.includes('已存在')));
+      if(errors.length){if(errors.some(error=>error.includes('已存在')))openSameTierDuplicateModal([{name:draft.name,tier:draft.tier,version:normalizeVersion(draft.version)||'空',errors}]);else showToast('请填写必填项');return;}
+      const targetTypes=sharedIdentityTypes(currentHierarchy),version=normalizeVersion(draft.version),base=draft.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||`block-${Date.now()}`;
+      const def={id:`${base}-${Date.now().toString().slice(-6)}`,name:draft.name.trim(),round:currentHierarchy==='spf'?'':version,category:draft.category||'',reference:draft.reference==='空'?'':draft.reference||'',blockOwner:'',schematicOwner:draft.schematicOwner||'',layoutOwner:draft.layoutOwner||''};
+      targetTypes.forEach(type=>{
+        const currentAnchor=inlineDraftAnchor(currentHierarchy),anchor=type===currentHierarchy?currentAnchor:identityCounterpart(currentAnchor,type);
+        const currentParent=draft.parent?data[currentHierarchy].find(item=>item.id===draft.parent):null,parent=type===currentHierarchy?currentParent:identityCounterpart(currentParent,type);
+        const item=row(`${type.slice(0,3)}-${def.id}-${data[type].length+1}`,def,parent?.id||null,draft.tier,Array(checkLabels[type].length).fill(0),'','');
+        insertInlineItem(item,type,anchor,draft.mode);
+        const rail=railState[type][def.id]=blankRail(type);
+        if(type===currentHierarchy){rail.planned=draft.planned||'';rail.actual=draft.actual||'';rail.startDate=draft.startDate||'';rail.planWorkdays=draft.planWorkdays||'';rail.resource=draft.resource||'';}
+        reopenCompletedParents(item,type);
+        structureChanges[type].unshift(changeEvent(currentActorId,draft.mode==='version'?'新增 Version':'新增 Block','不存在',`${def.name} · T${item.tier} · ${version||'空'}`,auditNow()));
+      });
+      if(currentHierarchy==='spf')detailState.spf[def.id]={round:version,lvsPath:draft.lvsPath||'',cdl:draft.cdl||'',gds:draft.gds||''};
+      inlineAddDraft=null;renderWbs();renderDashboard();showToast(`${def.name} 已创建`);
+    }
+
     function renderWbs() {
       closeChangePopover();
       closeCalculationPopover();
@@ -1363,11 +1576,10 @@
       });
       const spfCreateRow=isSpf?`<tr class="spf-create-row" data-spf-create-row tabindex="0" role="button" aria-label="新增 SPF Block" title="点击新增 Block"><td class="frozen-column frozen-block-column"><span class="spf-create-cue"><span class="row-action row-add spf-create-plus" aria-hidden="true">+</span><span class="spf-create-label">新增 Block</span></span></td><td class="frozen-column frozen-round-column last-frozen-column"></td>${Array.from({length:10},()=>'<td></td>').join('')}</tr>`:'';
       const mergeSpans=blockMergeSpans(items,currentHierarchy);
-      const dataRows=items.length
-        ? items.map(item => rowHtml(item,mergeSpans.get(item.id)??1)).join('')
-        : all.length
-          ? `<tr><td colspan="16"><div class="empty"><strong>没有匹配的 Block</strong>调整搜索词或筛选条件</div></td></tr>`
-          : '';
+      const draftActive=inlineAddDraft?.hierarchy===currentHierarchy,draftIndex=draftActive?inlineDraftIndex(items):-1,renderedRows=[];
+      items.forEach((item,index)=>{if(draftActive&&index===draftIndex)renderedRows.push(inlineDraftRowHtml());renderedRows.push(rowHtml(item,mergeSpans.get(item.id)??1));});
+      if(draftActive&&draftIndex>=items.length)renderedRows.push(inlineDraftRowHtml());
+      const dataRows=renderedRows.length?renderedRows.join(''):all.length?`<tr><td colspan="16"><div class="empty"><strong>没有匹配的 Block</strong>调整搜索词或筛选条件</div></td></tr>`:'';
       wbsBody.innerHTML = spfCreateRow+dataRows;
       applyWbsColumnLayout();
       bindPlannedReleaseLock();
@@ -1376,44 +1588,32 @@
       spfCreateButton?.addEventListener('pointerleave',()=>spfCreateButton.classList.remove('create-row-active'));
       spfCreateButton?.addEventListener('focus',()=>spfCreateButton.classList.add('create-row-active'));
       spfCreateButton?.addEventListener('blur',()=>spfCreateButton.classList.remove('create-row-active'));
-      spfCreateButton?.addEventListener('click',()=>openAddInstanceModal());
-      spfCreateButton?.addEventListener('keydown',event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();openAddInstanceModal();}});
+      spfCreateButton?.addEventListener('click',()=>{const anchor=data.spf.find(item=>item.tier===2)||data.spf[0]||null;startInlineBlockDraft(anchor);});
+      spfCreateButton?.addEventListener('keydown',event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();const anchor=data.spf.find(item=>item.tier===2)||data.spf[0]||null;startInlineBlockDraft(anchor);}});
       document.querySelector('[data-latest-change-panel]')?.addEventListener('click',event=>{event.stopPropagation();latestChangeExpanded=!latestChangeExpanded;closeChangePopover();renderWbs();});
       document.getElementById('structureChangeButton')?.addEventListener('click',event=>{event.stopPropagation();openStructureChangeHistory(event.currentTarget);});
       updateStructureChangeSummary();
       bindCalculationRules();
       bindWbsRows();
+      bindInlineDraft();
     }
 
     function hierarchyOrderedItems(type) {
-      const instances=data[type],ordered=[],visited=new Set();
-      const appendChildren=parentId=>{
-        const siblings=instances.filter(item=>(item.parent||null)===parentId);
-        for(let index=0;index<siblings.length;){
-          const key=blockMergeKey(siblings[index]);
-          let end=index+1;
-          while(end<siblings.length&&blockMergeKey(siblings[end])===key)end++;
-          siblings.slice(index,end).sort((left,right)=>versionRank(left,type)-versionRank(right,type)).forEach(item=>{
-            if(visited.has(item.id))return;
-            visited.add(item.id);ordered.push(item);appendChildren(item.id);
-          });
-          index=end;
-        }
-      };
-      appendChildren(null);
-      instances.forEach(item=>{if(!visited.has(item.id)){visited.add(item.id);ordered.push(item);appendChildren(item.id);}});
-      return ordered;
+      const instances=data[type],seen=new Set(),groups=[];
+      instances.forEach((item,index)=>{const key=blockMergeGroupKey(item);if(seen.has(key))return;seen.add(key);groups.push({tier:item.tier,index,items:instances.filter(candidate=>blockMergeGroupKey(candidate)===key).sort((left,right)=>versionRank(left,type)-versionRank(right,type))});});
+      return groups.sort((left,right)=>left.tier-right.tier||left.index-right.index).flatMap(group=>group.items);
     }
 
     function itemVersion(item,type) { return type==='spf'?spfInfoFor(item).round:item.def.round||''; }
     function versionRank(item,type) { const rank=versionOptions.indexOf(itemVersion(item,type));return rank<0?versionOptions.length:rank; }
     function blockMergeKey(item) { return `${item.def.name.trim().toLowerCase()}|${item.tier}`; }
+    function blockMergeGroupKey(item) { return `${item.parent||'__root__'}|${blockMergeKey(item)}`; }
     function blockMergeSpans(items,type) {
       const spans=new Map();
       for(let index=0;index<items.length;){
-        const key=blockMergeKey(items[index]);
+        const key=blockMergeGroupKey(items[index]);
         let end=index+1;
-        while(end<items.length&&blockMergeKey(items[end])===key)end++;
+        while(end<items.length&&blockMergeGroupKey(items[end])===key)end++;
         spans.set(items[index].id,end-index);
         for(let current=index+1;current<end;current++)spans.set(items[current].id,0);
         index=end;
@@ -1426,7 +1626,9 @@
       const rail = railFor(item, type);
       const state = stateFor(item, type);
       const p = progress(item, type);
-      const hasChildren = data[type].some(x => x.parent === item.id);
+      const mergeGroup=data[type].filter(candidate=>blockMergeGroupKey(candidate)===blockMergeGroupKey(item));
+      const hasChildren = mergeGroup.some(member=>data[type].some(child=>child.parent===member.id));
+      const groupExpanded = mergeGroup.every(member=>member.expanded);
       const levelPad = (item.tier - 1) * 17;
       const late = state === 'delay';
       const categoryCell = `<div class="editable-cell"><div class="cell-display ${item.def.category ? '' : 'empty'}">${item.def.category ? esc(item.def.category) : ''}</div><div class="cell-editor choice"><select class="cell-select ${item.def.category ? '' : 'empty-value'}" data-edit="category" aria-label="${esc(item.def.name)} Block Category">${optionsHtml(blockCategories,item.def.category)}</select></div></div>`;
@@ -1453,8 +1655,8 @@
         : type === 'layout'
           ? `${counterpartProgressCell}${ownerCell}${layoutPlanWorkdaysCell}${layoutResourceCell}${dateEditorCell('startDate',rail.startDate)}${dateEditorCell('planned',rail.planned,late?'date late':'date')}${dateEditorCell('actual',rail.actual,'date')}${ownProgressCell}${checkItemCell}${layoutQualifiedCell}`
           : `${checkItemCell}${spfReadyCell}`;
-      const blockCell=blockSpan===0?'':`<td rowspan="${blockSpan}" class="frozen-column frozen-block-column ${blockSpan>1?'merged-block-cell':''}" data-block-merge-key="${esc(blockMergeKey(item))}"><div class="block-cell" style="${blockSpan>1?'':`padding-left:${levelPad}px`}"><button class="tree-toggle ${hasChildren?'':'hidden'}" title="展开/折叠">${item.expanded?'▾':'▸'}</button><div class="block-main"><div class="block-title-line"><span class="block-name-wrap"><span class="block-name">${esc(item.def.name)}</span><span class="row-actions"><button class="row-action row-add" data-add-child type="button" title="新增 Block" aria-label="在 ${esc(item.def.name)} 行新增 Block">+</button><button class="row-action row-delete" data-delete-instance type="button" title="删除 ${esc(item.def.name)} Block" aria-label="删除 ${esc(item.def.name)} Block"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6v14H5V6"></path><path d="M10 11v5M14 11v5"></path></svg></button></span></span><span class="tier">T${item.tier}${item.tierTop && type==='layout'?' · TOP':''}</span></div></div></div></td>`;
-      return `<tr data-id="${item.id}" data-block-merge-key="${esc(blockMergeKey(item))}" class="${selectedItem?.id === item.id ? 'selected' : ''}">
+      const blockCell=blockSpan===0?'':`<td rowspan="${blockSpan}" class="frozen-column frozen-block-column ${blockSpan>1?'merged-block-cell':''}" data-block-merge-key="${esc(blockMergeKey(item))}" data-block-merge-group="${esc(blockMergeGroupKey(item))}"><div class="block-cell" style="${blockSpan>1?'':`padding-left:${levelPad}px`}"><button class="tree-toggle ${hasChildren?'':'hidden'}" title="${groupExpanded?'收起':'展开'}下级 Block" aria-label="${groupExpanded?'收起':'展开'} ${esc(item.def.name)} 的下级 Block" aria-expanded="${groupExpanded}">${groupExpanded?'▾':'▸'}</button><div class="block-main"><div class="block-title-line"><span class="block-name-wrap"><span class="block-name">${esc(item.def.name)}</span><span class="row-actions"><button class="row-action row-add" data-add-child type="button" title="新增 Block" aria-label="在 ${esc(item.def.name)} 行新增 Block">+</button><button class="row-action row-delete" data-delete-instance type="button" title="删除 ${esc(item.def.name)} Block" aria-label="删除 ${esc(item.def.name)} Block"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6v14H5V6"></path><path d="M10 11v5M14 11v5"></path></svg></button></span></span><span class="tier">T${item.tier}</span></div></div></div></td>`;
+      return `<tr data-id="${item.id}" data-block-merge-key="${esc(blockMergeKey(item))}" data-block-merge-group="${esc(blockMergeGroupKey(item))}" class="${selectedItem?.id === item.id ? 'selected' : ''}">
         ${blockCell}
         ${roundCell}
         ${type === 'spf' ? spfOwnerCells : genericIdentityCells}
@@ -1469,10 +1671,10 @@
     function bindWbsRows() {
       wbsBody.querySelectorAll('tr[data-id]').forEach(tr => {
         const item = data[currentHierarchy].find(x => x.id === tr.dataset.id);
-        tr.querySelector('.tree-toggle')?.addEventListener('click', e => { e.stopPropagation(); item.expanded = !item.expanded; renderWbs(); });
+        tr.querySelector('.tree-toggle')?.addEventListener('click', e => { e.stopPropagation(); const group=data[currentHierarchy].filter(candidate=>blockMergeGroupKey(candidate)===blockMergeGroupKey(item)),expanded=group.every(member=>member.expanded);group.forEach(member=>member.expanded=!expanded);renderWbs(); });
         tr.querySelector('.block-name')?.addEventListener('click', e => { e.stopPropagation(); openDrawer(item); });
-        tr.querySelector('[data-add-child]')?.addEventListener('click', e => { e.stopPropagation(); openAddInstanceModal(item); });
-        tr.querySelector('[data-delete-instance]')?.addEventListener('click', e => { e.stopPropagation(); requestDeleteInstance(item); });
+        tr.querySelector('[data-add-child]')?.addEventListener('click', e => { e.stopPropagation(); openInlineAddMenu(item,e.currentTarget); });
+        tr.querySelector('[data-delete-instance]')?.addEventListener('click', e => { e.stopPropagation(); requestDeleteInstance(item,currentHierarchy); });
         tr.querySelectorAll('[data-check-index]').forEach(button => button.addEventListener('click', e => {
           e.stopPropagation();
           const index = Number(button.dataset.checkIndex);
@@ -1483,8 +1685,8 @@
           control.addEventListener('change', () => updateTableField(item, control.dataset.edit, control.value));
         });
         tr.querySelector('[data-change-history]')?.addEventListener('click', e => { e.stopPropagation(); openRowChangeHistory(item,e.currentTarget); });
-        tr.addEventListener('mouseenter',()=>wbsBody.querySelector(`td.merged-block-cell[data-block-merge-key="${CSS.escape(tr.dataset.blockMergeKey)}"]`)?.classList.add('merge-row-hover'));
-        tr.addEventListener('mouseleave',()=>wbsBody.querySelector(`td.merged-block-cell[data-block-merge-key="${CSS.escape(tr.dataset.blockMergeKey)}"]`)?.classList.remove('merge-row-hover'));
+        tr.addEventListener('mouseenter',()=>wbsBody.querySelector(`td.merged-block-cell[data-block-merge-group="${CSS.escape(tr.dataset.blockMergeGroup)}"]`)?.classList.add('merge-row-hover'));
+        tr.addEventListener('mouseleave',()=>wbsBody.querySelector(`td.merged-block-cell[data-block-merge-group="${CSS.escape(tr.dataset.blockMergeGroup)}"]`)?.classList.remove('merge-row-hover'));
         tr.addEventListener('click', () => { selectedItem = item; renderWbs(); });
       });
     }
@@ -1529,7 +1731,7 @@
       }
       if (field === 'planned' || field === 'actual' || field === 'startDate') rail[field] = normalized;
       const labels = {round:'Version',category:'Block Category',reference:'Reference project',owner:hierarchyMeta[currentHierarchy].owner,schematicOwner:'Schematic Owner',layoutOwner:'Layout Owner',lvsPath:'LVS path',cdl:'cdl',gds:'gds',planWorkdays:'Plan workdays',actualWorkdays:'Actual workdays',resource:'Resource',planned:hierarchyMeta[currentHierarchy].date,actual:hierarchyMeta[currentHierarchy].actual,startDate:'Start date'};
-      if(field==='category'||field==='reference') recordDefinitionChange(item,['schematic','layout'],labels[field],oldValue,normalized);
+      if(field==='round'||field==='category'||field==='reference') recordDefinitionChange(item,['schematic','layout'],labels[field],oldValue,normalized);
       else if(field==='schematicOwner'||(field==='owner'&&currentHierarchy==='schematic')) recordDefinitionChange(item,['schematic','spf'],labels[field],oldValue,normalized);
       else if(field==='layoutOwner'||(field==='owner'&&currentHierarchy==='layout')) recordDefinitionChange(item,['layout','spf'],labels[field],oldValue,normalized);
       else recordChange(item,currentHierarchy,labels[field],oldValue,normalized);
@@ -1647,24 +1849,26 @@
     function mergedVersionGroup(item,type=currentHierarchy) {
       return data[type].filter(candidate=>(candidate.parent||null)===(item.parent||null)&&blockMergeKey(candidate)===blockMergeKey(item)).sort((left,right)=>versionRank(left,type)-versionRank(right,type));
     }
-    function requestDeleteInstance(item) {
-      const group=mergedVersionGroup(item);
-      if(group.length>1)return openVersionDeleteModal(item,group);
-      deleteInstance(item);
+    function requestDeleteInstance(item,type) {
+      const group=mergedVersionGroup(item,type);
+      if(group.length>1)return openVersionDeleteModal(item,group,type);
+      deleteInstance(item,type);
     }
-    function deleteInstance(item,skipConfirm=false) {
-      const type = currentHierarchy;
-      if (data[type].some(child=>child.parent===item.id)) return showToast('请先删除或移动该节点的子 Instance');
+    function deleteInstance(item,type,skipConfirm=false) {
+      const targets=sharedIdentityTypes(type).map(targetType=>[targetType,targetType===type?item:identityCounterpart(item,targetType)]).filter(([,target])=>target);
+      if (targets.some(([targetType,target])=>data[targetType].some(child=>child.parent===target.id))) return showToast('请先删除或移动该节点的子 Instance');
       const version=itemVersion(item,type);
       if (!skipConfirm&&!confirm(`确认删除 ${item.def.name} · T${item.tier} · ${version}？`)) return;
       const before = `${item.def.name} · T${item.tier} · ${version}`;
-      data[type].splice(data[type].findIndex(candidate=>candidate.id===item.id),1);
-      structureChanges[type].unshift(changeEvent(currentActorId,'删除 Block Version',before,'已删除',auditNow()));
+      targets.forEach(([targetType,target])=>{
+        data[targetType].splice(data[targetType].findIndex(candidate=>candidate.id===target.id),1);
+        structureChanges[targetType].unshift(changeEvent(currentActorId,'删除 Block Version',before,'已删除',auditNow()));
+      });
       if (selectedItem?.id === item.id) closeDrawer();
       if(!skipConfirm){renderWbs();renderDashboard();renderDelay();showToast(`${item.def.name} · ${version} 已删除`);}
     }
-    function openVersionDeleteModal(item,group) {
-      pendingVersionDelete={item,type:currentHierarchy,group,selected:new Set()};
+    function openVersionDeleteModal(item,group,type) {
+      pendingVersionDelete={item,type,group,selected:new Set()};
       document.getElementById('versionDeleteTitle').textContent=`删除 ${item.def.name} · T${item.tier}`;
       document.getElementById('versionDeleteIntro').textContent='请选择需要删除的 Version，可多选。仅删除选中行，其他 Version 不受影响。';
       renderVersionDeleteOptions();
@@ -1695,7 +1899,7 @@
       if(wholeGroup&&!confirm(`确认删除 ${item.def.name} · T${item.tier} 的全部 ${group.length} 个 Version？`))return;
       pendingVersionDelete=null;
       document.getElementById('versionDeleteModal').classList.remove('open');
-      targets.forEach(target=>deleteInstance(target,true));
+      targets.forEach(target=>deleteInstance(target,type,true));
       renderWbs();renderDashboard();renderDelay();
       showToast(wholeGroup?`${item.def.name} 整个 Block 已删除`:`已删除 ${targets.map(target=>itemVersion(target,type)).join('、')}`);
     }
@@ -1778,7 +1982,7 @@
     }
     function closeCalculationHoverPopover() {
       const popover=document.getElementById('calculationPopover');
-      if(popover.dataset.mode==='hover')closeCalculationPopover();
+      if(popover.dataset.mode==='hover'&&openCalculationButton&&!openCalculationButton.matches(':hover')&&document.activeElement!==openCalculationButton)closeCalculationPopover();
     }
     function closeCalculationPopover() {
       document.getElementById('calculationPopover')?.classList.remove('open');
@@ -1878,8 +2082,8 @@
         range.selectNodeContents(title);selection.removeAllRanges();selection.addRange(range);
       };
       title.onkeydown=event=>{
-        if(event.key==='Enter'){event.preventDefault();title.blur();}
-        if(event.key==='Escape'){event.preventDefault();cancelled=true;title.textContent=item.def.name;title.blur();}
+        if(event.key==='Enter'){event.preventDefault();event.stopPropagation();title.blur();}
+        if(event.key==='Escape'){event.preventDefault();event.stopPropagation();cancelled=true;title.textContent=item.def.name;title.blur();}
       };
       title.onblur=()=>{
         const nextName=title.textContent;
@@ -1955,6 +2159,7 @@
       const duplicate=Object.entries(data).some(([type,instances])=>instances.some(instance=>groupDefinitionIds.has(instance.def.id)&&instances.some(candidate=>!groupDefinitionIds.has(candidate.def.id)&&candidate.tier===instance.tier&&candidate.def.name.toLowerCase()===nextName.toLowerCase()&&itemVersion(candidate,type)===itemVersion(instance,type))));
       if(duplicate){showToast('同名、同 Tier、同 Version 的 Block 已存在');openDrawer(item);return;}
       if(group.length>1&&!confirm(`该 Block 包含 ${group.length} 个 Version：${group.map(candidate=>itemVersion(candidate,currentHierarchy)).join('、')}。修改名称将同步更新整个组，是否继续？`)){openDrawer(item);return;}
+      group.forEach(candidate=>recordDefinitionChange(candidate,['schematic','layout'],'Block',oldName,nextName));
       group.forEach(candidate=>candidate.def.name=nextName);
       renderDashboard();renderDelay();openDrawer(item);
       showToast(group.length>1?`${group.length} 个 Version 的 Block name 已同步更新`:`Block name 已更新：${oldName} → ${nextName}`);
@@ -2034,6 +2239,7 @@
     }
 
     function setHierarchy(type) {
+      inlineAddDraft=null;closeInlineAddMenu();
       currentHierarchy = type;
       document.querySelectorAll('[data-hierarchy]').forEach(b=>b.classList.toggle('active',b.dataset.hierarchy===type));
       tableWrap.scrollLeft = 0;
@@ -2116,7 +2322,7 @@
         const checks=checkLabels[type].map(label=>embeddedCheckValue(cell(source,label)));
         if(!name)issues.push('Block name 不能为空');
         if(!tier)issues.push('Tier 无法识别');
-        if(fields.Version&&!versionOptions.includes(fields.Version))issues.push('Version 只能选择 1st、2nd、3rd、4th、5th');
+        if(!versionOptions.includes(fields.Version))issues.push('Version 必须选择 1st、2nd、3rd、4th、5th 之一');
         if(fields['Block Category']&&!blockCategories.includes(fields['Block Category']))issues.push(`Block Category 无效：${fields['Block Category']}`);
         ['Schematic Owner','Layout Owner'].forEach(field=>{if(fields[field]&&!embeddedImportOwners.has(fields[field]))issues.push(`${field} 无法匹配：${fields[field]}`);});
         Object.entries(fields).forEach(([field,value])=>{if(/date|release|finish/i.test(field)&&value&&!/^\d{4}-\d{2}-\d{2}$/.test(value))issues.push(`${field} 格式应为 YYYY-MM-DD`);});
@@ -2124,11 +2330,11 @@
         if(fields.Resource&&!/^-?(?:\d+(?:\.\d*)?|\.\d+)$/.test(fields.Resource))issues.push('Resource 必须为数字');
         rows.push({index:index+1,hierarchy:type,sheetName,name,tier,parentPath,fields,checks,issues,status:'valid',decision:'import'});
       });
-      const paths=new Map(rows.filter(row=>row.name).map(row=>[[...embeddedPath(row.parentPath),row.name].join('/').toLowerCase(),row.index])),siblings=new Map(),names=new Map();
-      rows.forEach(row=>{const parentKey=embeddedPath(row.parentPath).join('/').toLowerCase();if(row.tier>1&&!paths.has(parentKey))row.issues.push(`Parent path 不存在：${row.parentPath}`);else if(row.tier>1&&paths.get(parentKey)>=row.index)row.issues.push('Parent 必须位于子节点之前');const siblingKey=`${parentKey}|${row.name}|${row.tier}`.toLowerCase();siblings.set(siblingKey,[...(siblings.get(siblingKey)||[]),row]);const nameKey=row.name.toLowerCase();names.set(nameKey,[...(names.get(nameKey)||[]),row]);});
-      siblings.forEach(group=>{if(group.length>1)group.forEach(row=>row.issues.push('相同 Parent path 下重复 Block'));});
-      names.forEach(group=>{if(group.length>1)group.forEach(row=>{if(!row.issues.some(issue=>issue.includes('重复 Block')))row.issues.push(`同名 Block 共 ${group.length} 行，默认共享 Definition`);});});
-      rows.forEach(row=>{const hard=row.issues.some(issue=>/不能为空|无法识别|不存在|无效|无法匹配|格式|必须|重复 Block/.test(issue));row.status=hard?'error':row.issues.length?'warning':'valid';row.decision=hard?'fix':row.status==='warning'?'share':'import';});
+      const paths=new Map(),uniqueKeys=new Map();
+      rows.filter(row=>row.name).forEach(row=>{const pathKey=[...embeddedPath(row.parentPath),row.name].join('/').toLowerCase();if(!paths.has(pathKey))paths.set(pathKey,row.index);});
+      rows.forEach(row=>{const parentKey=embeddedPath(row.parentPath).join('/').toLowerCase();if(row.tier>1&&!paths.has(parentKey))row.issues.push(`Parent path 不存在：${row.parentPath}`);else if(row.tier>1&&paths.get(parentKey)>=row.index)row.issues.push('Parent 必须位于子节点之前');const uniqueKey=`${row.name}|${row.tier}|${row.fields.Version}`.toLowerCase();uniqueKeys.set(uniqueKey,[...(uniqueKeys.get(uniqueKey)||[]),row]);});
+      uniqueKeys.forEach(group=>{if(group.length>1)group.forEach(row=>row.issues.push(`Block name + Tier + Version 重复：${row.name} · T${row.tier} · ${row.fields.Version}`));});
+      rows.forEach(row=>{const hard=row.issues.some(issue=>/不能为空|无法识别|不存在|无效|无法匹配|格式|必须|重复/.test(issue));row.status=hard?'error':row.issues.length?'warning':'valid';row.decision=hard?'fix':row.status==='warning'?'share':'import';});
       return rows;
     }
     function analyzeEmbeddedImport() {
@@ -2140,14 +2346,14 @@
     }
     function embeddedImportReviewHtml() {
       const rows=embeddedImportState.rows,counts={valid:rows.filter(row=>row.status==='valid').length,warning:rows.filter(row=>row.status==='warning').length,error:rows.filter(row=>row.status==='error').length};
-      return `<section class="ei-card"><div class="ei-card-head"><h2>模板校验预览</h2><small>${esc(embeddedImportState.fileName)} · ${rows.length} rows</small></div><div class="ei-card-body"><div class="ei-counts"><span class="ei-count good">可导入 ${counts.valid}</span><span class="ei-count warn">需确认 ${counts.warning}</span><span class="ei-count bad">错误 ${counts.error}</span></div><div class="ei-notice" style="margin-bottom:9px">同一 hierarchy 不同路径的同名 Block 默认共享 Definition；相同路径重复为错误。</div><div class="ei-review"><table><thead><tr><th>Hierarchy</th><th>#</th><th>Block</th><th>Parent path</th><th>Tier</th><th>校验</th><th>处理</th></tr></thead><tbody>${rows.map(row=>`<tr><td>${row.hierarchy.toUpperCase()}</td><td>${row.index}</td><td><strong>${esc(row.name||'—')}</strong></td><td>${esc(row.parentPath||'根节点')}</td><td>T${esc(row.tier||'—')}</td><td><span class="ei-status ${row.status==='valid'?'good':row.status==='warning'?'warn':'bad'}">${row.status==='valid'?'可导入':row.status==='warning'?'需确认':'错误'}</span><div class="ei-issue">${row.issues.map(esc).join('；')||'校验通过'}</div></td><td>${row.status==='error'?'<span style="color:var(--red)">返回修正</span>':row.status==='warning'?`<select class="ei-decision" data-ei-decision="${row.hierarchy}:${row.index}"><option value="share">共享 Definition</option><option value="split">拆分</option><option value="skip">跳过</option></select>`:'导入'}</td></tr>`).join('')}</tbody></table></div></div></section><div class="ei-actions"><button class="btn" data-ei-step="2">返回预览</button><button class="btn primary" id="eiPrepare">检查并继续</button></div>`;
+      return `<section class="ei-card"><div class="ei-card-head"><h2>模板校验预览</h2><small>${esc(embeddedImportState.fileName)} · ${rows.length} rows</small></div><div class="ei-card-body"><div class="ei-counts"><span class="ei-count good">可导入 ${counts.valid}</span><span class="ei-count warn">需确认 ${counts.warning}</span><span class="ei-count bad">错误 ${counts.error}</span></div><div class="ei-notice" style="margin-bottom:9px">同一 hierarchy 以 Block name + Tier + Version 为唯一键；同名同 Tier 的不同 Version 将形成独立行并自动合并 Block 单元格。</div><div class="ei-review"><table><thead><tr><th>Hierarchy</th><th>#</th><th>Block</th><th>Parent path</th><th>Tier</th><th>Version</th><th>校验</th><th>处理</th></tr></thead><tbody>${rows.map(row=>`<tr><td>${row.hierarchy.toUpperCase()}</td><td>${row.index}</td><td><strong>${esc(row.name||'—')}</strong></td><td>${esc(row.parentPath||'根节点')}</td><td>T${esc(row.tier||'—')}</td><td>${esc(row.fields.Version||'—')}</td><td><span class="ei-status ${row.status==='valid'?'good':row.status==='warning'?'warn':'bad'}">${row.status==='valid'?'可导入':row.status==='warning'?'需确认':'错误'}</span><div class="ei-issue">${row.issues.map(esc).join('；')||'校验通过'}</div></td><td>${row.status==='error'?'<span style="color:var(--red)">返回修正</span>':'导入'}</td></tr>`).join('')}</tbody></table></div></div></section><div class="ei-actions"><button class="btn" data-ei-step="2">返回预览</button><button class="btn primary" id="eiPrepare">检查并继续</button></div>`;
     }
     function prepareEmbeddedCommit() {
       if(embeddedImportState.rows.some(row=>row.status==='error'))return showToast('仍有错误行，请返回修正');
       embeddedImportState.step=4;renderEmbeddedImport();
     }
     function embeddedImportCommitHtml() {
-      const accepted=embeddedImportState.rows.filter(row=>row.decision!=='skip');const groups=accepted.reduce((map,row)=>{const key=row.name.toLowerCase();map.set(key,[...(map.get(key)||[]),row]);return map;},new Map());const definitions=[...groups.values()].reduce((total,group)=>total+group.filter(row=>row.decision==='split').length+(group.some(row=>row.decision!=='split')?1:0),0);
+      const accepted=embeddedImportState.rows.filter(row=>row.decision!=='skip');const definitions=new Set(accepted.map(row=>`${row.name.toLowerCase()}|${row.tier}|${row.fields.Version}`)).size;
       if(embeddedImportState.created)return `<div class="ei-success"><div class="ei-success-mark">✓</div><h2>${esc(embeddedImportState.tableName)} 已创建</h2><p>${accepted.length} 个 Instance、${definitions} 个 Definition 已导入 DDCPC；派生状态已重新计算。</p><div class="ei-actions" style="justify-content:center"><button class="btn" id="eiNewImport">重新导入</button><button class="btn primary" id="eiOpenWbs">打开新表</button></div><div class="ei-notice" style="max-width:600px;margin:18px auto 0;text-align:left">Import Job：${esc(embeddedImportState.job)} · 生产环境支持按本批次整批撤销。</div></div>`;
       const hierarchyCounts=['schematic','layout','spf'].map(type=>[type.toUpperCase(),accepted.filter(row=>row.hierarchy===type).length]);
       const summary=[['新表',embeddedImportState.tableName],...hierarchyCounts,['Definitions',definitions],['跳过',embeddedImportState.rows.length-accepted.length],['错误',0]];
@@ -2161,8 +2367,9 @@
       ['schematic','layout','spf'].forEach(type=>{data[type].splice(0);Object.keys(railState[type]).forEach(key=>delete railState[type][key]);changeHistory[type]={};structureChanges[type]=[];});
       Object.keys(detailState.spf).forEach(key=>delete detailState.spf[key]);
       Object.keys(detailState.aiRouting).forEach(key=>delete detailState.aiRouting[key]);
-      const definitionFor=row=>{const sharedKey=row.decision==='split'?`${row.hierarchy}:${row.index}:${row.name.toLowerCase()}`:row.name.toLowerCase();let definition=definitions.get(sharedKey);if(!definition){const slug=row.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'block';definition={id:`import-${slug}-${++definitionSequence}`,name:row.name,round:'',category:'',reference:'',blockOwner:'',schematicOwner:'',layoutOwner:''};definitions.set(sharedKey,definition);}if(row.hierarchy!=='spf'&&row.fields.Version&&!definition.round)definition.round=normalizeVersion(row.fields.Version);if(row.fields['Block Category'])definition.category=row.fields['Block Category'];if(row.fields['Reference project'])definition.reference=row.fields['Reference project'];if(row.fields['Schematic Owner'])definition.schematicOwner=row.fields['Schematic Owner'];if(row.fields['Layout Owner'])definition.layoutOwner=row.fields['Layout Owner'];return definition;};
-      ['schematic','layout','spf'].forEach(type=>{const pathToInstance=new Map();accepted.filter(row=>row.hierarchy===type).sort((a,b)=>a.index-b.index).forEach(importRow=>{const definition=definitionFor(importRow),parentKey=embeddedPath(importRow.parentPath).join('/').toLowerCase(),parentId=parentKey?pathToInstance.get(parentKey)||null:null,id=`imp-${type.slice(0,3)}-${++instanceSequence}`,planned=type==='schematic'?importRow.fields['Planned release']:type==='layout'?importRow.fields['Plan finish']:importRow.fields['Planned SPF release'],actual=type==='schematic'?importRow.fields['Actual release']:type==='layout'?importRow.fields['Actual finish']:importRow.fields['Actual SPF release'];const item=row(id,definition,parentId,importRow.tier,importRow.checks,planned||'',actual||'');data[type].push(item);pathToInstance.set([...embeddedPath(importRow.parentPath),importRow.name].join('/').toLowerCase(),id);railState[type][definition.id]||={checks:[...importRow.checks],planned:planned||'',actual:actual||'',startDate:importRow.fields['Start date']||'',planWorkdays:importRow.fields['Plan workdays']||'',actualWorkdays:importRow.fields['Actual workdays']||'',resource:importRow.fields.Resource||'',checkStatus:importRow.checks.every(Boolean)?'Done':importRow.checks.some(Boolean)?'Ongoing':'Not started'};if(type==='spf')detailState.spf[definition.id]={round:normalizeVersion(importRow.fields.Version||''),lvsPath:importRow.fields['LVS path']||'',cdl:importRow.fields.cdl||'',gds:importRow.fields.gds||''};});});
+      const definitionFor=row=>{const sharedKey=`${row.name.toLowerCase()}|${row.tier}|${row.fields.Version}`;let definition=definitions.get(sharedKey);if(!definition){const slug=row.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'block';definition={id:`import-${slug}-${++definitionSequence}`,name:row.name,round:row.hierarchy==='spf'?'':normalizeVersion(row.fields.Version),category:'',reference:'',blockOwner:'',schematicOwner:'',layoutOwner:''};definitions.set(sharedKey,definition);}if(row.fields['Block Category'])definition.category=row.fields['Block Category'];if(row.fields['Reference project'])definition.reference=row.fields['Reference project'];if(row.fields['Schematic Owner'])definition.schematicOwner=row.fields['Schematic Owner'];if(row.fields['Layout Owner'])definition.layoutOwner=row.fields['Layout Owner'];return definition;};
+      ['schematic','layout','spf'].forEach(type=>{const pathToInstances=new Map();accepted.filter(row=>row.hierarchy===type).sort((a,b)=>a.index-b.index).forEach(importRow=>{const definition=definitionFor(importRow),parentKey=embeddedPath(importRow.parentPath).join('/').toLowerCase(),parentCandidates=pathToInstances.get(parentKey)||[],parentId=parentKey?(parentCandidates.find(candidate=>candidate.version===importRow.fields.Version)||parentCandidates[0])?.id||null:null,id=`imp-${type.slice(0,3)}-${++instanceSequence}`,planned=type==='schematic'?importRow.fields['Planned release']:type==='layout'?importRow.fields['Plan finish']:importRow.fields['Planned SPF release'],actual=type==='schematic'?importRow.fields['Actual release']:type==='layout'?importRow.fields['Actual finish']:importRow.fields['Actual SPF release'];const item=row(id,definition,parentId,importRow.tier,importRow.checks,planned||'',actual||'');data[type].push(item);const pathKey=[...embeddedPath(importRow.parentPath),importRow.name].join('/').toLowerCase();pathToInstances.set(pathKey,[...(pathToInstances.get(pathKey)||[]),{id,version:importRow.fields.Version}]);railState[type][definition.id]={checks:[...importRow.checks],planned:planned||'',actual:actual||'',startDate:importRow.fields['Start date']||'',planWorkdays:importRow.fields['Plan workdays']||'',actualWorkdays:importRow.fields['Actual workdays']||'',resource:importRow.fields.Resource||'',checkStatus:importRow.checks.every(Boolean)?'Done':importRow.checks.some(Boolean)?'Ongoing':'Not started'};if(type==='spf')detailState.spf[definition.id]={round:normalizeVersion(importRow.fields.Version),lvsPath:importRow.fields['LVS path']||'',cdl:importRow.fields.cdl||'',gds:importRow.fields.gds||''};});});
+      synchronizeSchematicLayoutIdentityRows();
       data.layout.forEach(item=>{item.tierTop=data.layout.some(child=>child.parent===item.id);});
       const tableSelect=document.getElementById('tableSelect');
       if(![...tableSelect.options].some(option=>option.value===embeddedImportState.tableName))tableSelect.add(new Option(embeddedImportState.tableName,embeddedImportState.tableName));
@@ -2188,124 +2395,6 @@
       document.getElementById('eiNewImport')?.addEventListener('click',openEmbeddedExcelImport);
       document.getElementById('eiOpenWbs')?.addEventListener('click',()=>{showPage('wbs');setHierarchy(currentHierarchy);});
     }
-    function openAddInstanceModal(contextItem=null) {
-      addFormRows=[newAddFormRow(contextItem)];
-      const maxTier=currentHierarchy==='spf'?4:6;
-      const context=contextItem?(contextItem.tier<maxTier?` · Parent：${contextItem.def.name}`:` · 在 ${contextItem.def.name} 同层新增`):'';
-      document.getElementById('addInstanceHierarchy').textContent=`当前目标：${currentHierarchy.toUpperCase()} hierarchy${context}`;
-      renderAddFormRows();
-      document.getElementById('addInstanceModal').classList.add('open');
-    }
-    function closeAddInstanceModal() { document.getElementById('addInstanceModal').classList.remove('open'); }
-    function newAddFormRow(contextItem=null) {
-      const maxTier=currentHierarchy==='spf'?4:6;
-      if(contextItem){const childAllowed=contextItem.tier<maxTier;return {id:`add-row-${++addFormRowSequence}`,name:'',tier:childAllowed?contextItem.tier+1:contextItem.tier,parentRef:childAllowed?`existing:${contextItem.id}`:contextItem.parent?`existing:${contextItem.parent}`:'',version:''};}
-      const defaultParent=data[currentHierarchy].find(item=>item.tier===2)||data[currentHierarchy][0];
-      return {id:`add-row-${++addFormRowSequence}`,name:'',tier:Math.min(maxTier,(defaultParent?.tier||0)+1),parentRef:defaultParent?`existing:${defaultParent.id}`:'',version:''};
-    }
-    function addParentOptions(row,index) {
-      const existing=data[currentHierarchy].map(item=>`<option value="existing:${item.id}" ${row.parentRef===`existing:${item.id}`?'selected':''}>T${item.tier} · ${esc(item.def.name)}</option>`).join('');
-      const drafts=addFormRows.slice(0,index).map(item=>`<option value="draft:${item.id}" ${row.parentRef===`draft:${item.id}`?'selected':''}>本次 · T${item.tier} · ${esc(item.name||'未命名')}</option>`).join('');
-      return `<option value="" ${row.parentRef?'':'selected'}>无 Parent（根节点）</option>${existing}${drafts}`;
-    }
-    function validateAddFormRows() {
-      const maxTier=currentHierarchy==='spf'?4:6,validated=[];
-      addFormRows.forEach((row,index)=>{
-        const errors=[],name=row.name.trim(),tier=Number(row.tier),version=normalizeVersion(row.version);
-        if(!name)errors.push('Block name 必填');
-        if(!Number.isInteger(tier)||tier<1||tier>maxTier)errors.push(`Tier 必须为 1–${maxTier}`);
-        if(!version)errors.push('Version 必选');
-        let parent=null,parentId='';
-        if(row.parentRef.startsWith('existing:')){parentId=row.parentRef.slice(9);parent=data[currentHierarchy].find(item=>item.id===parentId)||null;}
-        if(row.parentRef.startsWith('draft:')){const draftId=row.parentRef.slice(6);parent=validated.find(item=>item.id===draftId)||null;parentId=draftId;}
-        if(tier>1&&!row.parentRef)errors.push('非根节点必须选择 Parent');
-        if(row.parentRef&&!parent)errors.push('Parent 不存在或必须位于当前行之前');
-        if(parent&&Number(parent.tier)>=tier)errors.push('Parent Tier 必须小于当前 Tier');
-        const resolvedParentId=parent?.source==='draft'?`draft:${parent.id}`:parent?.id||'';
-        if(data[currentHierarchy].some(item=>item.tier===tier&&item.def.name.toLowerCase()===name.toLowerCase()&&itemVersion(item,currentHierarchy)===version))errors.push(`T${tier} · ${version} 已存在同名 Block`);
-        if(validated.some(item=>item.tier===tier&&item.version===version&&item.name.toLowerCase()===name.toLowerCase()))errors.push(`本次添加中 T${tier} · ${version} 存在同名 Block`);
-        validated.push({...row,index,name,tier,version,parent,source:'draft',resolvedParentId,errors});
-      });
-      return validated;
-    }
-    function renderAddFormRows() {
-      const maxTier=currentHierarchy==='spf'?4:6;
-      document.getElementById('addFormRows').innerHTML=addFormRows.map((row,index)=>`<div class="add-form-row" data-add-row="${row.id}"><span class="add-row-number">${index+1}</span><input data-add-field="name" value="${esc(row.name)}" placeholder="例如 COLUMN_CTRL" aria-label="第 ${index+1} 行 Block name"><select data-add-field="tier" aria-label="第 ${index+1} 行 Tier">${Array.from({length:maxTier},(_,position)=>`<option value="${position+1}" ${Number(row.tier)===position+1?'selected':''}>T${position+1}</option>`).join('')}</select><select data-add-field="parentRef" aria-label="第 ${index+1} 行 Parent node">${addParentOptions(row,index)}</select><select data-add-field="version" aria-label="第 ${index+1} 行 Version"><option value="" ${row.version?'':'selected'} disabled>请选择</option>${versionOptions.map(version=>`<option value="${version}" ${row.version===version?'selected':''}>${version}</option>`).join('')}</select><span class="add-row-status" data-add-status></span><button class="remove-add-row" type="button" data-remove-add-row title="删除第 ${index+1} 行" aria-label="删除第 ${index+1} 行">×</button></div>`).join('');
-      document.querySelectorAll('[data-add-row]').forEach(element=>{
-        const row=addFormRows.find(item=>item.id===element.dataset.addRow);
-        element.querySelectorAll('[data-add-field]').forEach(control=>{
-          control.addEventListener('input',()=>{row[control.dataset.addField]=control.value;refreshAddFormValidation();});
-          control.addEventListener('change',()=>{row[control.dataset.addField]=control.value;requestAnimationFrame(renderAddFormRows);});
-        });
-        element.querySelector('[data-remove-add-row]').addEventListener('click',()=>{
-          if(addFormRows.length===1){showToast('至少保留一行');return;}
-          addFormRows=addFormRows.filter(item=>item.id!==row.id);renderAddFormRows();
-        });
-      });
-      refreshAddFormValidation();
-    }
-    function refreshAddFormValidation() {
-      const validated=validateAddFormRows();
-      validated.forEach(row=>{const status=document.querySelector(`[data-add-row="${row.id}"] [data-add-status]`);if(!status)return;status.textContent=row.errors.length?row.errors.join('；'):'可添加';status.classList.toggle('error',Boolean(row.errors.length));});
-      const errors=validated.filter(row=>row.errors.length).length;
-      document.getElementById('addInstanceSummary').textContent=`${validated.length} 行 · ${errors?`${errors} 行需修正`:'全部可添加'}`;
-      document.getElementById('saveInstance').disabled=!validated.length;
-      return validated;
-    }
-    function appendAddFormRow() { addFormRows.push(newAddFormRow());renderAddFormRows(); }
-    function insertBlockAtParentFront(item, lastCreatedByParent, lastCreatedByGroup) {
-      const instances=data[currentHierarchy],parentKey=item.parent||'__root__';
-      const groupKey=`${parentKey}|${blockMergeKey(item)}`;
-      const previousGroupItem=lastCreatedByGroup.get(groupKey);
-      if(previousGroupItem){
-        const previousIndex=instances.findIndex(candidate=>candidate.id===previousGroupItem.id);
-        instances.splice(previousIndex+1,0,item);
-        lastCreatedByGroup.set(groupKey,item);
-        lastCreatedByParent.set(parentKey,item);
-        return;
-      }
-      const firstMatchingIndex=instances.findIndex(candidate=>(candidate.parent||null)===(item.parent||null)&&blockMergeKey(candidate)===blockMergeKey(item));
-      if(firstMatchingIndex>=0){
-        instances.splice(firstMatchingIndex,0,item);
-        lastCreatedByGroup.set(groupKey,item);
-        lastCreatedByParent.set(parentKey,item);
-        return;
-      }
-      const previousCreated=lastCreatedByParent.get(parentKey);
-      if(previousCreated){
-        const previousIndex=instances.findIndex(candidate=>candidate.id===previousCreated.id);
-        instances.splice(previousIndex+1,0,item);
-      } else {
-        const firstChildIndex=instances.findIndex(candidate=>(candidate.parent||null)===(item.parent||null));
-        if(firstChildIndex<0)instances.push(item);else instances.splice(firstChildIndex,0,item);
-      }
-      lastCreatedByGroup.set(groupKey,item);
-      lastCreatedByParent.set(parentKey,item);
-    }
-    function saveAddFormRows() {
-      const valid=refreshAddFormValidation();
-      if(!valid.length)return;
-      const duplicateRows=valid.filter(row=>row.errors.some(error=>error.includes('同名 Block')));
-      if(duplicateRows.length)return openSameTierDuplicateModal(duplicateRows);
-      if(valid.some(row=>row.errors.length))return showToast('请先修正所有行');
-      const createdByRowId=new Map();
-      const lastCreatedByParent=new Map();
-      const lastCreatedByGroup=new Map();
-      valid.forEach(rowData=>{
-        const base=rowData.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||`block-${Date.now()}`;
-        const def={id:`${base}-${Date.now().toString().slice(-5)}-${rowData.index+1}`,name:rowData.name,round:currentHierarchy==='spf'?'':rowData.version,category:'',reference:'',blockOwner:'',schematicOwner:'',layoutOwner:''};
-        const parentId=rowData.parent?.source==='draft'?createdByRowId.get(rowData.parent.id)?.id:rowData.parent?.id||null;
-        const id=`${currentHierarchy.slice(0,3)}-${def.id}-${data[currentHierarchy].length+1}`;
-        const item=row(id,def,parentId,rowData.tier,Array(checkLabels[currentHierarchy].length).fill(0),'','');
-        insertBlockAtParentFront(item,lastCreatedByParent,lastCreatedByGroup);createdByRowId.set(rowData.id,item);
-        railState[currentHierarchy][def.id]||={checks:Array(checkLabels[currentHierarchy].length).fill(0),planned:'',actual:'',startDate:'',planWorkdays:'',actualWorkdays:'',resource:'',checkStatus:'Not started'};
-        if(currentHierarchy==='spf')detailState.spf[def.id]={round:rowData.version,lvsPath:'',cdl:'',gds:''};
-        reopenCompletedParents(item,currentHierarchy);
-        structureChanges[currentHierarchy].unshift(changeEvent(currentActorId,valid.length===1?'新增 Block':'批量新增 Block','不存在',`${def.name} · T${item.tier}`,auditNow()));
-      });
-      closeAddInstanceModal();renderWbs();renderDashboard();
-      showToast(`已添加 ${valid.length} 个 Block / Instance`);
-    }
     function openSameTierDuplicateModal(rows) {
       document.getElementById('sameTierDuplicateList').innerHTML=rows.map(row=>`<div class="validation-blocker"><strong>${esc(row.name)} · T${row.tier} · ${esc(row.version)}</strong><small>${row.errors.filter(error=>error.includes('同名 Block')).map(esc).join('、')}</small></div>`).join('');
       document.getElementById('sameTierDuplicateModal').classList.add('open');
@@ -2313,9 +2402,10 @@
     }
     function closeSameTierDuplicateModal() { document.getElementById('sameTierDuplicateModal').classList.remove('open'); }
     function showPage(name) {
+      if(name!=='wbs'){inlineAddDraft=null;closeInlineAddMenu();}
       document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===name+'Page'));
       document.querySelectorAll('.nav button[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===name));
-      if(name==='dashboard') renderDashboard(); if(name==='delay') renderDelay(); if(name==='checkItems') renderCheckDetails();
+      if(name==='wbs')renderWbs();if(name==='dashboard') renderDashboard(); if(name==='delay') renderDelay(); if(name==='checkItems') renderCheckDetails();
     }
     function isWbsTableFullscreen() { return document.body.classList.contains('wbs-table-fullscreen'); }
     function syncWbsTableFullscreen() {
@@ -2378,15 +2468,15 @@
     document.addEventListener('click',event=>{if(!document.getElementById('changePopover').contains(event.target)&&!event.target.closest('[data-change-history]')&&!event.target.closest('#structureChangeButton'))closeChangePopover();});
     document.addEventListener('click',event=>{if(!document.getElementById('calculationPopover').contains(event.target)&&!event.target.closest('[data-calculation-rule]'))closeCalculationPopover();});
     document.addEventListener('click',event=>{if(!document.getElementById('columnFilterPopover').contains(event.target)&&!event.target.closest('[data-column-filter]'))closeColumnFilterPopover();});
-    tableWrap.addEventListener('scroll',()=>{closeChangePopover();closeCalculationPopover();closeColumnFilterPopover();});
-    window.addEventListener('resize',()=>{closeChangePopover();closeCalculationPopover();closeColumnFilterPopover();if(isWbsTableFullscreen())refreshWbsColumnLayout();});
+    document.addEventListener('click',event=>{if(!document.getElementById('inlineAddMenu').contains(event.target)&&!event.target.closest('[data-add-child]'))closeInlineAddMenu();});
+    tableWrap.addEventListener('scroll',()=>{closeChangePopover();if(document.activeElement!==openCalculationButton)closeCalculationPopover();closeColumnFilterPopover();closeInlineAddMenu();});
+    window.addEventListener('resize',()=>{closeChangePopover();closeCalculationPopover();closeColumnFilterPopover();closeInlineAddMenu();if(isWbsTableFullscreen())refreshWbsColumnLayout();});
     new ResizeObserver(()=>{if(isWbsTableFullscreen())refreshWbsColumnLayout();}).observe(document.documentElement);
     document.getElementById('drawerClose').addEventListener('click',closeDrawer);
     document.getElementById('drawerBackdrop').addEventListener('click',closeDrawer);
     document.getElementById('importExcelBtn').addEventListener('click',openEmbeddedExcelImport);
-    document.querySelectorAll('[data-close-add-modal]').forEach(b=>b.addEventListener('click',closeAddInstanceModal));
-    document.getElementById('addInstanceModal').addEventListener('click',event=>{if(event.target===event.currentTarget)closeAddInstanceModal();});
-    document.getElementById('appendAddRow').addEventListener('click',appendAddFormRow);
+    document.getElementById('inlineAddVersion').addEventListener('click',()=>{if(inlineAddAnchor)startInlineVersionDraft(inlineAddAnchor);});
+    document.getElementById('inlineAddBlock').addEventListener('click',()=>{if(inlineAddAnchor)startInlineBlockDraft(inlineAddAnchor);});
     document.querySelectorAll('[data-close-check-validation]').forEach(button=>button.addEventListener('click',closeCheckValidationModal));
     document.getElementById('checkValidationModal').addEventListener('click',event=>{if(event.target===event.currentTarget)closeCheckValidationModal();});
     document.querySelectorAll('[data-close-tier-duplicate]').forEach(button=>button.addEventListener('click',closeSameTierDuplicateModal));
@@ -2397,7 +2487,6 @@
     document.querySelectorAll('[data-close-version-delete]').forEach(button=>button.addEventListener('click',closeVersionDeleteModal));
     document.getElementById('versionDeleteModal').addEventListener('click',event=>{if(event.target===event.currentTarget)closeVersionDeleteModal();});
     document.getElementById('confirmVersionDelete').addEventListener('click',confirmVersionDelete);
-    document.getElementById('saveInstance').addEventListener('click',saveAddFormRows);
     document.getElementById('refreshDashboard').addEventListener('click',()=>{renderDashboard();showToast('状态已按最新 check 和日期重新计算');});
     document.getElementById('tableSelect').addEventListener('change',event=>switchPrototypeTable(event.target.value));
     document.getElementById('wbsFullscreenToggle').addEventListener('click',toggleWbsTableFullscreen);
@@ -2405,21 +2494,22 @@
     document.getElementById('delaySort').addEventListener('click',()=>{renderDelay();showToast('已按延误天数从高到低排序');});
     document.addEventListener('keydown', event => {
       if (event.key !== 'Escape') return;
+      if(inlineAddDraft){cancelInlineDraft(false);return;}
+      if(document.getElementById('inlineAddMenu').classList.contains('open')){closeInlineAddMenu();return;}
       if(isWbsTableFullscreen()){exitWbsTableFullscreen();return;}
       if(document.getElementById('versionDeleteModal').classList.contains('open')){closeVersionDeleteModal();return;}
       if(document.getElementById('sameNameCheckModal').classList.contains('open')){resolveSameNameCheck(false);return;}
       if(document.getElementById('sameTierDuplicateModal').classList.contains('open')){closeSameTierDuplicateModal();return;}
       if(document.getElementById('checkValidationModal').classList.contains('open')){closeCheckValidationModal();return;}
-      if(document.getElementById('addInstanceModal').classList.contains('open')){closeAddInstanceModal();return;}
       closeDrawer();
       closeChangePopover();
       closeCalculationPopover();
       closeColumnFilterPopover();
-      closeAddInstanceModal();
       closeCheckValidationModal();
       closeSameTierDuplicateModal();
     });
 
+    synchronizeSchematicLayoutIdentityRows();
     const initialTableState=captureTableState();
     ['ChanEdgel','ChanLeft','ChanMid'].forEach(tableName=>tableStateStore.set(tableName,structuredClone(initialTableState)));
     renderWbs(); renderDashboard(); renderDelay();
