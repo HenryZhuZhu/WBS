@@ -237,26 +237,20 @@
     th.frozen-column { z-index: 7; }
     td.frozen-column { position: sticky; z-index: 2; background: white; }
     .frozen-block-column { left: 0; padding-left: 3px !important; padding-right: 3px !important; }
-    td.merged-block-cell { vertical-align: middle; border-bottom-color: var(--line); }
-    td.merged-block-cell .block-cell { position: relative; min-height: 48px; justify-content: center; padding: 0 5px !important; }
-    td.merged-block-cell .tree-toggle { position: absolute; left: 4px; }
-    td.merged-block-cell .block-main { position: static; flex: 1; }
-    td.merged-block-cell .block-title-line { justify-content: center; }
-    td.merged-block-cell .tier { position: absolute; right: 5px; margin-left: 0; }
-    td.merged-block-cell.merge-row-hover { background: #f7faff; }
-    td.merged-block-cell.merge-row-selected { background: #eef5ff; }
-    td.merged-block-cell.merge-row-hover .row-actions, td.merged-block-cell .row-actions:focus-within { opacity: 1; pointer-events: auto; }
     .frozen-round-column { background: white; }
-    th.frozen-block-column .column-header-content { max-width: calc(100% - 16px); margin-left: 16px; }
+    th.frozen-block-column .column-header-content { width: calc(100% - 16px); max-width: calc(100% - 16px); margin-left: 16px; }
     .last-frozen-column { border-right: 1px solid var(--line); box-shadow: 8px 0 14px rgba(26, 39, 52, .08); }
-    .column-header-content { height: 100%; max-width: 100%; display: inline-flex; align-items: center; gap: 3px; vertical-align: middle; }
-    .column-header-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .column-resizer { position: relative; z-index: 10; width: 10px; height: 16px; flex: 0 0 10px; display: block; border: 0; border-radius: 3px; padding: 0; color: #a6b0bb; background: transparent; cursor: col-resize; touch-action: none; }
-    .column-resizer::before, .column-resizer::after { content: ""; position: absolute; top: 3px; width: 2px; height: 2px; border-radius: 50%; background: currentColor; box-shadow: 0 4px currentColor, 0 8px currentColor; }
-    .column-resizer::before { left: 2px; }
-    .column-resizer::after { left: 6px; }
-    .column-resizer:hover, .column-resizer:focus-visible, .column-resizer.active { color: var(--blue); background: var(--blue-soft); outline: none; }
-    .column-resizer.filtered { color: white; background: var(--blue); }
+    .column-header-content { width: 100%; height: 100%; max-width: 100%; display: inline-flex; align-items: center; gap: 3px; padding-right: 12px; vertical-align: middle; }
+    .column-header-content.has-filter { padding-right: 38px; }
+    .column-header-label { min-width: 0; flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .column-filter-trigger { position: absolute; right: 14px; top: 50%; width: 18px; height: 18px; display: grid; place-items: center; border: 0; border-radius: 3px; padding: 0; color: #8995a2; background: transparent; transform: translateY(-50%); }
+    .column-filter-trigger:hover, .column-filter-trigger:focus-visible, .column-filter-trigger.active { outline: 0; color: var(--blue); background: var(--blue-soft); }
+    .column-filter-trigger.filtered { color: white; background: var(--blue); }
+    .column-filter-trigger svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .column-resizer { position: absolute; z-index: 10; top: 0; right: 0; width: 12px; height: 100%; display: block; border: 0; padding: 0; color: #b8c2cc; background: transparent; cursor: col-resize; touch-action: none; }
+    .column-resizer::after { content: ""; position: absolute; top: 0; right: 0; bottom: 0; width: 2px; border-radius: 1px; background: currentColor; transition: color .12s ease, box-shadow .12s ease; }
+    .column-resizer:hover, .column-resizer:focus-visible, .column-resizer.active { color: var(--blue); outline: none; }
+    .column-resizer:hover::after, .column-resizer:focus-visible::after, .column-resizer.active::after { box-shadow: -1px 0 0 rgba(23,105,224,.14), 1px 0 0 rgba(23,105,224,.14); }
     body.resizing-wbs-column { cursor: col-resize; user-select: none; }
     .calculated-column-title { display: inline-flex; align-items: center; gap: 5px; }
     .calculation-info { width: 18px; height: 18px; flex: 0 0 18px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: currentColor; display: inline-grid; place-items: center; opacity: .72; vertical-align: middle; }
@@ -324,7 +318,7 @@
     .latest-change-panel-toggle.filtered::after { content: ""; position: absolute; top: 3px; right: 3px; width: 5px; height: 5px; border-radius: 50%; background: var(--blue); box-shadow: 0 0 0 1px white; }
     th.change-column.latest-change-collapsed, td.change-column.latest-change-collapsed { padding: 0 !important; }
     th.change-column.latest-change-collapsed .column-header-content { display: flex; justify-content: center; gap: 0; }
-    th.change-column.latest-change-collapsed .column-header-label, th.change-column.latest-change-collapsed .column-resizer, td.change-column.latest-change-collapsed > * { display: none; }
+    th.change-column.latest-change-collapsed .column-header-label, th.change-column.latest-change-collapsed .column-filter-trigger, th.change-column.latest-change-collapsed .column-resizer, td.change-column.latest-change-collapsed > * { display: none; }
     .header-structure-change { height: 24px; flex: 0 0 auto; display: inline-flex; align-items: center; gap: 4px; border: 1px solid #c5d2df; border-radius: 4px; padding: 0 5px; color: #405269; background: white; font-size: 9px; font-weight: 700; }
     .header-structure-change:hover, .header-structure-change:focus-visible, .header-structure-change.open { outline: 0; border-color: #8fb6e9; color: var(--blue); background: var(--blue-soft); }
     .header-structure-change .structure-change-count { min-width: 16px; height: 16px; padding: 0 4px; font-size: 8px; }
@@ -491,6 +485,8 @@
     .inline-draft-row.version-draft .inline-version-cell { position: sticky; }
     .inline-draft-row.version-draft .inline-version-cell::before { top: 14px; left: 12px; }
     .inline-draft-row.version-draft .inline-version-cell select { padding-left: 18px; }
+    .inline-version-draft-control { display: flex; align-items: center; gap: 4px; }
+    .inline-version-draft-control > select { min-width: 92px; }
     .inline-draft-locked-name { min-width: 70px; overflow: hidden; font-weight: 800; text-overflow: ellipsis; }
     .inline-tier-select, .inline-tier-static { width: 90px; flex: 0 0 90px; height: 30px; margin-left: 5px; border: 1px solid #b8c5d3; border-radius: 5px; color: #405165; background: white; font-size: 10px; font-weight: 700; }
     .inline-tier-select { padding: 0 5px; }
@@ -970,6 +966,7 @@
       if(!tableStateStore.has(tableName))tableStateStore.set(tableName,captureTableState());
       restoreTableState(tableStateStore.get(tableName));
       activeTableName=tableName;
+      Object.values(selectedVersionRows).forEach(selection=>selection.clear());
       resetWbsColumnFilters();
       if(!data[currentHierarchy].length)currentHierarchy=['schematic','layout','spf'].find(type=>data[type].length)||'schematic';
       setHierarchy(currentHierarchy);renderDashboard();renderDelay();
@@ -1072,6 +1069,13 @@
       const options=`<option value="" disabled ${normalized?'':'selected'}>请选择</option>${versionOptions.map(option=>`<option value="${option}" ${option===normalized?'selected':''}>${option}</option>`).join('')}`;
       return `<td class="${frozen?'frozen-column frozen-round-column':''}"><div class="editable-cell"><div class="cell-display ${normalized?'':'empty'}">${esc(normalized)}</div><div class="cell-editor choice"><select class="cell-select" data-edit="round" aria-label="Version，单选">${options}</select></div></div></td>`;
     }
+    function versionSwitcherCell(item,type) {
+      const group=data[type].filter(candidate=>blockMergeGroupKey(candidate)===blockMergeGroupKey(item)).sort((left,right)=>versionRank(left,type)-versionRank(right,type));
+      if(group.length<=1)return versionEditorCell(itemVersion(item,type),true);
+      const current=itemVersion(item,type),options=group.map(candidate=>`<option value="${esc(candidate.id)}" ${candidate.id===item.id?'selected':''}>${esc(itemVersion(candidate,type))}</option>`).join('');
+      const title=`当前展示 Version：${current}；选择后整行切换为对应 Version 数据`;
+      return `<td class="frozen-column frozen-round-column"><div class="editable-cell version-switcher" tabindex="0"><div class="cell-display" title="${esc(title)}">${esc(current)}</div><div class="cell-editor choice"><select class="cell-select" data-version-switch aria-label="${esc(item.def.name)} 当前展示 Version：${esc(current)}" title="${esc(title)}">${options}</select></div></div></td>`;
+    }
     function searchableEditorCell(field, value, list, title, extraClass='') {
       return `<td class="${extraClass}"><div class="editable-cell wide"><div class="cell-display ${value ? '' : 'empty'}">${value ? esc(value) : ''}</div><div class="cell-editor choice"><input class="cell-input" data-edit="${field}" list="${list}" value="${esc(value)}" title="${esc(title)}"></div></div></td>`;
     }
@@ -1163,6 +1167,7 @@
     let openCalculationButton = null;
     let inlineAddDraft = null;
     let inlineAddAnchor = null;
+    const selectedVersionRows = {schematic:new Map(),layout:new Map(),spf:new Map()};
     let pendingSameNameCheck = null;
     let pendingVersionDelete = null;
 
@@ -1250,7 +1255,7 @@
       popover.classList.add('open');
       popover.style.left=`${Math.min(window.innerWidth-width-margin,Math.max(margin,rect.left))}px`;
       let top=rect.bottom+6;if(top+popover.offsetHeight>window.innerHeight-margin)top=Math.max(margin,rect.top-popover.offsetHeight-6);popover.style.top=`${top}px`;
-      search.focus();
+      search.focus({preventScroll:true});
     }
     function applyColumnFilter() {
       if(!columnFilterDraft)return;
@@ -1315,6 +1320,7 @@
     function syncWbsColumnLayout(type,definitions,widths) {
       const displayedWidths=displayedWbsColumnWidths(definitions,widths);
       if(inlineAddDraft?.hierarchy===type)displayedWidths[0]=Math.max(displayedWidths[0],330);
+      if(inlineAddDraft?.hierarchy===type&&inlineAddDraft.mode==='version')displayedWidths[1]=Math.max(displayedWidths[1],160);
       [...wbsColgroup.children].forEach((column,index)=>{column.style.width=`${displayedWidths[index]}px`;});
       const totalWidth=displayedWidths.reduce((sum,width)=>sum+width,0);
       wbsTable.style.width=`${totalWidth}px`;
@@ -1357,13 +1363,22 @@
         const filterTitle=key==='latestChange'?'最近修改':headerText;
         const handle=document.createElement('button');
         handle.type='button';
-        handle.className=`column-resizer ${wbsColumnFilters[type][key]?'filtered':''}`;
-        if(filterable){handle.dataset.columnFilter=key;handle.setAttribute('aria-haspopup','dialog');handle.setAttribute('aria-expanded','false');}
-        else{handle.setAttribute('role','separator');handle.setAttribute('aria-orientation','vertical');}
-        handle.setAttribute('aria-label',filterable?`${filterTitle}：拖动调整列宽，点击筛选`:`调整 ${headerText} 列宽`);
+        handle.className='column-resizer';
+        handle.setAttribute('role','separator');handle.setAttribute('aria-orientation','vertical');
+        handle.setAttribute('aria-label',`拖动调整 ${headerText} 列宽`);
         handle.setAttribute('aria-valuemin',String(minimum));
         handle.setAttribute('aria-valuemax','600');
-        handle.title=filterable?'拖动调整列宽；点击筛选':'拖动调整列宽';
+        handle.title='拖动调整列宽';
+        let filterButton=null;
+        if(filterable){
+          content.classList.add('has-filter');
+          filterButton=document.createElement('button');
+          filterButton.type='button';filterButton.className=`column-filter-trigger ${wbsColumnFilters[type][key]?'filtered':''}`;
+          filterButton.dataset.columnFilter=key;filterButton.setAttribute('aria-haspopup','dialog');filterButton.setAttribute('aria-expanded','false');
+          filterButton.setAttribute('aria-label',`筛选 ${filterTitle}`);filterButton.title=`筛选 ${filterTitle}`;
+          filterButton.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16l-6 7v5l-4 2v-7z"></path></svg>';
+          filterButton.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();openColumnFilterPopover(filterButton,type,key,filterTitle);});
+        }
         const updateWidth=nextWidth=>{
           widths[index]=Math.min(600,Math.max(minimum,Math.round(nextWidth)));
           const preferenceTypes=['schematic','layout'].includes(type)&&sharedFrozenColumnKeys.has(key)?['schematic','layout']:[type];
@@ -1373,19 +1388,19 @@
         handle.addEventListener('pointerdown',event=>{
           event.stopPropagation();
           const startX=event.clientX,startWidth=widths[index];let didDrag=false;
-          const move=moveEvent=>{const delta=moveEvent.clientX-startX;if(!didDrag&&Math.abs(delta)<4)return;if(!didDrag){didDrag=true;handle.classList.add('active');document.body.classList.add('resizing-wbs-column');}updateWidth(startWidth+delta);};
-          const stop=()=>{handle.classList.remove('active');document.body.classList.remove('resizing-wbs-column');window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',stop);if(didDrag)saveWbsColumnWidths();else if(filterable)openColumnFilterPopover(handle,type,key,filterTitle);};
+          const move=moveEvent=>{const delta=moveEvent.clientX-startX;if(!didDrag&&Math.abs(delta)<2)return;if(!didDrag){didDrag=true;handle.classList.add('active');document.body.classList.add('resizing-wbs-column');}updateWidth(startWidth+delta);};
+          const stop=()=>{handle.classList.remove('active');document.body.classList.remove('resizing-wbs-column');window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',stop);if(didDrag)saveWbsColumnWidths();};
           window.addEventListener('pointermove',move);window.addEventListener('pointerup',stop,{once:true});
         });
         handle.addEventListener('keydown',event=>{
           if(['ArrowLeft','ArrowRight'].includes(event.key)){event.preventDefault();updateWidth(widths[index]+(event.key==='ArrowRight'?10:-10));saveWbsColumnWidths();return;}
-          if(filterable&&['Enter',' '].includes(event.key)){event.preventDefault();event.stopPropagation();openColumnFilterPopover(handle,type,key,filterTitle);}
         });
         content.append(label);
         if(calculationButton)content.append(calculationButton);
         if(plannedLockButton)content.append(plannedLockButton);
         if(structureChangeButton)content.append(structureChangeButton);
         if(latestChangePanelButton)content.append(latestChangePanelButton);
+        if(filterButton)content.append(filterButton);
         content.append(handle);
         header.appendChild(content);
       });
@@ -1444,20 +1459,15 @@
       if(!inlineAddDraft?.anchorId)return null;
       return data[type].find(item=>item.id===inlineAddDraft.anchorId)||null;
     }
-    function inlineDraftSameLevel() {
-      const anchor=inlineDraftAnchor();
-      return Boolean(anchor&&inlineAddDraft?.mode==='block'&&inlineAddDraft.tier===anchor.tier);
-    }
     function inlineDraftIndex(items) {
       if(!inlineAddDraft||inlineAddDraft.hierarchy!==currentHierarchy)return-1;
       const name=inlineAddDraft.name.trim().toLowerCase();
       const matching=items.filter(item=>(item.parent||null)===(inlineAddDraft.parent||null)&&item.tier===inlineAddDraft.tier&&item.def.name.trim().toLowerCase()===name);
-      if(name&&matching.length)return items.indexOf(matching[matching.length-1])+1;
       const anchor=inlineDraftAnchor();
-      if(inlineAddDraft.mode==='version'||inlineDraftSameLevel()){
-        const group=anchor?items.filter(item=>blockMergeGroupKey(item)===blockMergeGroupKey(anchor)):[];
-        if(group.length)return items.indexOf(group[group.length-1])+1;
-      }
+      const group=anchor?items.filter(item=>blockMergeGroupKey(item)===blockMergeGroupKey(anchor)):[];
+      if(inlineAddDraft.mode==='version'&&group.length)return items.indexOf(group[0]);
+      if(inlineAddDraft.mode==='block'&&group.length)return items.indexOf(group[group.length-1])+1;
+      if(name&&matching.length)return items.indexOf(matching[matching.length-1])+1;
       const firstSameTier=items.findIndex(item=>item.tier===inlineAddDraft.tier);
       if(firstSameTier>=0)return firstSameTier;
       const firstDeeper=items.findIndex(item=>item.tier>inlineAddDraft.tier);
@@ -1483,7 +1493,9 @@
       const draft=inlineAddDraft,versionRequired=draft.mode==='version',available=versionRequired?availableInlineVersions(inlineDraftAnchor()):versionOptions;
       const blockMain=draft.mode==='version'?`<span class="inline-draft-locked-name">${esc(draft.name)}</span><span class="tier">T${draft.tier}</span>`:`<span class="inline-draft-name">${inlineDraftInput('name',draft.name,'id="inlineDraftName" placeholder="输入 Block 名称"')}</span>${inlineTierControl()}`;
       const versionOptionsHtml=`<option value="">选择 Version</option>${available.map(version=>`<option value="${version}" ${draft.version===version?'selected':''}>${version}</option>`).join('')}`;
-      return `<tr class="inline-draft-row ${versionRequired?'version-draft':''}" data-inline-draft><td class="frozen-column frozen-block-column inline-draft-block"><div class="block-cell" style="padding-left:${(draft.tier-1)*17}px"><span class="tree-toggle hidden"></span>${blockMain}${inlineDraftActions()}</div></td><td class="frozen-column frozen-round-column inline-version-cell ${currentHierarchy==='spf'?'last-frozen-column':''}"><select id="inlineDraftVersion" data-inline-field="version">${versionOptionsHtml}</select></td>${inlineDraftBusinessCells()}</tr>`;
+      const blockCell=`<td class="frozen-column frozen-block-column inline-draft-block"><div class="block-cell" style="padding-left:${(draft.tier-1)*17}px"><span class="tree-toggle hidden"></span>${blockMain}${versionRequired?'':inlineDraftActions()}</div></td>`;
+      const versionControl=versionRequired?`<div class="inline-version-draft-control"><select id="inlineDraftVersion" data-inline-field="version">${versionOptionsHtml}</select>${inlineDraftActions()}</div>`:`<select id="inlineDraftVersion" data-inline-field="version">${versionOptionsHtml}</select>`;
+      return `<tr class="inline-draft-row ${versionRequired?'version-draft':''}" data-inline-draft>${blockCell}<td class="frozen-column frozen-round-column inline-version-cell ${currentHierarchy==='spf'?'last-frozen-column':''}">${versionControl}</td>${inlineDraftBusinessCells()}</tr>`;
     }
     function inlineDraftValidation() {
       const draft=inlineAddDraft,errors=[];
@@ -1504,7 +1516,7 @@
       document.querySelectorAll('[data-inline-field]').forEach(control=>{
         control.addEventListener('click',event=>event.stopPropagation());
         control.addEventListener('input',()=>{inlineAddDraft[control.dataset.inlineField]=control.value;});
-        control.addEventListener('change',()=>{inlineAddDraft[control.dataset.inlineField]=control.value;});
+        control.addEventListener('change',()=>{inlineAddDraft[control.dataset.inlineField]=control.value;if(inlineAddDraft.mode==='version'&&control.dataset.inlineField==='version'){inlineAddDraft.focus=true;renderWbs();}});
       });
       document.getElementById('inlineDraftTier')?.addEventListener('change',event=>{applyInlineDraftTier(Number(event.target.value));renderWbs();});
       document.getElementById('confirmInlineDraft')?.addEventListener('click',event=>{event.stopPropagation();confirmInlineDraft();});
@@ -1514,8 +1526,8 @@
     function cancelInlineDraft(notify=true) { inlineAddDraft=null;renderWbs();if(notify)showToast('已取消草稿'); }
     function insertInlineItem(item,type,anchor,mode) {
       const instances=data[type],matching=instances.filter(candidate=>(candidate.parent||null)===(item.parent||null)&&blockMergeKey(candidate)===blockMergeKey(item));
-      if(matching.length){instances.splice(instances.indexOf(matching[matching.length-1])+1,0,item);return;}
-      if(mode==='block'&&anchor&&item.tier===anchor.tier){const group=instances.filter(candidate=>blockMergeGroupKey(candidate)===blockMergeGroupKey(anchor));instances.splice(instances.indexOf(group[group.length-1])+1,0,item);return;}
+      if(matching.length){item.displayAfterId=matching.find(candidate=>candidate.displayAfterId)?.displayAfterId||null;instances.splice(instances.indexOf(matching[matching.length-1])+1,0,item);return;}
+      if(mode==='block'&&anchor){const group=instances.filter(candidate=>blockMergeGroupKey(candidate)===blockMergeGroupKey(anchor));item.displayAfterId=anchor.id;instances.splice(instances.indexOf(group[group.length-1])+1,0,item);return;}
       const firstTarget=instances.findIndex(candidate=>candidate.tier===item.tier);
       instances.splice(firstTarget<0?instances.length:firstTarget,0,item);
     }
@@ -1531,6 +1543,7 @@
         const currentParent=draft.parent?data[currentHierarchy].find(item=>item.id===draft.parent):null,parent=type===currentHierarchy?currentParent:identityCounterpart(currentParent,type);
         const item=row(`${type.slice(0,3)}-${def.id}-${data[type].length+1}`,def,parent?.id||null,draft.tier,Array(checkLabels[type].length).fill(0),'','');
         insertInlineItem(item,type,anchor,draft.mode);
+        if(draft.mode==='version')selectedVersionRows[type].set(blockMergeGroupKey(item),item.id);
         const rail=railState[type][def.id]=blankRail(type);
         if(type===currentHierarchy){rail.planned=draft.planned||'';rail.actual=draft.actual||'';rail.startDate=draft.startDate||'';rail.planWorkdays=draft.planWorkdays||'';rail.resource=draft.resource||'';}
         reopenCompletedParents(item,type);
@@ -1562,22 +1575,22 @@
         ? `<tr><th class="frozen-column frozen-block-column">Block</th><th class="frozen-column frozen-round-column last-frozen-column">Version</th><th>Schematic Owner</th><th>Layout Owner</th><th>Check item</th><th>${calculatedHeader('SPF check status','spfReady')}</th><th>LVS path</th><th>cdl</th><th>gds</th><th>${meta.date}</th><th>${meta.actual}</th>${changeHeader}</tr>`
         : `<tr><th class="frozen-column frozen-block-column">Block</th><th class="frozen-column frozen-round-column">Version</th><th class="frozen-column frozen-category-column">Block Category</th><th class="frozen-column frozen-reference-column last-frozen-column">Reference project</th>${workflowHeaders}${changeHeader}</tr>`;
       const query = document.getElementById('searchInput').value.trim().toLowerCase();
-      const all = hierarchyOrderedItems(currentHierarchy);
+      const all = hierarchyOrderedItems(currentHierarchy),displayItems=selectedHierarchyVersionItems(currentHierarchy,all);
       const visibleByTree = item => {
         let p = item.parent;
         while (p) { const parent = all.find(x => x.id === p); if (!parent || !parent.expanded) return false; p = parent.parent; }
         return true;
       };
-      const items = all.filter(item => {
+      const items = displayItems.filter(item => {
         const hay = `${item.def.name} ${ownerFor(item,currentHierarchy)} ${item.def.reference}`.toLowerCase();
         return visibleByTree(item)
           && (!query || hay.includes(query))
           && matchesWbsColumnFilters(item,currentHierarchy);
       });
       const spfCreateRow=isSpf?`<tr class="spf-create-row" data-spf-create-row tabindex="0" role="button" aria-label="新增 SPF Block" title="点击新增 Block"><td class="frozen-column frozen-block-column"><span class="spf-create-cue"><span class="row-action row-add spf-create-plus" aria-hidden="true">+</span><span class="spf-create-label">新增 Block</span></span></td><td class="frozen-column frozen-round-column last-frozen-column"></td>${Array.from({length:10},()=>'<td></td>').join('')}</tr>`:'';
-      const mergeSpans=blockMergeSpans(items,currentHierarchy);
       const draftActive=inlineAddDraft?.hierarchy===currentHierarchy,draftIndex=draftActive?inlineDraftIndex(items):-1,renderedRows=[];
-      items.forEach((item,index)=>{if(draftActive&&index===draftIndex)renderedRows.push(inlineDraftRowHtml());renderedRows.push(rowHtml(item,mergeSpans.get(item.id)??1));});
+      const versionDraftKey=draftActive&&inlineAddDraft.mode==='version'&&inlineDraftAnchor()?blockMergeGroupKey(inlineDraftAnchor()):null;
+      items.forEach((item,index)=>{if(draftActive&&index===draftIndex)renderedRows.push(inlineDraftRowHtml());if(versionDraftKey===blockMergeGroupKey(item))return;renderedRows.push(rowHtml(item));});
       if(draftActive&&draftIndex>=items.length)renderedRows.push(inlineDraftRowHtml());
       const dataRows=renderedRows.length?renderedRows.join(''):all.length?`<tr><td colspan="16"><div class="empty"><strong>没有匹配的 Block</strong>调整搜索词或筛选条件</div></td></tr>`:'';
       wbsBody.innerHTML = spfCreateRow+dataRows;
@@ -1600,28 +1613,41 @@
 
     function hierarchyOrderedItems(type) {
       const instances=data[type],seen=new Set(),groups=[];
-      instances.forEach((item,index)=>{const key=blockMergeGroupKey(item);if(seen.has(key))return;seen.add(key);groups.push({tier:item.tier,index,items:instances.filter(candidate=>blockMergeGroupKey(candidate)===key).sort((left,right)=>versionRank(left,type)-versionRank(right,type))});});
-      return groups.sort((left,right)=>left.tier-right.tier||left.index-right.index).flatMap(group=>group.items);
+      instances.forEach((item,index)=>{const key=blockMergeGroupKey(item);if(seen.has(key))return;seen.add(key);const items=instances.filter(candidate=>blockMergeGroupKey(candidate)===key).sort((left,right)=>versionRank(left,type)-versionRank(right,type));groups.push({tier:item.tier,index,items,displayAfterId:items.find(candidate=>candidate.displayAfterId)?.displayAfterId||null});});
+      const sorted=groups.sort((left,right)=>left.tier-right.tier||left.index-right.index),groupByItemId=new Map();
+      groups.forEach(group=>group.items.forEach(item=>groupByItemId.set(item.id,group)));
+      const anchored=new Set(groups.filter(group=>group.displayAfterId&&groupByItemId.has(group.displayAfterId)&&groupByItemId.get(group.displayAfterId)!==group)),ordered=[],appended=new Set();
+      const appendGroup=group=>{if(appended.has(group))return;appended.add(group);ordered.push(group);groups.filter(candidate=>anchored.has(candidate)&&group.items.some(item=>item.id===candidate.displayAfterId)).sort((left,right)=>left.index-right.index).forEach(appendGroup);};
+      sorted.filter(group=>!anchored.has(group)).forEach(appendGroup);
+      sorted.forEach(appendGroup);
+      return ordered.flatMap(group=>group.items);
+    }
+
+    function selectedHierarchyVersionItems(type,ordered=hierarchyOrderedItems(type)) {
+      const result=[],seen=new Set(),selection=selectedVersionRows[type];
+      ordered.forEach(item=>{
+        const key=blockMergeGroupKey(item);
+        if(seen.has(key))return;
+        seen.add(key);
+        const group=ordered.filter(candidate=>blockMergeGroupKey(candidate)===key);
+        const selected=group.find(candidate=>candidate.id===selection.get(key))||group[0];
+        selection.set(key,selected.id);result.push(selected);
+      });
+      return result;
+    }
+
+    function selectVisibleVersion(item,type=currentHierarchy) {
+      selectedVersionRows[type].set(blockMergeGroupKey(item),item.id);
+      if(!['schematic','layout'].includes(type))return;
+      const counterpartType=type==='schematic'?'layout':'schematic',counterpart=identityCounterpart(item,counterpartType);
+      if(counterpart)selectedVersionRows[counterpartType].set(blockMergeGroupKey(counterpart),counterpart.id);
     }
 
     function itemVersion(item,type) { return type==='spf'?spfInfoFor(item).round:item.def.round||''; }
     function versionRank(item,type) { const rank=versionOptions.indexOf(itemVersion(item,type));return rank<0?versionOptions.length:rank; }
     function blockMergeKey(item) { return `${item.def.name.trim().toLowerCase()}|${item.tier}`; }
     function blockMergeGroupKey(item) { return `${item.parent||'__root__'}|${blockMergeKey(item)}`; }
-    function blockMergeSpans(items,type) {
-      const spans=new Map();
-      for(let index=0;index<items.length;){
-        const key=blockMergeGroupKey(items[index]);
-        let end=index+1;
-        while(end<items.length&&blockMergeGroupKey(items[end])===key)end++;
-        spans.set(items[index].id,end-index);
-        for(let current=index+1;current<end;current++)spans.set(items[current].id,0);
-        index=end;
-      }
-      return spans;
-    }
-
-    function rowHtml(item,blockSpan=1) {
+    function rowHtml(item) {
       const type = currentHierarchy;
       const rail = railFor(item, type);
       const state = stateFor(item, type);
@@ -1634,7 +1660,7 @@
       const categoryCell = `<div class="editable-cell"><div class="cell-display ${item.def.category ? '' : 'empty'}">${item.def.category ? esc(item.def.category) : ''}</div><div class="cell-editor choice"><select class="cell-select ${item.def.category ? '' : 'empty-value'}" data-edit="category" aria-label="${esc(item.def.name)} Block Category">${optionsHtml(blockCategories,item.def.category)}</select></div></div>`;
       const ownerList = type === 'schematic' ? 'schematicOwners' : 'layoutOwners';
       const spfInfo = type === 'spf' ? spfInfoFor(item) : null;
-      const roundCell = versionEditorCell(type==='spf'?spfInfo.round:item.def.round,true);
+      const roundCell = versionSwitcherCell(item,type);
       const genericIdentityCells = `<td class="frozen-column frozen-category-column">${categoryCell}</td>${searchableEditorCell('reference',item.def.reference,'referenceProjects','输入可模糊搜索产品；选择空后单元格留白','frozen-column frozen-reference-column last-frozen-column')}`;
       const ownerCell = type === 'spf' ? '' : searchableEditorCell('owner',ownerFor(item,type),ownerList,'输入可模糊搜索人名；清空表示空');
       const spfOwnerCells = type === 'spf' ? `${searchableEditorCell('schematicOwner',item.def.schematicOwner,'schematicOwners','输入可模糊搜索 Schematic Owner')}${searchableEditorCell('layoutOwner',item.def.layoutOwner,'layoutOwners','输入可模糊搜索 Layout Owner')}` : '';
@@ -1655,7 +1681,7 @@
         : type === 'layout'
           ? `${counterpartProgressCell}${ownerCell}${layoutPlanWorkdaysCell}${layoutResourceCell}${dateEditorCell('startDate',rail.startDate)}${dateEditorCell('planned',rail.planned,late?'date late':'date')}${dateEditorCell('actual',rail.actual,'date')}${ownProgressCell}${checkItemCell}${layoutQualifiedCell}`
           : `${checkItemCell}${spfReadyCell}`;
-      const blockCell=blockSpan===0?'':`<td rowspan="${blockSpan}" class="frozen-column frozen-block-column ${blockSpan>1?'merged-block-cell':''}" data-block-merge-key="${esc(blockMergeKey(item))}" data-block-merge-group="${esc(blockMergeGroupKey(item))}"><div class="block-cell" style="${blockSpan>1?'':`padding-left:${levelPad}px`}"><button class="tree-toggle ${hasChildren?'':'hidden'}" title="${groupExpanded?'收起':'展开'}下级 Block" aria-label="${groupExpanded?'收起':'展开'} ${esc(item.def.name)} 的下级 Block" aria-expanded="${groupExpanded}">${groupExpanded?'▾':'▸'}</button><div class="block-main"><div class="block-title-line"><span class="block-name-wrap"><span class="block-name">${esc(item.def.name)}</span><span class="row-actions"><button class="row-action row-add" data-add-child type="button" title="新增 Block" aria-label="在 ${esc(item.def.name)} 行新增 Block">+</button><button class="row-action row-delete" data-delete-instance type="button" title="删除 ${esc(item.def.name)} Block" aria-label="删除 ${esc(item.def.name)} Block"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6v14H5V6"></path><path d="M10 11v5M14 11v5"></path></svg></button></span></span><span class="tier">T${item.tier}</span></div></div></div></td>`;
+      const blockCell=`<td class="frozen-column frozen-block-column" data-block-merge-key="${esc(blockMergeKey(item))}" data-block-merge-group="${esc(blockMergeGroupKey(item))}"><div class="block-cell" style="padding-left:${levelPad}px"><button class="tree-toggle ${hasChildren?'':'hidden'}" title="${groupExpanded?'收起':'展开'}下级 Block" aria-label="${groupExpanded?'收起':'展开'} ${esc(item.def.name)} 的下级 Block" aria-expanded="${groupExpanded}">${groupExpanded?'▾':'▸'}</button><div class="block-main"><div class="block-title-line"><span class="block-name-wrap"><span class="block-name">${esc(item.def.name)}</span><span class="row-actions"><button class="row-action row-add" data-add-child type="button" title="新增 Block" aria-label="在 ${esc(item.def.name)} 行新增 Block">+</button><button class="row-action row-delete" data-delete-instance type="button" title="删除 ${esc(item.def.name)} Block" aria-label="删除 ${esc(item.def.name)} Block"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6v14H5V6"></path><path d="M10 11v5M14 11v5"></path></svg></button></span></span><span class="tier">T${item.tier}</span></div></div></div></td>`;
       return `<tr data-id="${item.id}" data-block-merge-key="${esc(blockMergeKey(item))}" data-block-merge-group="${esc(blockMergeGroupKey(item))}" class="${selectedItem?.id === item.id ? 'selected' : ''}">
         ${blockCell}
         ${roundCell}
@@ -1675,6 +1701,14 @@
         tr.querySelector('.block-name')?.addEventListener('click', e => { e.stopPropagation(); openDrawer(item); });
         tr.querySelector('[data-add-child]')?.addEventListener('click', e => { e.stopPropagation(); openInlineAddMenu(item,e.currentTarget); });
         tr.querySelector('[data-delete-instance]')?.addEventListener('click', e => { e.stopPropagation(); requestDeleteInstance(item,currentHierarchy); });
+        tr.querySelector('[data-version-switch]')?.addEventListener('click',event=>event.stopPropagation());
+        tr.querySelector('[data-version-switch]')?.addEventListener('change',event=>{
+          event.stopPropagation();
+          const selected=data[currentHierarchy].find(candidate=>candidate.id===event.currentTarget.value);
+          if(!selected)return;
+          selectVisibleVersion(selected,currentHierarchy);
+          selectedItem=selected;renderWbs();
+        });
         tr.querySelectorAll('[data-check-index]').forEach(button => button.addEventListener('click', e => {
           e.stopPropagation();
           const index = Number(button.dataset.checkIndex);
@@ -1685,8 +1719,6 @@
           control.addEventListener('change', () => updateTableField(item, control.dataset.edit, control.value));
         });
         tr.querySelector('[data-change-history]')?.addEventListener('click', e => { e.stopPropagation(); openRowChangeHistory(item,e.currentTarget); });
-        tr.addEventListener('mouseenter',()=>wbsBody.querySelector(`td.merged-block-cell[data-block-merge-group="${CSS.escape(tr.dataset.blockMergeGroup)}"]`)?.classList.add('merge-row-hover'));
-        tr.addEventListener('mouseleave',()=>wbsBody.querySelector(`td.merged-block-cell[data-block-merge-group="${CSS.escape(tr.dataset.blockMergeGroup)}"]`)?.classList.remove('merge-row-hover'));
         tr.addEventListener('click', () => { selectedItem = item; renderWbs(); });
       });
     }
@@ -2004,6 +2036,7 @@
     }
     function openDrawer(item,options={}) {
       const drawerBody=document.getElementById('drawerBody'),scrollTop=options.preserveScroll?drawerBody.scrollTop:0;
+      selectVisibleVersion(item,currentHierarchy);
       selectedItem = item;
       const versionGroup=drawerVersionGroup(item,currentHierarchy);
       document.getElementById('drawerTitle').textContent = item.def.name;
@@ -2469,7 +2502,7 @@
     document.addEventListener('click',event=>{if(!document.getElementById('calculationPopover').contains(event.target)&&!event.target.closest('[data-calculation-rule]'))closeCalculationPopover();});
     document.addEventListener('click',event=>{if(!document.getElementById('columnFilterPopover').contains(event.target)&&!event.target.closest('[data-column-filter]'))closeColumnFilterPopover();});
     document.addEventListener('click',event=>{if(!document.getElementById('inlineAddMenu').contains(event.target)&&!event.target.closest('[data-add-child]'))closeInlineAddMenu();});
-    tableWrap.addEventListener('scroll',()=>{closeChangePopover();if(document.activeElement!==openCalculationButton)closeCalculationPopover();closeColumnFilterPopover();closeInlineAddMenu();});
+    tableWrap.addEventListener('scroll',()=>{closeChangePopover();if(document.activeElement!==openCalculationButton)closeCalculationPopover();if(!document.getElementById('columnFilterPopover').contains(document.activeElement))closeColumnFilterPopover();closeInlineAddMenu();});
     window.addEventListener('resize',()=>{closeChangePopover();closeCalculationPopover();closeColumnFilterPopover();closeInlineAddMenu();if(isWbsTableFullscreen())refreshWbsColumnLayout();});
     new ResizeObserver(()=>{if(isWbsTableFullscreen())refreshWbsColumnLayout();}).observe(document.documentElement);
     document.getElementById('drawerClose').addEventListener('click',closeDrawer);
