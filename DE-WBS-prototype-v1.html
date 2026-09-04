@@ -62,17 +62,15 @@
     .nav button.active { background: #273b4b; color: white; box-shadow: inset 3px 0 #4c9aff; }
     .nav-icon { width: 20px; text-align: center; font-size: 16px; }
     .nav-badge { margin-left: auto; background: #c33c3c; color: white; border-radius: 9px; min-width: 18px; height: 18px; padding: 0 5px; font-size: 11px; text-align: center; line-height: 18px; }
-    .sidebar-foot { margin-top: auto; border-top: 1px solid #2b3945; padding: 14px; }
-    .user { display: flex; gap: 10px; align-items: center; }
-    .user-copy { min-width: 0; }
+    .sidebar-foot { margin-top: auto; border-top: 1px solid #2b3945; padding: 14px; display: grid; place-items: center; }
     .avatar { width: 30px; height: 30px; border-radius: 50%; background: #dfe9f5; color: #27435c; display: grid; place-items: center; font-weight: 700; }
-    .user small { color: #8193a2; display: block; }
 
     .topbar {
       position: fixed; left: var(--sidebar); right: 0; top: 0; height: var(--topbar); background: var(--surface);
       border-bottom: 1px solid var(--line); display: flex; align-items: center; padding: 0 24px; z-index: 15; transition: left .2s ease;
     }
     .sidebar-toggle { width: 34px; height: 34px; border: 1px solid #344655; border-radius: 6px; background: var(--nav-2); color: #c8d5df; display: grid; place-items: center; flex: 0 0 auto; padding: 0; margin-left: auto; }
+    .sidebar-foot .sidebar-toggle { margin: 0; }
     .sidebar-toggle:hover { color: white; border-color: #4c9aff; background: #2b4050; }
     .sidebar-toggle svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
     .project-picker { display: flex; gap: 10px; align-items: center; }
@@ -81,6 +79,10 @@
     #tableSelect { width: 104px; }
     .table-picker-label { margin-left: 10px; color: var(--text-3); }
     .top-actions { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+    .topbar-user { min-width: 142px; height: 38px; display: flex; align-items: center; gap: 9px; margin-left: 2px; padding-left: 12px; border-left: 1px solid var(--line); }
+    .topbar-user-copy { min-width: 0; line-height: 1.25; }
+    .topbar-user-copy strong { display: block; color: var(--text); font-size: 12px; }
+    .topbar-user-copy small { display: block; margin-top: 2px; color: var(--text-3); font-size: 10px; white-space: nowrap; }
     .icon-btn { width: 34px; height: 34px; border: 1px solid var(--line); background: white; border-radius: 6px; display: grid; place-items: center; color: var(--text-2); }
     .icon-btn:hover { color: var(--blue); border-color: #9cc1f5; background: var(--blue-soft); }
     .icon-btn svg { width: 17px; height: 17px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
@@ -240,10 +242,12 @@
     .io-ip-head .io-ip-base-header { top: 0; z-index: 9; text-align: left !important; background: #f3f7fb !important; }
     .io-ip-head .io-ip-single-header { top: 0; z-index: 6; text-align: left !important; background: #edf3f9 !important; }
     .io-ip-head .io-ip-group-title { display: block; overflow: hidden; text-overflow: ellipsis; font-weight: 700; }
-    .io-ip-reference-column, .io-ip-schematic-owner-column, .io-ip-layout-owner-column { position: sticky; z-index: 2; background: white; }
-    .io-ip-head th.frozen-block-column, th.io-ip-reference-column, th.io-ip-schematic-owner-column, th.io-ip-layout-owner-column { z-index: 9 !important; }
-    tbody tr:hover td.io-ip-reference-column, tbody tr:hover td.io-ip-schematic-owner-column, tbody tr:hover td.io-ip-layout-owner-column { background: #f7faff; }
-    tbody tr.selected td.io-ip-reference-column, tbody tr.selected td.io-ip-schematic-owner-column, tbody tr.selected td.io-ip-layout-owner-column { background: #eef5ff; }
+    .io-ip-source-column, .io-ip-reference-column, .io-ip-schematic-owner-column, .io-ip-layout-owner-column { position: sticky; z-index: 2; background: white; }
+    .io-ip-head th.io-ip-source-column, .io-ip-head th.frozen-block-column, th.io-ip-reference-column, th.io-ip-schematic-owner-column, th.io-ip-layout-owner-column { z-index: 9 !important; }
+    tbody tr:hover td.io-ip-source-column, tbody tr:hover td.io-ip-reference-column, tbody tr:hover td.io-ip-schematic-owner-column, tbody tr:hover td.io-ip-layout-owner-column { background: #f7faff; }
+    tbody tr.selected td.io-ip-source-column, tbody tr.selected td.io-ip-reference-column, tbody tr.selected td.io-ip-schematic-owner-column, tbody tr.selected td.io-ip-layout-owner-column { background: #eef5ff; }
+    td.io-ip-source-column.source-region { vertical-align: middle; text-align: center; color: #405269; background: #f3f7fb; border-right: 1px solid #d6e0ea; border-bottom-color: #cbd7e3; font-weight: 700; }
+    td.io-ip-source-column.source-region span { display: inline-block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
     .io-ip-table .block-name { cursor: pointer; }
     .io-ip-table .block-name:hover { color: var(--blue); text-decoration: underline; }
     .io-ip-table .calculated-column-title { max-width: 100%; }
@@ -284,13 +288,14 @@
     .block-main { position: relative; display: grid; min-width: 0; flex: 1; overflow: hidden; }
     .block-title-line { display: flex; align-items: center; gap: 5px; min-width: 0; overflow: hidden; }
     .block-name-wrap { position: relative; min-width: 0; max-width: calc(100% - 51px); display: inline-flex; align-items: center; }
-    .row-actions { position: absolute; top: 50%; left: calc(100% + 2px); z-index: 3; display: flex; align-items: center; gap: 1px; padding: 1px 2px; opacity: 0; pointer-events: none; transform: translateY(-50%); background: #f7faff; }
+    .row-actions { position: absolute; top: 50%; left: calc(100% + 2px); z-index: 3; display: flex; align-items: center; gap: 1px; padding: 1px 2px; opacity: 0; pointer-events: auto; transform: translateY(-50%); background: #f7faff; }
     tbody tr.selected .row-actions { background: #eef5ff; }
-    tbody tr:hover .row-actions, .row-actions:focus-within { opacity: 1; pointer-events: auto; }
+    tbody tr:hover .row-actions, .row-actions:focus-within { opacity: 1; }
     .row-action { width: 22px; height: 22px; padding: 0; border: 1px solid transparent; border-radius: 4px; background: transparent; color: var(--text-3); display: grid; place-items: center; }
     .row-add { font-size: 17px; line-height: 1; }
     .row-add:hover, .row-add:focus-visible { outline: 0; color: var(--blue); border-color: #9cc1f5; background: var(--blue-soft); }
     .row-delete:hover { color: var(--red); border-color: #efb7b4; background: var(--red-soft); }
+    .row-delete:disabled { color: #b4bdc7; border-color: transparent; background: transparent; cursor: not-allowed; }
     .row-delete svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     .tree-toggle { width: 16px; height: 20px; flex: 0 0 16px; border: 0; background: transparent; color: var(--text-3); padding: 0; font-size: 11px; }
     .tree-toggle.hidden { visibility: hidden; }
@@ -626,15 +631,13 @@
     body.sidebar-collapsed .brand { padding: 0; justify-content: center; }
     body.sidebar-collapsed .brand-copy,
     body.sidebar-collapsed .nav-label,
-    body.sidebar-collapsed .nav-text,
-    body.sidebar-collapsed .user-copy { display: none; }
+    body.sidebar-collapsed .nav-text { display: none; }
     body.sidebar-collapsed .nav { padding: 14px 7px; }
     body.sidebar-collapsed .nav button { position: relative; justify-content: center; padding: 0; gap: 0; }
     body.sidebar-collapsed .nav-icon { width: auto; }
     body.sidebar-collapsed .nav button.active { box-shadow: inset 3px 0 #4c9aff; }
     body.sidebar-collapsed .nav-badge { position: absolute; top: 2px; right: 2px; margin: 0; transform: scale(.82); }
     body.sidebar-collapsed .sidebar-foot { padding: 12px 0; }
-    body.sidebar-collapsed .user { justify-content: center; flex-direction: column; gap: 8px; }
     body.sidebar-collapsed .sidebar-toggle { margin: 0; }
   </style>
 </head>
@@ -652,11 +655,7 @@
         <button data-page="delay" title="Delay 监控"><span class="nav-icon">◷</span><span class="nav-text">Delay 监控</span><span class="nav-badge" id="delayBadge">4</span></button>
       </nav>
       <div class="sidebar-foot">
-        <div class="user">
-          <div class="avatar">PL</div>
-          <div class="user-copy"><strong>Lin Q.</strong><small>Process Leader</small></div>
-          <button class="sidebar-toggle" id="sidebarToggle" title="收起侧边栏" aria-label="收起侧边栏" aria-expanded="true"><span id="sidebarToggleIcon" aria-hidden="true"><svg class="lucide lucide-panel-left-close" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M9 3v18"></path><path d="m16 15-3-3 3-3"></path></svg></span></button>
-        </div>
+        <button class="sidebar-toggle" id="sidebarToggle" title="收起侧边栏" aria-label="收起侧边栏" aria-expanded="true"><span id="sidebarToggleIcon" aria-hidden="true"><svg class="lucide lucide-panel-left-close" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M9 3v18"></path><path d="m16 15-3-3 3-3"></path></svg></span></button>
       </div>
     </aside>
 
@@ -673,6 +672,10 @@
           <span class="notification-dot" id="notificationDot" aria-hidden="true"></span>
         </button>
         <button class="icon-btn" id="helpBtn" title="帮助">?</button>
+        <div class="topbar-user" aria-label="当前用户 Lin Q.，Process Leader">
+          <div class="avatar" aria-hidden="true">PL</div>
+          <div class="topbar-user-copy"><strong>Lin Q.</strong><small>Process Leader</small></div>
+        </div>
       </div>
     </header>
 
@@ -818,6 +821,22 @@
     </div>
   </div>
 
+  <div class="modal-backdrop" id="specialIpDeleteModal" role="alertdialog" aria-modal="true" aria-labelledby="specialIpDeleteTitle" aria-describedby="specialIpDeleteIntro">
+    <div class="modal">
+      <div class="modal-head"><h3 id="specialIpDeleteTitle">删除 Block</h3><button class="drawer-close" data-close-special-ip-delete aria-label="关闭">×</button></div>
+      <div class="modal-body"><p class="validation-intro" id="specialIpDeleteIntro"></p></div>
+      <div class="modal-foot"><button class="btn" data-close-special-ip-delete>取消</button><button class="btn primary" id="confirmSpecialIpDelete">确认删除</button></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="specialIpE3Modal" role="alertdialog" aria-modal="true" aria-labelledby="specialIpE3Title" aria-describedby="specialIpE3Intro">
+    <div class="modal">
+      <div class="modal-head"><h3 id="specialIpE3Title">新增同名 Block</h3><button class="drawer-close" data-close-special-ip-e3 aria-label="关闭">×</button></div>
+      <div class="modal-body"><p class="validation-intro" id="specialIpE3Intro">是否确认新增同名Block，新增后不允许删除</p></div>
+      <div class="modal-foot"><button class="btn" data-close-special-ip-e3>取消</button><button class="btn primary" id="confirmSpecialIpE3">确认</button></div>
+    </div>
+  </div>
+
   <datalist id="referenceProjects"><option value="空"></option><option value="DPJQC"></option><option value="DPKRC"></option><option value="DPLSA"></option><option value="DPMXB"></option><option value="DPNQC"></option><option value="DPQTA"></option></datalist>
   <datalist id="schematicOwners"><option value="" label="空"></option><option value="Ming Zhao"></option><option value="Han Li"></option><option value="Qin Yang"></option><option value="Ivy Xu"></option><option value="Kai Ding"></option><option value="Rui Jiang"></option></datalist>
   <datalist id="layoutOwners"><option value="" label="空"></option><option value="Tao He"></option><option value="Nina Gao"></option><option value="Eric Lin"></option><option value="Sora Pan"></option><option value="Wei Chen"></option></datalist>
@@ -851,7 +870,7 @@
       spf: { owner: 'SPF Owner', date: 'Planned SPF release', actual: 'Actual SPF release' }
     };
     const versionOptions = ['1st', '2nd', '3rd', '4th', '5th'];
-    const blockCategories = ['', 'DFT', 'Analog', 'Fuse', 'Data path', 'DqByte', 'Banklogic', 'Xdec+Ydec', 'Row+Refresh+RHR', 'IO', 'Controller', 'DLDO'];
+    const blockCategories = ['', 'DFT', 'Analog IP', 'Fuse', 'Data path', 'DqByte', 'Banklogic', 'Xdec+Ydec', 'Row+Refresh+RHR', 'IO IP', 'Controller', 'DLDO'];
     const changeActors = {
       lin: { name:'Lin Q.', role:'Process Leader', initials:'LQ' },
       qin: { name:'Qin Yang', role:'Schematic Owner', initials:'QY' },
@@ -865,13 +884,13 @@
       top: { id:'top', name:'CE_TOP', round:'3rd', category:'Controller', reference:'DPJQC', blockOwner:'Yan Sun', schematicOwner:'Ming Zhao', layoutOwner:'Tao He' },
       core: { id:'core', name:'CORE_ARRAY', round:'2nd', category:'Banklogic', reference:'DPKRC', blockOwner:'Lei Wang', schematicOwner:'Han Li', layoutOwner:'Nina Gao' },
       row: { id:'row', name:'ROW_CTRL', round:'1st', category:'Row+Refresh+RHR', reference:'DPLSA', blockOwner:'Lei Wang', schematicOwner:'Qin Yang', layoutOwner:'Eric Lin' },
-      senseV1: { id:'sense-v1', name:'SENSE_AMP', round:'1st', category:'Analog', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Ming Zhao', layoutOwner:'Nina Gao' },
-      sense: { id:'sense', name:'SENSE_AMP', round:'2nd', category:'Analog', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Ming Zhao', layoutOwner:'Nina Gao' },
-      senseT4: { id:'sense-t4', name:'SENSE_AMP', round:'3rd', category:'Analog', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Qin Yang', layoutOwner:'Eric Lin' },
-      senseSpfV2: { id:'sense-spf-v2', name:'SENSE_AMP', round:'2nd', category:'Analog', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Han Li', layoutOwner:'Tao He' },
-      senseSpfT4: { id:'sense-spf-t4', name:'SENSE_AMP', round:'3rd', category:'Analog', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Qin Yang', layoutOwner:'Eric Lin' },
+      senseV1: { id:'sense-v1', name:'SENSE_AMP', round:'1st', category:'Analog IP', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Ming Zhao', layoutOwner:'Nina Gao' },
+      sense: { id:'sense', name:'SENSE_AMP', round:'2nd', category:'Analog IP', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Ming Zhao', layoutOwner:'Nina Gao' },
+      senseT4: { id:'sense-t4', name:'SENSE_AMP', round:'3rd', category:'Analog IP', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Qin Yang', layoutOwner:'Eric Lin' },
+      senseSpfV2: { id:'sense-spf-v2', name:'SENSE_AMP', round:'2nd', category:'Analog IP', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Han Li', layoutOwner:'Tao He' },
+      senseSpfT4: { id:'sense-spf-t4', name:'SENSE_AMP', round:'3rd', category:'Analog IP', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Qin Yang', layoutOwner:'Eric Lin' },
       bitcell: { id:'bitcell', name:'BITCELL', round:'3rd', category:'Data path', reference:'DPNQC', blockOwner:'Ming Zhao', schematicOwner:'Han Li', layoutOwner:'Tao He' },
-      io: { id:'io', name:'IO_RING', round:'1st', category:'IO', reference:'', blockOwner:'Yan Sun', schematicOwner:'Ivy Xu', layoutOwner:'Eric Lin' },
+      io: { id:'io', name:'IO_RING', round:'1st', category:'IO IP', reference:'', blockOwner:'Yan Sun', schematicOwner:'Ivy Xu', layoutOwner:'Eric Lin' },
       dft: { id:'dft', name:'MBIST_CTRL', round:'4th', category:'DFT', reference:'DPQTA', blockOwner:'Kai Ding', schematicOwner:'Kai Ding', layoutOwner:'Sora Pan' },
       pwr: { id:'pwr', name:'DLDO_MAIN', round:'5th', category:'DLDO', reference:'DPMXB', blockOwner:'Rui Jiang', schematicOwner:'Rui Jiang', layoutOwner:'Tao He' }
     };
@@ -942,7 +961,7 @@
     const changeHistory = {
       schematic: {
         top: [changeEvent('qin','Planned release','2026-08-15','2026-08-18','2026-08-26 10:32')],
-        core: [changeEvent('han','Block Category','Analog','Banklogic','2026-08-26 09:58')],
+        core: [changeEvent('han','Block Category','Analog IP','Banklogic','2026-08-26 09:58')],
         row: [changeEvent('qin','Schematic Owner','Ming Zhao','Qin Yang','2026-08-26 09:14')]
       },
       layout: {
@@ -964,7 +983,7 @@
     const ioProcessStatusOptions = ['', 'Ongoing', 'Done', 'Ongoing（delay）'];
     const ioYesNoOptions = ['', 'Yes', 'No'];
     const ioIpColumnDefinitions = [
-      ['block',165],['referenceProject',115],['schematicOwner',120],['layoutOwner',120],
+      ['sourceTableName',105],['block',165],['referenceProject',115],['schematicOwner',120],['layoutOwner',120],
       ['hookupDeadline',108],['hookupStatus',125],['specReviewDeadline',108],['specReviewStatus',125],
       ['preSimDeadline',108],['preSimStatus',125],['preSimReviewAi',125],['preSimReviewAiStatus',125],
       ['schReleasePlanFinish',108],['schReleaseActualFinish',108],['schReleaseStatus',125],
@@ -972,15 +991,9 @@
       ['layoutFinishPlanned',108],['layoutFinishActual',108],['layoutFinishStatus',125],['layoutModifyEmail',165],
       ['qualityOwner',120],['qualityDeadline',108],['qualityStatus',125],['postSimDeadline',108],['postSimStatus',125],['latestChange',44]
     ];
-    const ioIpRows = [
-      {id:'ioip-dq',block:'DQ_IO_SLICE',referenceProject:'DPJQC',schematicOwner:'Ivy Xu',layoutOwner:'Eric Lin',hookupDeadline:'2026-08-14',hookupStatus:'Done',specReviewDeadline:'2026-08-18',specReviewStatus:'Done',preSimDeadline:'2026-08-21',preSimStatus:'Done',preSimReviewAi:'AI report v2',preSimReviewAiStatus:'Done',schReleasePlanFinish:'2026-08-22',schReleaseActualFinish:'2026-08-24',coWorkRlsSchematicEmail:'Yes',coWorkFloorplanDoneEmail:'Yes',coWorkFloorplanConfirmEmail:'Yes',coWorkLayoutStatus:'Ongoing',coWorkRoutingCheck:'Checked',coWorkRoutingDoneEmail:'',layoutFinishPlanned:'2026-09-03',layoutFinishActual:'',layoutModifyEmail:'',qualityOwner:'Eric Lin',qualityDeadline:'2026-09-04',qualityStatus:'Ongoing',postSimDeadline:'2026-09-12',postSimStatus:''},
-      {id:'ioip-ca',block:'CA_IO',referenceProject:'DPKRC',schematicOwner:'Qin Yang',layoutOwner:'Nina Gao',hookupDeadline:'2026-08-16',hookupStatus:'Done',specReviewDeadline:'2026-08-20',specReviewStatus:'Done',preSimDeadline:'2026-08-24',preSimStatus:'Done',preSimReviewAi:'Reviewed',preSimReviewAiStatus:'Done',schReleasePlanFinish:'2026-08-26',schReleaseActualFinish:'2026-08-25',coWorkRlsSchematicEmail:'Yes',coWorkFloorplanDoneEmail:'Yes',coWorkFloorplanConfirmEmail:'Yes',coWorkLayoutStatus:'Done',coWorkRoutingCheck:'Checked',coWorkRoutingDoneEmail:'Yes',layoutFinishPlanned:'2026-09-02',layoutFinishActual:'2026-09-01',layoutModifyEmail:'No',qualityOwner:'Nina Gao',qualityDeadline:'2026-09-03',qualityStatus:'Done',postSimDeadline:'2026-09-10',postSimStatus:'Ongoing'},
-      {id:'ioip-ck',block:'CK_IO',referenceProject:'DPMXB',schematicOwner:'Ming Zhao',layoutOwner:'Tao He',hookupDeadline:'2026-08-22',hookupStatus:'Ongoing（delay）',specReviewDeadline:'2026-08-25',specReviewStatus:'Ongoing',preSimDeadline:'2026-08-29',preSimStatus:'Ongoing',preSimReviewAi:'',preSimReviewAiStatus:'',schReleasePlanFinish:'2026-08-28',schReleaseActualFinish:'',coWorkRlsSchematicEmail:'Yes',coWorkFloorplanDoneEmail:'No',coWorkFloorplanConfirmEmail:'',coWorkLayoutStatus:'Ongoing（delay）',coWorkRoutingCheck:'Need review',coWorkRoutingDoneEmail:'No',layoutFinishPlanned:'2026-09-08',layoutFinishActual:'',layoutModifyEmail:'',qualityOwner:'Tao He',qualityDeadline:'2026-09-09',qualityStatus:'',postSimDeadline:'2026-09-16',postSimStatus:''},
-      {id:'ioip-vref',block:'VREF_IO',referenceProject:'DPLSA',schematicOwner:'Han Li',layoutOwner:'Wei Chen',hookupDeadline:'2026-08-28',hookupStatus:'Ongoing',specReviewDeadline:'2026-09-01',specReviewStatus:'Ongoing',preSimDeadline:'2026-09-05',preSimStatus:'',preSimReviewAi:'',preSimReviewAiStatus:'',schReleasePlanFinish:'2026-09-06',schReleaseActualFinish:'',coWorkRlsSchematicEmail:'',coWorkFloorplanDoneEmail:'',coWorkFloorplanConfirmEmail:'',coWorkLayoutStatus:'',coWorkRoutingCheck:'',coWorkRoutingDoneEmail:'',layoutFinishPlanned:'2026-09-18',layoutFinishActual:'',layoutModifyEmail:'',qualityOwner:'Wei Chen',qualityDeadline:'2026-09-19',qualityStatus:'',postSimDeadline:'2026-09-25',postSimStatus:''},
-      {id:'ioip-zq',block:'ZQ_CAL',referenceProject:'DPQTA',schematicOwner:'Rui Jiang',layoutOwner:'Sora Pan',hookupDeadline:'2026-09-03',hookupStatus:'',specReviewDeadline:'2026-09-06',specReviewStatus:'',preSimDeadline:'2026-09-10',preSimStatus:'',preSimReviewAi:'',preSimReviewAiStatus:'',schReleasePlanFinish:'2026-09-12',schReleaseActualFinish:'',coWorkRlsSchematicEmail:'',coWorkFloorplanDoneEmail:'',coWorkFloorplanConfirmEmail:'',coWorkLayoutStatus:'',coWorkRoutingCheck:'',coWorkRoutingDoneEmail:'',layoutFinishPlanned:'2026-09-24',layoutFinishActual:'',layoutModifyEmail:'',qualityOwner:'Sora Pan',qualityDeadline:'2026-09-25',qualityStatus:'',postSimDeadline:'2026-10-02',postSimStatus:''}
-    ];
+    const ioIpRows = [];
     const analogIpColumnDefinitions = [
-      ['block',165],['referenceProject',115],['schematicOwner',120],['layoutOwner',120],
+      ['sourceTableName',105],['block',165],['referenceProject',115],['schematicOwner',120],['layoutOwner',120],
       ['releasePlanned',108],['releaseActual',108],['releaseStatus',125],
       ['coWorkRlsSchematicEmail',190],['coWorkFloorplanDoneEmail',175],['coWorkFloorplanConfirmEmail',190],['coWorkRoutingDoneEmail',175],
       ['layoutFinishPlanned',108],['layoutFinishActual',108],['layoutFinishStatus',125],['layoutModifyEmail',165],
@@ -988,29 +1001,19 @@
       ['spfSimPlanned',108],['spfSimActual',108],['spfSimStatus',125],['comment',190],
       ['finalReviewPlanned',108],['finalReviewActual',108],['finalReviewStatus',125],['latestChange',44]
     ];
-    const analogIpRows = [
-      {id:'analog-sense',block:'SENSE_AMP',referenceProject:'DPMXB',schematicOwner:'Ming Zhao',layoutOwner:'Nina Gao',releasePlanned:'2026-08-12',releaseActual:'2026-08-13',releaseStatus:'',coWorkRlsSchematicEmail:'Yes',coWorkFloorplanDoneEmail:'Yes',coWorkFloorplanConfirmEmail:'Yes',coWorkRoutingDoneEmail:'Yes',layoutFinishPlanned:'2026-08-28',layoutFinishActual:'2026-08-30',layoutModifyEmail:'No',qualityOwner:'Nina Gao',qualityDeadline:'2026-09-01',qualityStatus:'Done',dcEmDeadline:'2026-09-03',dcEmStatus:'Done',pdcShareStatus:'Done',spfSimPlanned:'2026-09-06',spfSimActual:'2026-09-07',comment:'Matching review passed',finalReviewPlanned:'2026-09-10',finalReviewActual:'2026-09-10'},
-      {id:'analog-vref',block:'VREF_CORE',referenceProject:'DPJQC',schematicOwner:'Han Li',layoutOwner:'Tao He',releasePlanned:'2026-08-18',releaseActual:'2026-08-17',releaseStatus:'',coWorkRlsSchematicEmail:'Yes',coWorkFloorplanDoneEmail:'Yes',coWorkFloorplanConfirmEmail:'Yes',coWorkRoutingDoneEmail:'',layoutFinishPlanned:'2026-09-03',layoutFinishActual:'2026-09-02',layoutModifyEmail:'',qualityOwner:'Tao He',qualityDeadline:'2026-09-04',qualityStatus:'Ongoing',dcEmDeadline:'2026-09-06',dcEmStatus:'Ongoing',pdcShareStatus:'Ongoing',spfSimPlanned:'2026-09-10',spfSimActual:'',comment:'Waiting for SPF-sim',finalReviewPlanned:'2026-09-14',finalReviewActual:''},
-      {id:'analog-dldo',block:'DLDO_MAIN',referenceProject:'DPLSA',schematicOwner:'Rui Jiang',layoutOwner:'Eric Lin',releasePlanned:'2026-08-22',releaseActual:'',releaseStatus:'',coWorkRlsSchematicEmail:'Yes',coWorkFloorplanDoneEmail:'No',coWorkFloorplanConfirmEmail:'',coWorkRoutingDoneEmail:'No',layoutFinishPlanned:'2026-09-08',layoutFinishActual:'',layoutModifyEmail:'Yes',qualityOwner:'Eric Lin',qualityDeadline:'2026-09-09',qualityStatus:'Ongoing（delay）',dcEmDeadline:'2026-09-11',dcEmStatus:'Ongoing（delay）',pdcShareStatus:'Ongoing',spfSimPlanned:'2026-09-15',spfSimActual:'',comment:'Floorplan update required',finalReviewPlanned:'2026-09-20',finalReviewActual:''},
-      {id:'analog-bias',block:'BIAS_GEN',referenceProject:'DPKRC',schematicOwner:'Qin Yang',layoutOwner:'Wei Chen',releasePlanned:'2026-08-30',releaseActual:'',releaseStatus:'',coWorkRlsSchematicEmail:'',coWorkFloorplanDoneEmail:'',coWorkFloorplanConfirmEmail:'',coWorkRoutingDoneEmail:'',layoutFinishPlanned:'2026-09-16',layoutFinishActual:'',layoutModifyEmail:'',qualityOwner:'Wei Chen',qualityDeadline:'2026-09-17',qualityStatus:'',dcEmDeadline:'2026-09-19',dcEmStatus:'',pdcShareStatus:'',spfSimPlanned:'2026-09-23',spfSimActual:'',comment:'',finalReviewPlanned:'2026-09-28',finalReviewActual:''},
-      {id:'analog-temp',block:'TEMP_SENSOR',referenceProject:'DPQTA',schematicOwner:'Ivy Xu',layoutOwner:'Sora Pan',releasePlanned:'2026-09-04',releaseActual:'',releaseStatus:'',coWorkRlsSchematicEmail:'',coWorkFloorplanDoneEmail:'',coWorkFloorplanConfirmEmail:'',coWorkRoutingDoneEmail:'',layoutFinishPlanned:'2026-09-22',layoutFinishActual:'',layoutModifyEmail:'',qualityOwner:'Sora Pan',qualityDeadline:'2026-09-23',qualityStatus:'',dcEmDeadline:'2026-09-25',dcEmStatus:'',pdcShareStatus:'',spfSimPlanned:'2026-09-29',spfSimActual:'',comment:'',finalReviewPlanned:'2026-10-05',finalReviewActual:''}
-    ];
-    [ioIpRows,analogIpRows].forEach(rows=>rows.forEach(item=>Object.assign(item,{tier:item.tier||1,parent:item.parent||null,expanded:item.expanded!==false})));
-    const specialIpChangeHistory = {
-      io: {
-        'ioip-dq': [changeEvent('qin','Hookup Status','Ongoing','Done','2026-09-03 10:18')],
-        'ioip-ca': [changeEvent('nina','Layout quality Status','Ongoing','Done','2026-09-03 09:46')]
-      },
-      analog: {
-        'analog-sense': [changeEvent('nina','Layout quality Status','Ongoing','Done','2026-09-03 10:06')],
-        'analog-vref': [changeEvent('han','Comment','空','Waiting for SPF-sim','2026-09-03 09:24')]
-      }
-    };
+    const analogIpRows = [];
+    [ioIpRows,analogIpRows].forEach(rows=>rows.forEach(item=>Object.assign(item,{sourceTableName:item.sourceTableName||'',sourceRegionName:item.sourceRegionName||'',tier:item.tier||1,parent:item.parent||null,expanded:item.expanded!==false})));
+    const specialIpStablePositions = {io:new Map(),analog:new Map()};
+    const specialIpStableSources = {io:new Map(),analog:new Map()};
+    const specialIpPreviousCategories = new Map();
+    const specialIpChangeHistory = {io:{},analog:{}};
     const specialIpStructureChanges = {io:[],analog:[]};
     let selectedIoIpRowId = null;
     let selectedAnalogIpRowId = null;
     let selectedSpecialIpItem = null;
     let specialIpAddDraft = null;
+    let pendingSpecialIpDelete = null;
+    let pendingSpecialIpE3 = null;
     const backupState = {};
     const tableStateStore = new Map();
     let activeTableName = 'ChanEdgel';
@@ -1036,39 +1039,90 @@
     function isIoIpTable(tableName=activeTableName) { return tableName===IO_IP_TABLE_NAME; }
     function isAnalogIpTable(tableName=activeTableName) { return tableName===ANALOG_IP_TABLE_NAME; }
     function isSpecialIpTable(tableName=activeTableName) { return isIoIpTable(tableName)||isAnalogIpTable(tableName); }
-    function derivedSpecialIpRowId(type,item) { return `${type}-derived-${item.def.id}`; }
-    function createDerivedIoIpRow(item) {
-      return {id:derivedSpecialIpRowId('io',item),sourceDefinitionId:item.def.id,block:item.def.name,tier:1,parent:null,expanded:true,referenceProject:item.def.reference||'',schematicOwner:item.def.schematicOwner||'',layoutOwner:item.def.layoutOwner||'',hookupDeadline:'',hookupStatus:'',specReviewDeadline:'',specReviewStatus:'',preSimDeadline:'',preSimStatus:'',preSimReviewAi:'',preSimReviewAiStatus:'',schReleasePlanFinish:'',schReleaseActualFinish:'',coWorkRlsSchematicEmail:'',coWorkFloorplanDoneEmail:'',coWorkFloorplanConfirmEmail:'',coWorkLayoutStatus:'',coWorkRoutingCheck:'',coWorkRoutingDoneEmail:'',layoutFinishPlanned:'',layoutFinishActual:'',layoutModifyEmail:'',qualityOwner:'',qualityDeadline:'',qualityStatus:'',postSimDeadline:'',postSimStatus:''};
+    function specialIpSourceIdentity(sourceTableName,sourceDefinitionId) { return `${sourceTableName}\u0000${sourceDefinitionId}`; }
+    function derivedSpecialIpRowId(type,item,sourceTableName) { return `${type}-derived-${encodeURIComponent(sourceTableName)}-${item.def.id}`; }
+    function sourceMatchesSpecialIpRow(row,item,sourceTableName=activeTableName) { return row.sourceTableName===sourceTableName&&row.sourceDefinitionId===item.def.id; }
+    function effectiveSpecialIpSource(item,rows) {
+      if(item.sourceTableName)return item.sourceTableName;
+      if(item.sourceRegionName)return item.sourceRegionName;
+      const byId=new Map(rows.map(row=>[row.id,row]));
+      let parentId=item.parent;
+      while(parentId){
+        const parent=byId.get(parentId);
+        if(!parent)return '';
+        if(parent.sourceTableName)return parent.sourceTableName;
+        parentId=parent.parent;
+      }
+      return '';
     }
-    function createDerivedAnalogIpRow(item) {
-      return {id:derivedSpecialIpRowId('analog',item),sourceDefinitionId:item.def.id,block:item.def.name,tier:1,parent:null,expanded:true,referenceProject:item.def.reference||'',schematicOwner:item.def.schematicOwner||'',layoutOwner:item.def.layoutOwner||'',releasePlanned:'',releaseActual:'',releaseStatus:'',coWorkRlsSchematicEmail:'',coWorkFloorplanDoneEmail:'',coWorkFloorplanConfirmEmail:'',coWorkRoutingDoneEmail:'',layoutFinishPlanned:'',layoutFinishActual:'',layoutModifyEmail:'',qualityOwner:'',qualityDeadline:'',qualityStatus:'',dcEmDeadline:'',dcEmStatus:'',pdcShareStatus:'',spfSimPlanned:'',spfSimActual:'',comment:'',finalReviewPlanned:'',finalReviewActual:''};
+    function specialIpStablePositionBeforeActive(type,rows,index) {
+      const stablePositions=specialIpStablePositions[type],positions=[...stablePositions.values()],next=stablePositions.get(rows[index]?.id);
+      if(Number.isFinite(next)){
+        const previous=Math.max(-1,...positions.filter(position=>position<next));
+        return (previous+next)/2;
+      }
+      return Math.max(-1,...positions)+1;
     }
-    function removeDerivedSpecialIpRow(type,item) {
-      const rows=type==='io'?ioIpRows:analogIpRows,index=rows.findIndex(row=>row.sourceDefinitionId===item.def.id);
+    function specialIpStablePositionAfter(type,anchorId) {
+      const positions=specialIpStablePositions[type],anchorPosition=positions.get(anchorId);
+      if(!Number.isFinite(anchorPosition))return Math.max(-1,...positions.values())+1;
+      const nextPosition=Math.min(Infinity,...[...positions.values()].filter(position=>position>anchorPosition));
+      return Number.isFinite(nextPosition)?(anchorPosition+nextPosition)/2:anchorPosition+1;
+    }
+    function newDerivedSpecialIpStablePosition(type,sourceTableName) {
+      const positions=specialIpStablePositions[type],sources=specialIpStableSources[type];
+      const sourcePositions=[...positions].filter(([id])=>sources.get(id)===sourceTableName).map(([,position])=>position);
+      if(!sourcePositions.length)return Math.max(-1,...positions.values())+1;
+      const previous=Math.max(...sourcePositions),next=Math.min(Infinity,...[...positions.values()].filter(position=>position>previous));
+      return Number.isFinite(next)?(previous+next)/2:previous+1;
+    }
+    function insertDerivedSpecialIpRow(type,rows,created) {
+      const stablePositions=specialIpStablePositions[type],storedPosition=stablePositions.get(created.id);
+      if(Number.isFinite(storedPosition)){
+        const restoreIndex=rows.findIndex(row=>stablePositions.get(row.id)>storedPosition);
+        rows.splice(restoreIndex<0?rows.length:restoreIndex,0,created);
+        return;
+      }
+      const stablePosition=newDerivedSpecialIpStablePosition(type,created.sourceTableName);
+      stablePositions.set(created.id,stablePosition);
+      specialIpStableSources[type].set(created.id,created.sourceTableName);
+      const insertIndex=rows.findIndex(row=>stablePositions.get(row.id)>stablePosition);
+      rows.splice(insertIndex<0?rows.length:insertIndex,0,created);
+    }
+    function createDerivedIoIpRow(item,sourceTableName='') {
+      return {id:derivedSpecialIpRowId('io',item,sourceTableName),sourceTableName,sourceDefinitionId:item.def.id,block:item.def.name,tier:1,parent:null,expanded:true,referenceProject:item.def.reference||'',schematicOwner:item.def.schematicOwner||'',layoutOwner:item.def.layoutOwner||'',hookupDeadline:'',hookupStatus:'',specReviewDeadline:'',specReviewStatus:'',preSimDeadline:'',preSimStatus:'',preSimReviewAi:'',preSimReviewAiStatus:'',schReleasePlanFinish:'',schReleaseActualFinish:'',coWorkRlsSchematicEmail:'',coWorkFloorplanDoneEmail:'',coWorkFloorplanConfirmEmail:'',coWorkLayoutStatus:'',coWorkRoutingCheck:'',coWorkRoutingDoneEmail:'',layoutFinishPlanned:'',layoutFinishActual:'',layoutModifyEmail:'',qualityOwner:'',qualityDeadline:'',qualityStatus:'',postSimDeadline:'',postSimStatus:''};
+    }
+    function createDerivedAnalogIpRow(item,sourceTableName='') {
+      return {id:derivedSpecialIpRowId('analog',item,sourceTableName),sourceTableName,sourceDefinitionId:item.def.id,block:item.def.name,tier:1,parent:null,expanded:true,referenceProject:item.def.reference||'',schematicOwner:item.def.schematicOwner||'',layoutOwner:item.def.layoutOwner||'',releasePlanned:'',releaseActual:'',releaseStatus:'',coWorkRlsSchematicEmail:'',coWorkFloorplanDoneEmail:'',coWorkFloorplanConfirmEmail:'',coWorkRoutingDoneEmail:'',layoutFinishPlanned:'',layoutFinishActual:'',layoutModifyEmail:'',qualityOwner:'',qualityDeadline:'',qualityStatus:'',dcEmDeadline:'',dcEmStatus:'',pdcShareStatus:'',spfSimPlanned:'',spfSimActual:'',comment:'',finalReviewPlanned:'',finalReviewActual:''};
+    }
+    function removeDerivedSpecialIpRow(type,item,sourceTableName=activeTableName) {
+      const rows=type==='io'?ioIpRows:analogIpRows,index=rows.findIndex(row=>sourceMatchesSpecialIpRow(row,item,sourceTableName));
       if(index<0)return false;
       const [removed]=rows.splice(index,1);
       delete specialIpChangeHistory[type][removed.id];
       if(selectedSpecialIpItem?.id===removed.id)closeDrawer();
       return true;
     }
-    function syncChanEdgelCategoryToSpecialIp(item,oldCategory,newCategory) {
-      if(activeTableName!=='ChanEdgel'||oldCategory===newCategory)return null;
-      const transitions=[['io','IO',ioIpRows,createDerivedIoIpRow],['analog','Analog',analogIpRows,createDerivedAnalogIpRow]];
+    function syncWbsCategoryToSpecialIp(item,oldCategory,newCategory) {
+      if(isSpecialIpTable()||oldCategory===newCategory)return null;
+      const sourceTableName=activeTableName,sourceIdentity=specialIpSourceIdentity(sourceTableName,item.def.id);
+      if(![IO_IP_TABLE_NAME,ANALOG_IP_TABLE_NAME].includes(oldCategory)&&[IO_IP_TABLE_NAME,ANALOG_IP_TABLE_NAME].includes(newCategory))specialIpPreviousCategories.set(sourceIdentity,oldCategory);
+      const transitions=[['io','IO IP',ioIpRows,createDerivedIoIpRow],['analog','Analog IP',analogIpRows,createDerivedAnalogIpRow]];
       const changes=[];
       transitions.forEach(([type,category,rows,factory])=>{
-        if(oldCategory===category&&newCategory!==category&&removeDerivedSpecialIpRow(type,item))changes.push(`已从 ${category} IP 删除`);
-        if(oldCategory!==category&&newCategory===category&&!rows.some(row=>row.sourceDefinitionId===item.def.id)){
-          rows.push(factory(item));
-          changes.push(`已新增至 ${category} IP`);
+        if(oldCategory===category&&newCategory!==category&&removeDerivedSpecialIpRow(type,item,sourceTableName))changes.push(`已从 ${category} 删除`);
+        if(oldCategory!==category&&newCategory===category&&!rows.some(row=>sourceMatchesSpecialIpRow(row,item,sourceTableName))){
+          insertDerivedSpecialIpRow(type,rows,factory(item,sourceTableName));
+          changes.push(`已新增至 ${category}`);
         }
       });
       return changes.join('；')||null;
     }
     function specialIpCategoryRemovalBlocked(item,oldCategory,newCategory) {
-      if(activeTableName!=='ChanEdgel'||oldCategory===newCategory)return false;
-      const type=oldCategory==='IO'?'io':oldCategory==='Analog'?'analog':null;
+      if(isSpecialIpTable()||oldCategory===newCategory)return false;
+      const type=oldCategory==='IO IP'?'io':oldCategory==='Analog IP'?'analog':null;
       if(!type)return false;
-      const rows=type==='io'?ioIpRows:analogIpRows,linked=rows.find(row=>row.sourceDefinitionId===item.def.id);
+      const rows=type==='io'?ioIpRows:analogIpRows,linked=rows.find(row=>sourceMatchesSpecialIpRow(row,item,activeTableName));
       return Boolean(linked&&rows.some(child=>child.parent===linked.id));
     }
     function createManualSpecialIpRow(type,draft) {
@@ -1076,11 +1130,22 @@
       const created=type==='io'?createDerivedIoIpRow(temporary):createDerivedAnalogIpRow(temporary);
       created.id=`${type}-manual-${Date.now()}-${Math.random().toString(36).slice(2,7)}`;
       delete created.sourceDefinitionId;
-      created.tier=draft.tier;created.parent=draft.parent;created.expanded=true;
+      created.sourceRegionName=draft.sourceRegionName||'';created.tier=draft.tier;created.parent=draft.parent;created.expanded=true;
+      return created;
+    }
+    function createE3SpecialIpRow(item,type,rows) {
+      const temporary={def:{id:`e3-${Date.now()}`,name:item.block,reference:item.referenceProject,schematicOwner:item.schematicOwner,layoutOwner:item.layoutOwner}};
+      const created=type==='io'?createDerivedIoIpRow(temporary,item.sourceTableName):createDerivedAnalogIpRow(temporary,item.sourceTableName);
+      created.id=`${type}-e3-${Date.now()}-${Math.random().toString(36).slice(2,7)}`;
+      delete created.sourceDefinitionId;
+      created.sourceRegionName=item.sourceRegionName||effectiveSpecialIpSource(item,rows);
+      created.tier=item.tier;created.parent=item.parent;created.expanded=true;
+      created.e3Generated=true;created.e3SourceRowId=item.id;
       return created;
     }
     function startSpecialIpAddDraft(item,type) {
-      specialIpAddDraft={type,anchorId:item.id,block:'',tier:item.tier,parent:item.parent,referenceProject:'',schematicOwner:'',layoutOwner:'',focus:true};
+      const rows=type==='io'?ioIpRows:analogIpRows;
+      specialIpAddDraft={type,anchorId:item.id,block:'',tier:item.tier,parent:item.parent,sourceRegionName:effectiveSpecialIpSource(item,rows),referenceProject:'',schematicOwner:'',layoutOwner:'',focus:true};
       renderWbs();
     }
     function cancelSpecialIpAddDraft(notify=true) {
@@ -1111,6 +1176,8 @@
       }
       const rows=draft.type==='io'?ioIpRows:analogIpRows,anchor=rows.find(item=>item.id===draft.anchorId),anchorIndex=rows.indexOf(anchor),created=createManualSpecialIpRow(draft.type,{...draft,block:draft.block.trim()});
       const insertIndex=anchorIndex<0?rows.length:draft.tier===anchor.tier?specialIpSubtreeBoundaryIndex(rows,anchor)+1:anchorIndex+1;
+      specialIpStablePositions[draft.type].set(created.id,specialIpStablePositionBeforeActive(draft.type,rows,insertIndex));
+      specialIpStableSources[draft.type].set(created.id,draft.sourceRegionName||'');
       rows.splice(insertIndex,0,created);
       specialIpStructureChanges[draft.type].unshift(changeEvent(currentActorId,'新增 Block','不存在',created.block,auditNow()));
       specialIpChangeHistory[draft.type][created.id]=[];
@@ -1118,18 +1185,89 @@
     }
     function deleteSpecialIpRow(item,type) {
       const rows=type==='io'?ioIpRows:analogIpRows;
+      if(item.e3Generated)return showToast('该 Block 由 Layout modify email E3 生成，不允许删除');
       if(rows.some(child=>child.parent===item.id))return showToast('请先删除或移动该节点的子 Block');
-      if(!confirm(`确认删除 ${item.block}？`))return;
+      pendingSpecialIpDelete={item,type};
+      const previousCategory=item.sourceDefinitionId!==undefined?specialIpPreviousCategories.get(specialIpSourceIdentity(item.sourceTableName,item.sourceDefinitionId))??'':null;
+      document.getElementById('specialIpDeleteIntro').textContent=previousCategory===null?`确认删除 ${item.block}？`:`确认删除 ${item.block}？删除后 ${item.sourceTableName} 表中的 Block Category 将恢复为 ${previousCategory||'空'}。`;
+      document.getElementById('specialIpDeleteModal').classList.add('open');
+      requestAnimationFrame(()=>document.getElementById('confirmSpecialIpDelete').focus());
+    }
+    function closeSpecialIpDeleteModal() {
+      document.getElementById('specialIpDeleteModal').classList.remove('open');
+      pendingSpecialIpDelete=null;
+    }
+    function confirmSpecialIpDelete() {
+      if(!pendingSpecialIpDelete)return;
+      const {item,type}=pendingSpecialIpDelete,rows=type==='io'?ioIpRows:analogIpRows;
+      if(rows.some(child=>child.parent===item.id)){
+        closeSpecialIpDeleteModal();
+        showToast('请先删除或移动该节点的子 Block');return;
+      }
       const index=rows.findIndex(candidate=>candidate.id===item.id);
-      if(index<0)return;
+      if(index<0){closeSpecialIpDeleteModal();return;}
+      const derived=item.sourceDefinitionId!==undefined&&Boolean(item.sourceTableName);
+      let restoredCategory='';
+      if(derived){
+        const sourceIdentity=specialIpSourceIdentity(item.sourceTableName,item.sourceDefinitionId);
+        restoredCategory=specialIpPreviousCategories.get(sourceIdentity)??'';
+        const sourceState=tableStateStore.get(item.sourceTableName);
+        if(!sourceState){closeSpecialIpDeleteModal();showToast(`无法找到来源表 ${item.sourceTableName}`);return;}
+        const sourceItems=['schematic','layout'].flatMap(hierarchy=>sourceState.data[hierarchy]);
+        const sourceDefinitions=[...new Map(sourceItems.filter(candidate=>candidate.def.id===item.sourceDefinitionId).map(candidate=>[candidate.def.id,candidate.def])).values()];
+        if(!sourceDefinitions.length){closeSpecialIpDeleteModal();showToast(`无法找到 ${item.sourceTableName} 中的来源 Block`);return;}
+        sourceDefinitions.forEach(definition=>definition.category=restoredCategory);
+        ['schematic','layout'].forEach(hierarchy=>{
+          const sourceItem=sourceState.data[hierarchy].find(candidate=>candidate.def.id===item.sourceDefinitionId);
+          if(!sourceItem)return;
+          (sourceState.changeHistory[hierarchy][item.sourceDefinitionId] ||= []).unshift(changeEvent(currentActorId,'Block Category',type==='io'?'IO IP':'Analog IP',restoredCategory,auditNow()));
+        });
+      }
       rows.splice(index,1);
+      if(!derived){
+        specialIpStablePositions[type].delete(item.id);
+        specialIpStableSources[type].delete(item.id);
+      }
       if(specialIpAddDraft?.anchorId===item.id)specialIpAddDraft=null;
       specialIpStructureChanges[type].unshift(changeEvent(currentActorId,'删除 Block',item.block,'已删除',auditNow()));
       delete specialIpChangeHistory[type][item.id];
       if(selectedSpecialIpItem?.id===item.id)closeDrawer();
       if(type==='io'&&selectedIoIpRowId===item.id)selectedIoIpRowId=null;
       if(type==='analog'&&selectedAnalogIpRowId===item.id)selectedAnalogIpRowId=null;
-      renderWbs();showToast(`${item.block} 已删除`);
+      closeSpecialIpDeleteModal();
+      renderWbs();showToast(derived?`${item.block} 已删除；${item.sourceTableName} Block Category 已恢复为 ${restoredCategory||'空'}`:`${item.block} 已删除`);
+    }
+    function applySpecialIpFieldChange(item,type,field,newValue) {
+      const oldValue=item[field];
+      if(oldValue===newValue)return;
+      recordSpecialIpChange(item,type,field,oldValue,newValue);item[field]=newValue;
+      renderWbs();showToast(`${item.block} 已更新`);
+    }
+    function requestSpecialIpE3(item,type,newValue) {
+      if(newValue!=='Yes'||item.layoutModifyEmail==='Yes')return applySpecialIpFieldChange(item,type,'layoutModifyEmail',newValue);
+      pendingSpecialIpE3={item,type};
+      document.getElementById('specialIpE3Modal').classList.add('open');
+      requestAnimationFrame(()=>document.getElementById('confirmSpecialIpE3').focus());
+    }
+    function closeSpecialIpE3Modal() {
+      document.getElementById('specialIpE3Modal').classList.remove('open');
+      pendingSpecialIpE3=null;
+      renderWbs();
+    }
+    function confirmSpecialIpE3() {
+      if(!pendingSpecialIpE3)return;
+      const {item,type}=pendingSpecialIpE3,rows=type==='io'?ioIpRows:analogIpRows,index=rows.findIndex(candidate=>candidate.id===item.id);
+      if(index<0){closeSpecialIpE3Modal();return;}
+      const created=createE3SpecialIpRow(item,type,rows);
+      recordSpecialIpChange(item,type,'layoutModifyEmail',item.layoutModifyEmail,'Yes');item.layoutModifyEmail='Yes';
+      specialIpStablePositions[type].set(created.id,specialIpStablePositionAfter(type,item.id));
+      specialIpStableSources[type].set(created.id,effectiveSpecialIpSource(item,rows));
+      rows.splice(index+1,0,created);
+      specialIpStructureChanges[type].unshift(changeEvent(currentActorId,'Layout modify email E3 新增同名 Block','不存在',created.block,auditNow()));
+      specialIpChangeHistory[type][created.id]=[];
+      document.getElementById('specialIpE3Modal').classList.remove('open');
+      pendingSpecialIpE3=null;
+      renderWbs();showToast(`${created.block} 已新增，且不允许删除`);
     }
     function switchPrototypeTable(tableName) {
       if(tableName===activeTableName)return;
@@ -1433,7 +1571,8 @@
       return Object.entries(wbsColumnFilters[type]).every(([key,selected])=>selected.has(wbsColumnFilterValue(item,type,key)));
     }
     function specialIpColumnFilterValue(item,type,key) {
-      let value=key==='block'?item.block:item[key];
+      const rows=type==='io'?ioIpRows:analogIpRows;
+      let value=key==='block'?item.block:key==='sourceTableName'?effectiveSpecialIpSource(item,rows):item[key];
       if(key==='schReleaseStatus')value=ioIpDerivedStatus(item,'schReleasePlanFinish','schReleaseActualFinish');
       if(key==='layoutFinishStatus')value=ioIpDerivedStatus(item,'layoutFinishPlanned','layoutFinishActual');
       if(key==='spfSimStatus')value=ioIpDerivedStatus(item,'spfSimPlanned','spfSimActual');
@@ -1641,7 +1780,7 @@
       return definitions.map(([key,minimum])=>key==='latestChange'?(latestChangeDrawerCollapsed?8:44):Math.max(minimum,Number(wbsColumnWidths[type]?.[key])||minimum));
     }
     function assignSpecialIpHeaderKeys(type,definitions) {
-      const directIndexes=type==='io'?[0,1,2,3,24]:[0,1,2,3,14,24];
+      const directIndexes=type==='io'?[0,1,2,3,4,25]:[0,1,2,3,4,15,25];
       const topHeaders=[...wbsHead.querySelectorAll('.io-ip-group-row > th')].filter(header=>header.rowSpan===2&&!header.classList.contains('change-column'));
       topHeaders.forEach((header,index)=>header.dataset.columnKey=definitions[directIndexes[index]][0]);
       const directSet=new Set(directIndexes),secondIndexes=definitions.map((_,index)=>index).filter(index=>!directSet.has(index)&&definitions[index][0]!=='latestChange');
@@ -1650,15 +1789,16 @@
     function syncSpecialIpColumnLayout(type,definitions,widths) {
       const displayedWidths=displayedWbsColumnWidths(definitions,widths);
       const rows=type==='io'?ioIpRows:analogIpRows,maxTier=Math.max(1,...rows.map(item=>item.tier||1));
-      displayedWidths[0]=Math.max(displayedWidths[0],165+(maxTier-1)*17);
-      if(specialIpAddDraft?.type===type)displayedWidths[0]=Math.max(displayedWidths[0],330);
+      displayedWidths[1]=Math.max(displayedWidths[1],165+(maxTier-1)*17);
+      if(specialIpAddDraft?.type===type)displayedWidths[1]=Math.max(displayedWidths[1],330);
       [...wbsColgroup.children].forEach((column,index)=>{column.style.width=`${displayedWidths[index]}px`;});
       const totalWidth=displayedWidths.reduce((sum,width)=>sum+width,0);
       wbsTable.style.width=`${totalWidth}px`;wbsTable.style.minWidth=`${totalWidth}px`;
-      tableWrap.querySelectorAll('.frozen-block-column').forEach(cell=>{cell.style.left='0px';});
-      tableWrap.querySelectorAll('.io-ip-reference-column').forEach(cell=>{cell.style.left=`${displayedWidths[0]}px`;});
-      tableWrap.querySelectorAll('.io-ip-schematic-owner-column').forEach(cell=>{cell.style.left=`${displayedWidths[0]+displayedWidths[1]}px`;});
-      tableWrap.querySelectorAll('.io-ip-layout-owner-column').forEach(cell=>{cell.style.left=`${displayedWidths[0]+displayedWidths[1]+displayedWidths[2]}px`;});
+      tableWrap.querySelectorAll('.io-ip-source-column').forEach(cell=>{cell.style.left='0px';});
+      tableWrap.querySelectorAll('.frozen-block-column').forEach(cell=>{cell.style.left=`${displayedWidths[0]}px`;});
+      tableWrap.querySelectorAll('.io-ip-reference-column').forEach(cell=>{cell.style.left=`${displayedWidths[0]+displayedWidths[1]}px`;});
+      tableWrap.querySelectorAll('.io-ip-schematic-owner-column').forEach(cell=>{cell.style.left=`${displayedWidths[0]+displayedWidths[1]+displayedWidths[2]}px`;});
+      tableWrap.querySelectorAll('.io-ip-layout-owner-column').forEach(cell=>{cell.style.left=`${displayedWidths[0]+displayedWidths[1]+displayedWidths[2]+displayedWidths[3]}px`;});
       const workspace=tableWrap.closest('.workspace');
       workspace.style.setProperty('--wbs-change-width',`${displayedWidths[displayedWidths.length-1]}px`);
       workspace.classList.toggle('latest-change-drawer-collapsed',latestChangeDrawerCollapsed);
@@ -1911,7 +2051,27 @@
     }
     function specialIpBlockCell(item,type) {
       const rows=type==='io'?ioIpRows:analogIpRows,hasChildren=rows.some(child=>child.parent===item.id),expanded=item.expanded!==false,levelPad=(item.tier-1)*17;
-      return `<td class="frozen-column frozen-block-column"><div class="block-cell" style="padding-left:${levelPad}px"><button class="tree-toggle ${hasChildren?'':'hidden'}" type="button" title="${expanded?'收起':'展开'}下级 Block" aria-label="${expanded?'收起':'展开'} ${esc(item.block)} 的下级 Block" aria-expanded="${expanded}">${expanded?'▾':'▸'}</button><div class="block-main"><div class="block-title-line"><span class="block-name-wrap"><span class="block-name">${esc(item.block)}</span><span class="tier">T${item.tier}</span><span class="row-actions"><button class="row-action row-add" data-special-ip-add type="button" title="新增 Block" aria-label="在 ${esc(item.block)} 行新增 Block">+</button><button class="row-action row-delete" data-special-ip-delete type="button" title="删除 ${esc(item.block)} Block" aria-label="删除 ${esc(item.block)} Block"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6v14H5V6"></path><path d="M10 11v5M14 11v5"></path></svg></button></span></span></div></div></div></td>`;
+      const deleteDisabled=item.e3Generated;
+      return `<td class="frozen-column frozen-block-column"><div class="block-cell" style="padding-left:${levelPad}px"><button class="tree-toggle ${hasChildren?'':'hidden'}" type="button" title="${expanded?'收起':'展开'}下级 Block" aria-label="${expanded?'收起':'展开'} ${esc(item.block)} 的下级 Block" aria-expanded="${expanded}">${expanded?'▾':'▸'}</button><div class="block-main"><div class="block-title-line"><span class="block-name-wrap"><span class="block-name">${esc(item.block)}</span><span class="tier">T${item.tier}</span><span class="row-actions"><button class="row-action row-add" data-special-ip-add type="button" title="新增 Block" aria-label="在 ${esc(item.block)} 行新增 Block">+</button><button class="row-action row-delete" data-special-ip-delete type="button" title="${deleteDisabled?'该 Block 由 Layout modify email E3 生成，不允许删除':`删除 ${esc(item.block)} Block`}" aria-label="${deleteDisabled?`${esc(item.block)} 不允许删除`:`删除 ${esc(item.block)} Block`}" ${deleteDisabled?'disabled':''}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6v14H5V6"></path><path d="M10 11v5M14 11v5"></path></svg></button></span></span></div></div></div></td>`;
+    }
+    function specialIpSourceMergePlan(items,allRows,merge=true) {
+      const plan=new Map();
+      if(!merge){items.forEach(item=>plan.set(item.id,{label:effectiveSpecialIpSource(item,allRows),rowspan:1}));return plan;}
+      for(let index=0;index<items.length;){
+        const label=effectiveSpecialIpSource(items[index],allRows);
+        if(!label){plan.set(items[index].id,{label:'',rowspan:1});index++;continue;}
+        let end=index+1;
+        while(end<items.length&&effectiveSpecialIpSource(items[end],allRows)===label)end++;
+        plan.set(items[index].id,{label,rowspan:end-index});
+        for(let hidden=index+1;hidden<end;hidden++)plan.set(items[hidden].id,null);
+        index=end;
+      }
+      return plan;
+    }
+    function specialIpSourceCell(merge) {
+      if(merge===null)return '';
+      const label=merge?.label||'',rowspan=merge?.rowspan||1;
+      return `<td class="io-ip-source-column ${rowspan>1?'source-region':''}" ${rowspan>1?`rowspan="${rowspan}"`:''}><span title="${esc(label)}">${esc(label)}</span></td>`;
     }
     function specialIpTierControl() {
       const draft=specialIpAddDraft,rows=draft.type==='io'?ioIpRows:analogIpRows,anchor=rows.find(item=>item.id===draft.anchorId),maxTier=6;
@@ -1919,8 +2079,9 @@
       return `<select class="inline-tier-select" id="specialIpDraftTier" aria-label="Tier"><option value="${anchor.tier}" ${draft.tier===anchor.tier?'selected':''}>T${anchor.tier}（同级）</option><option value="${anchor.tier+1}" ${draft.tier===anchor.tier+1?'selected':''}>T${anchor.tier+1}（下一级）</option></select>`;
     }
     function specialIpDraftRowHtml(type,definitions) {
-      const draft=specialIpAddDraft,blankCells=definitions.slice(4,-1).map(()=>'<td></td>').join('');
+      const draft=specialIpAddDraft,blankCells=definitions.slice(5,-1).map(()=>'<td></td>').join('');
       return `<tr class="inline-draft-row" data-special-ip-draft-row>
+        <td class="io-ip-source-column"></td>
         <td class="frozen-column frozen-block-column inline-draft-block"><div class="block-cell" style="padding-left:${(draft.tier-1)*17}px"><span class="tree-toggle hidden"></span><span class="inline-draft-name">${inlineDraftInput('block',draft.block,'id="specialIpDraftName" placeholder="输入 Block 名称" data-special-ip-draft')}</span>${specialIpTierControl()}${inlineDraftActions()}</div></td>
         <td class="io-ip-reference-column">${inlineDraftInput('referenceProject',draft.referenceProject,'list="referenceProjects" placeholder="Reference project" data-special-ip-draft')}</td>
         <td class="io-ip-schematic-owner-column">${inlineDraftInput('schematicOwner',draft.schematicOwner,'list="schematicOwners" placeholder="Schematic Owner" data-special-ip-draft')}</td>
@@ -1951,10 +2112,11 @@
       }
       return true;
     }
-    function ioIpRowHtml(item) {
+    function ioIpRowHtml(item,sourceMerge) {
       const schReleaseStatus=ioIpDerivedStatus(item,'schReleasePlanFinish','schReleaseActualFinish');
       const layoutFinishStatus=ioIpDerivedStatus(item,'layoutFinishPlanned','layoutFinishActual');
       return `<tr data-io-id="${item.id}" class="${selectedIoIpRowId===item.id?'selected':''}">
+        ${specialIpSourceCell(sourceMerge)}
         ${specialIpBlockCell(item,'io')}
         ${searchableEditorCell('referenceProject',item.referenceProject,'referenceProjects','输入可模糊搜索产品；选择空后单元格留白','io-ip-reference-column').replace('data-edit="referenceProject"','data-io-edit="referenceProject"')}
         ${searchableEditorCell('schematicOwner',item.schematicOwner,'schematicOwners','输入可模糊搜索 Schematic Owner','io-ip-schematic-owner-column').replace('data-edit="schematicOwner"','data-io-edit="schematicOwner"')}
@@ -1990,9 +2152,9 @@
         tableRow.querySelectorAll('[data-io-edit]').forEach(control=>{
           control.addEventListener('click',event=>event.stopPropagation());
           control.addEventListener('change',()=>{
-            const field=control.dataset.ioEdit,oldValue=item[field],newValue=control.value==='空'?'':control.value;
-            recordSpecialIpChange(item,'io',field,oldValue,newValue);item[field]=newValue;
-            renderWbs();showToast(`${item.block} 已更新`);
+            const field=control.dataset.ioEdit,newValue=control.value==='空'?'':control.value;
+            if(field==='layoutModifyEmail')requestSpecialIpE3(item,'io',newValue);
+            else applySpecialIpFieldChange(item,'io',field,newValue);
           });
         });
         tableRow.querySelector('[data-special-change-history]')?.addEventListener('click',event=>{event.stopPropagation();openSpecialIpRowChangeHistory(item,'io',event.currentTarget);});
@@ -2002,7 +2164,7 @@
     function renderIoIpTable(preservedChange=null) {
       wbsHead.className='io-ip-head';
       wbsHead.innerHTML=`<tr class="io-ip-group-row">
-        <th class="frozen-column frozen-block-column io-ip-base-header" rowspan="2">Block</th><th class="io-ip-reference-column io-ip-base-header" rowspan="2">Reference project</th><th class="io-ip-schematic-owner-column io-ip-base-header" rowspan="2">Schematic owner</th><th class="io-ip-layout-owner-column last-frozen-column io-ip-base-header" rowspan="2">Layout owner</th>
+        <th class="io-ip-source-column io-ip-base-header" rowspan="2">Source</th><th class="frozen-column frozen-block-column io-ip-base-header" rowspan="2">Block</th><th class="io-ip-reference-column io-ip-base-header" rowspan="2">Reference project</th><th class="io-ip-schematic-owner-column io-ip-base-header" rowspan="2">Schematic owner</th><th class="io-ip-layout-owner-column last-frozen-column io-ip-base-header" rowspan="2">Layout owner</th>
         <th colspan="2"><span class="io-ip-group-title">Hookup</span></th><th colspan="2"><span class="io-ip-group-title">Spec&amp;Reviewb</span></th><th colspan="4"><span class="io-ip-group-title">Pre_sim result CRC review</span></th><th colspan="3"><span class="io-ip-group-title">SCH release for Layout</span></th><th colspan="6"><span class="io-ip-group-title">Schematic and Layout Co-work flow Check</span></th><th colspan="3"><span class="io-ip-group-title">Layout finish status（for layout）</span></th><th class="io-ip-single-header" rowspan="2">Layout modify email E3（Designer填）</th><th colspan="3"><span class="io-ip-group-title">Layout quality check（matching&amp;shielding）</span></th><th colspan="2"><span class="io-ip-group-title">Post_sim result CRC review</span></th>
         ${specialIpChangeHeaderHtml()}
       </tr><tr class="io-ip-leaf-row">
@@ -2012,16 +2174,17 @@
       </tr>`;
       const query=document.getElementById('searchInput').value.trim().toLowerCase();
       const items=ioIpRows.filter(item=>specialIpTreeVisible(item,ioIpRows)&&(!query||Object.values(item).some(value=>String(value).toLowerCase().includes(query)))&&matchesSpecialIpColumnFilters(item,'io'));
-      const rows=[],draftIndex=specialIpDraftIndex(items,'io');items.forEach((item,index)=>{if(index===draftIndex)rows.push(specialIpDraftRowHtml('io',ioIpColumnDefinitions));rows.push(ioIpRowHtml(item));});if(draftIndex>=items.length)rows.push(specialIpDraftRowHtml('io',ioIpColumnDefinitions));
-      wbsBody.innerHTML=rows.length?rows.join(''):`<tr><td colspan="31"><div class="empty"><strong>没有匹配的 IO IP Block</strong>调整搜索词后重试</div></td></tr>`;
+      const rows=[],draftIndex=specialIpDraftIndex(items,'io'),sourcePlan=specialIpSourceMergePlan(items,ioIpRows,!specialIpAddDraft);items.forEach((item,index)=>{if(index===draftIndex)rows.push(specialIpDraftRowHtml('io',ioIpColumnDefinitions));rows.push(ioIpRowHtml(item,sourcePlan.get(item.id)));});if(draftIndex>=items.length)rows.push(specialIpDraftRowHtml('io',ioIpColumnDefinitions));
+      wbsBody.innerHTML=rows.length?rows.join(''):`<tr><td colspan="32"><div class="empty"><strong>${ioIpRows.length?'没有匹配的 IO IP Block':'暂无 IO IP Block'}</strong>${ioIpRows.length?'调整搜索词或筛选条件后重试':'请先在普通 WBS 表中将 Block Category 选择为 IO IP'}</div></td></tr>`;
       applyIoIpColumnLayout();bindCalculationRules();bindIoIpRows();bindSpecialIpDraft();bindSpecialIpHistoryControls(items,'io',preservedChange);
     }
 
-    function analogIpRowHtml(item) {
+    function analogIpRowHtml(item,sourceMerge) {
       const layoutFinishStatus=ioIpDerivedStatus(item,'layoutFinishPlanned','layoutFinishActual');
       const spfSimStatus=ioIpDerivedStatus(item,'spfSimPlanned','spfSimActual');
       const finalReviewStatus=ioIpDerivedStatus(item,'finalReviewPlanned','finalReviewActual');
       return `<tr data-analog-id="${item.id}" class="${selectedAnalogIpRowId===item.id?'selected':''}">
+        ${specialIpSourceCell(sourceMerge)}
         ${specialIpBlockCell(item,'analog')}
         ${searchableEditorCell('referenceProject',item.referenceProject,'referenceProjects','输入可模糊搜索产品；选择空后单元格留白','io-ip-reference-column').replace('data-edit="referenceProject"','data-analog-edit="referenceProject"')}
         ${searchableEditorCell('schematicOwner',item.schematicOwner,'schematicOwners','输入可模糊搜索 Schematic Owner','io-ip-schematic-owner-column').replace('data-edit="schematicOwner"','data-analog-edit="schematicOwner"')}
@@ -2050,7 +2213,7 @@
         tableRow.querySelector('[data-special-ip-delete]')?.addEventListener('click',event=>{event.stopPropagation();deleteSpecialIpRow(item,'analog');});
         tableRow.querySelectorAll('[data-analog-edit]').forEach(control=>{
           control.addEventListener('click',event=>event.stopPropagation());
-          control.addEventListener('change',()=>{const field=control.dataset.analogEdit,oldValue=item[field],newValue=control.value==='空'?'':control.value;recordSpecialIpChange(item,'analog',field,oldValue,newValue);item[field]=newValue;renderWbs();showToast(`${item.block} 已更新`);});
+          control.addEventListener('change',()=>{const field=control.dataset.analogEdit,newValue=control.value==='空'?'':control.value;if(field==='layoutModifyEmail')requestSpecialIpE3(item,'analog',newValue);else applySpecialIpFieldChange(item,'analog',field,newValue);});
         });
         tableRow.querySelector('[data-special-change-history]')?.addEventListener('click',event=>{event.stopPropagation();openSpecialIpRowChangeHistory(item,'analog',event.currentTarget);});
         tableRow.addEventListener('click',()=>{selectedAnalogIpRowId=item.id;renderWbs();});
@@ -2059,7 +2222,7 @@
     function renderAnalogIpTable(preservedChange=null) {
       wbsHead.className='io-ip-head';
       wbsHead.innerHTML=`<tr class="io-ip-group-row">
-        <th class="frozen-column frozen-block-column io-ip-base-header" rowspan="2">Block</th><th class="io-ip-reference-column io-ip-base-header" rowspan="2">Reference project</th><th class="io-ip-schematic-owner-column io-ip-base-header" rowspan="2">Schematic owner</th><th class="io-ip-layout-owner-column last-frozen-column io-ip-base-header" rowspan="2">Layout owner</th>
+        <th class="io-ip-source-column io-ip-base-header" rowspan="2">Source</th><th class="frozen-column frozen-block-column io-ip-base-header" rowspan="2">Block</th><th class="io-ip-reference-column io-ip-base-header" rowspan="2">Reference project</th><th class="io-ip-schematic-owner-column io-ip-base-header" rowspan="2">Schematic owner</th><th class="io-ip-layout-owner-column last-frozen-column io-ip-base-header" rowspan="2">Layout owner</th>
         <th colspan="3"><span class="io-ip-group-title">Release for layout drawing</span></th><th colspan="4"><span class="io-ip-group-title">Schematic and Layout Co-work flow Check</span></th><th colspan="3"><span class="io-ip-group-title">Layout finish status（for layout）</span></th><th class="io-ip-single-header" rowspan="2">Layout modify email E3（Designer填）</th><th colspan="3"><span class="io-ip-group-title">Layout quality check（matching&amp;shielding）</span></th><th colspan="2"><span class="io-ip-group-title">DC EM（孙博文）</span></th><th colspan="1"><span class="io-ip-group-title">PDC share cm description for PTE deadline</span></th><th colspan="3"><span class="io-ip-group-title">Spf-sim finish review(for design)</span></th><th class="io-ip-single-header" rowspan="2">Comment</th><th colspan="3"><span class="io-ip-group-title">All check done &amp; final review</span></th>
         ${specialIpChangeHeaderHtml()}
       </tr><tr class="io-ip-leaf-row">
@@ -2072,8 +2235,8 @@
       </tr>`;
       const query=document.getElementById('searchInput').value.trim().toLowerCase();
       const items=analogIpRows.filter(item=>specialIpTreeVisible(item,analogIpRows)&&(!query||Object.values(item).some(value=>String(value).toLowerCase().includes(query)))&&matchesSpecialIpColumnFilters(item,'analog'));
-      const rows=[],draftIndex=specialIpDraftIndex(items,'analog');items.forEach((item,index)=>{if(index===draftIndex)rows.push(specialIpDraftRowHtml('analog',analogIpColumnDefinitions));rows.push(analogIpRowHtml(item));});if(draftIndex>=items.length)rows.push(specialIpDraftRowHtml('analog',analogIpColumnDefinitions));
-      wbsBody.innerHTML=rows.length?rows.join(''):`<tr><td colspan="29"><div class="empty"><strong>没有匹配的 Analog IP Block</strong>调整搜索词后重试</div></td></tr>`;
+      const rows=[],draftIndex=specialIpDraftIndex(items,'analog'),sourcePlan=specialIpSourceMergePlan(items,analogIpRows,!specialIpAddDraft);items.forEach((item,index)=>{if(index===draftIndex)rows.push(specialIpDraftRowHtml('analog',analogIpColumnDefinitions));rows.push(analogIpRowHtml(item,sourcePlan.get(item.id)));});if(draftIndex>=items.length)rows.push(specialIpDraftRowHtml('analog',analogIpColumnDefinitions));
+      wbsBody.innerHTML=rows.length?rows.join(''):`<tr><td colspan="30"><div class="empty"><strong>${analogIpRows.length?'没有匹配的 Analog IP Block':'暂无 Analog IP Block'}</strong>${analogIpRows.length?'调整搜索词或筛选条件后重试':'请先在普通 WBS 表中将 Block Category 选择为 Analog IP'}</div></td></tr>`;
       applyAnalogIpColumnLayout();bindCalculationRules();bindAnalogIpRows();bindSpecialIpDraft();bindSpecialIpHistoryControls(items,'analog',preservedChange);
     }
 
@@ -2309,7 +2472,7 @@
       else if(field==='schematicOwner'||(field==='owner'&&currentHierarchy==='schematic')) recordDefinitionChange(item,['schematic','spf'],labels[field],oldValue,normalized);
       else if(field==='layoutOwner'||(field==='owner'&&currentHierarchy==='layout')) recordDefinitionChange(item,['layout','spf'],labels[field],oldValue,normalized);
       else recordChange(item,currentHierarchy,labels[field],oldValue,normalized);
-      const specialIpSyncMessage=field==='category'?syncChanEdgelCategoryToSpecialIp(item,oldValue,normalized):null;
+      const specialIpSyncMessage=field==='category'?syncWbsCategoryToSpecialIp(item,oldValue,normalized):null;
       renderWbs(); renderDashboard(); renderDelay();
       showToast(`${labels[field]} 已更新${specialIpSyncMessage?`；${specialIpSyncMessage}`:''}`);
     }
@@ -2623,7 +2786,7 @@
     }
     function specialIpDrawerHtml(item,type) {
       const base=specialIpDetailSection('Block 信息',[
-        ['Reference project',item.referenceProject],['Schematic owner',item.schematicOwner],['Layout owner',item.layoutOwner]
+        ['Source',item.sourceTableName],['Reference project',item.referenceProject],['Schematic owner',item.schematicOwner],['Layout owner',item.layoutOwner]
       ]);
       if(type==='io'){
         const schReleaseStatus=ioIpDerivedStatus(item,'schReleasePlanFinish','schReleaseActualFinish');
@@ -3153,6 +3316,12 @@
     document.querySelectorAll('[data-close-version-delete]').forEach(button=>button.addEventListener('click',closeVersionDeleteModal));
     document.getElementById('versionDeleteModal').addEventListener('click',event=>{if(event.target===event.currentTarget)closeVersionDeleteModal();});
     document.getElementById('confirmVersionDelete').addEventListener('click',confirmVersionDelete);
+    document.querySelectorAll('[data-close-special-ip-delete]').forEach(button=>button.addEventListener('click',closeSpecialIpDeleteModal));
+    document.getElementById('specialIpDeleteModal').addEventListener('click',event=>{if(event.target===event.currentTarget)closeSpecialIpDeleteModal();});
+    document.getElementById('confirmSpecialIpDelete').addEventListener('click',confirmSpecialIpDelete);
+    document.querySelectorAll('[data-close-special-ip-e3]').forEach(button=>button.addEventListener('click',closeSpecialIpE3Modal));
+    document.getElementById('specialIpE3Modal').addEventListener('click',event=>{if(event.target===event.currentTarget)closeSpecialIpE3Modal();});
+    document.getElementById('confirmSpecialIpE3').addEventListener('click',confirmSpecialIpE3);
     document.getElementById('refreshDashboard').addEventListener('click',()=>{renderDashboard();showToast('状态已按最新 check 和日期重新计算');});
     document.getElementById('tableSelect').addEventListener('change',event=>switchPrototypeTable(event.target.value));
     document.getElementById('wbsFullscreenToggle').addEventListener('click',toggleWbsTableFullscreen);
@@ -3163,6 +3332,8 @@
       if(specialIpAddDraft){cancelSpecialIpAddDraft(false);return;}
       if(inlineAddDraft){cancelInlineDraft(false);return;}
       if(document.getElementById('inlineAddMenu').classList.contains('open')){closeInlineAddMenu();return;}
+      if(document.getElementById('specialIpE3Modal').classList.contains('open')){closeSpecialIpE3Modal();return;}
+      if(document.getElementById('specialIpDeleteModal').classList.contains('open')){closeSpecialIpDeleteModal();return;}
       if(isWbsTableFullscreen()){exitWbsTableFullscreen();return;}
       if(document.getElementById('versionDeleteModal').classList.contains('open')){closeVersionDeleteModal();return;}
       if(document.getElementById('sameNameCheckModal').classList.contains('open')){resolveSameNameCheck(false);return;}
