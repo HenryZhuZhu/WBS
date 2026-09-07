@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="de-wbs-build" content="2026-09-07-manual-ip-defaults-v3">
+  <meta name="de-wbs-build" content="2026-09-07-drawer-layout-v5">
   <title>DE-WBS Prototype v1</title>
   <style>
     :root {
@@ -972,8 +972,9 @@
       return issues;
     }
     function sourceRowsForProjection(sourceTableName) {
+      if(sourceTableName===activeTableName&&!isSpecialIpTable())return [...data.schematic,...data.layout];
       const snapshot=tableStateStore?.get(sourceTableName);
-      return snapshot?.data?[...snapshot.data.schematic,...snapshot.data.layout]:sourceTableName===activeTableName?[...data.schematic,...data.layout]:[];
+      return snapshot?.data?[...snapshot.data.schematic,...snapshot.data.layout]:[];
     }
     function specialProjectionIntegrityIssues(label,rows) {
       const issues=[],nodes=new Map();
@@ -1096,10 +1097,34 @@
     function clonePrototypeState(value) {
       return typeof structuredClone==='function'?structuredClone(value):JSON.parse(JSON.stringify(value));
     }
+    const pendingCategoryEdits=new Map();
+    let categoryCommitTimer=null,flushingCategoryEdits=false;
+    function queueCategoryEdit(item,hierarchy,value) {
+      const edit={tableName:activeTableName,hierarchy,itemId:item.id,definitionId:item.def.id,value};
+      pendingCategoryEdits.set(`${edit.tableName}\u0000${edit.definitionId}`,edit);
+      clearTimeout(categoryCommitTimer);
+      categoryCommitTimer=setTimeout(flushPendingCategoryEdits,0);
+    }
+    function flushPendingCategoryEdits() {
+      if(flushingCategoryEdits)return;
+      clearTimeout(categoryCommitTimer);categoryCommitTimer=null;
+      flushingCategoryEdits=true;
+      try{
+        for(const [key,edit] of pendingCategoryEdits){
+          pendingCategoryEdits.delete(key);
+          if(edit.tableName!==activeTableName){showToast('来源表已切换，请返回原表重试');continue;}
+          const item=data[edit.hierarchy].find(row=>row.id===edit.itemId&&row.def.id===edit.definitionId);
+          if(item)commitBlockCategory(item,edit.value);
+        }
+      }finally{flushingCategoryEdits=false;}
+    }
     function captureTableState() {
-      return clonePrototypeState({data,railState,detailState,changeHistory,structureChanges,schematicPlannedReleaseUnlocked});
+      flushPendingCategoryEdits();
+      const selectedVersions=Object.fromEntries(Object.entries(selectedVersionRows).map(([type,selection])=>[type,[...selection]]));
+      return clonePrototypeState({data,railState,detailState,changeHistory,structureChanges,schematicPlannedReleaseUnlocked,selectedVersions});
     }
     function restoreTableState(snapshot) {
+      flushPendingCategoryEdits();
       const state=clonePrototypeState(snapshot);
       ['schematic','layout','spf'].forEach(type=>{
         data[type].splice(0,data[type].length,...state.data[type]);
@@ -1107,6 +1132,8 @@
         Object.assign(railState[type],state.railState[type]);
         changeHistory[type]=state.changeHistory[type];
         structureChanges[type]=state.structureChanges[type];
+        selectedVersionRows[type].clear();
+        (state.selectedVersions?.[type]||[]).forEach(([key,value])=>selectedVersionRows[type].set(key,value));
       });
       detailState.spf=state.detailState.spf;
       detailState.aiRouting=state.detailState.aiRouting||{};
@@ -1119,7 +1146,12 @@
     function specialIpSourceIdentity(sourceTableName,sourceDefinitionId) { return `${sourceTableName}\u0000${sourceDefinitionId}`; }
     function specialIpMembershipKey(sourceTableName,sourceNodeId) { return `${sourceTableName}\u0000${sourceNodeId}`; }
     function derivedSpecialIpRowId(type,item,sourceTableName) { return `${type}-derived-${encodeURIComponent(sourceTableName)}-${item.def.id}`; }
-    function sourceMatchesSpecialIpRow(row,item,sourceTableName=activeTableName) { return row.sourceTableName===sourceTableName&&row.sourceNodeId===logicalNodeId(item); }
+    function specialIpSourceDefinitionIds(row) { return row.sourceDefinitionIds|| (row.sourceDefinitionId!==undefined?[row.sourceDefinitionId]:[]); }
+    function sourceMatchesSpecialIpRow(row,item,sourceTableName=activeTableName) { return row.sourceTableName===sourceTableName&&specialIpSourceDefinitionIds(row).includes(item.def.id); }
+    function specialIpSourceContext(item) {
+      const hierarchy=data.schematic.length?'schematic':'layout';
+      return {hierarchy,item:item?data[hierarchy].find(row=>row.def.id===item.def.id):null};
+    }
     function specialIpGroupKey(item) { return logicalNodeId(item)||`${logicalParentNodeId(item)||'__root__'}|${item.block.trim().toLowerCase()}|${item.tier}`; }
     function specialIpVersionRank(item) { const rank=versionOptions.indexOf(normalizeVersion(item.version));return rank<0?versionOptions.length:rank; }
     function specialIpVersionGroup(item,type) {
@@ -1205,7 +1237,6 @@
       if(index<0)return null;
       const [removed]=rows.splice(index,1);
       delete specialIpChangeHistory[type][removed.id];
-      if(selectedSpecialIpItem?.id===removed.id)closeDrawer();
       return removed;
     }
     function sourceProjectionChain(item,sourceHierarchy=currentHierarchy) {
@@ -1219,40 +1250,49 @@
       let parentProjected=null;
       chain.forEach(sourceItem=>{
         let projected=rows.find(row=>sourceMatchesSpecialIpRow(row,sourceItem,sourceTableName));
+        // Ancestors share a structural node; the selected source Version must match its own Definition.
+        if(!projected&&sourceItem!==item)projected=rows.find(row=>row.sourceTableName===sourceTableName&&row.sourceNodeId===logicalNodeId(sourceItem));
         const nodeOrder=sourceOrder.get(logicalNodeId(sourceItem))??sourceOrder.size;
         if(!projected){projected=factory(sourceItem,sourceTableName);projected.sourceStablePosition=sourceDerivedStablePosition(type,sourceTableName,nodeOrder);insertDerivedSpecialIpRow(type,rows,projected);}
         projected.sourceOrder=nodeOrder;
         projected.sourceStablePosition=sourceDerivedStablePosition(type,sourceTableName,nodeOrder);
-        logicalVersions(rows,projected).forEach((version,index)=>{const rank=versionOptions.indexOf(normalizeVersion(version.version)),position=projected.sourceStablePosition+(rank>=0?rank+1:index+6)*10;specialIpStablePositions[type].set(version.id,position);specialIpStableSources[type].set(version.id,sourceTableName);});
-        projected.tier=sourceItem.tier||1;
-        projected.parent=parentProjected?.id||null;
-        projected.parentNodeId=parentProjected?logicalNodeId(parentProjected):null;
-        projected.projectionDirect=specialIpDirectMemberships[type].has(specialIpMembershipKey(sourceTableName,logicalNodeId(sourceItem)));
+        logicalVersions(rows,projected).forEach((version,index)=>{
+          const rank=versionOptions.indexOf(normalizeVersion(version.version)),position=projected.sourceStablePosition+(rank>=0?rank+1:index+6)*10;
+          specialIpStablePositions[type].set(version.id,position);specialIpStableSources[type].set(version.id,sourceTableName);
+          version.tier=sourceItem.tier||1;version.parent=parentProjected?.id||null;version.parentNodeId=parentProjected?logicalNodeId(parentProjected):null;
+        });
         parentProjected=projected;
       });
       sortSpecialIpRows(type,rows);
     }
     function reconcileActiveSourceCategoriesToSpecialIp() {
       if(isSpecialIpTable())return;
-      const sourceTableName=activeTableName,sourceHierarchy=data.schematic.length?'schematic':data.layout.length?'layout':null;
-      if(!sourceHierarchy)return;
-      const sourceItems=hierarchyOrderedItems(sourceHierarchy),representatives=[],seenNodeIds=new Set();
-      sourceItems.forEach(item=>{const nodeId=logicalNodeId(item);if(!seenNodeIds.has(nodeId)){seenNodeIds.add(nodeId);representatives.push(item);}});
+      const sourceTableName=activeTableName,{hierarchy:sourceHierarchy}=specialIpSourceContext();
+      const sourceItems=hierarchyOrderedItems(sourceHierarchy);
       const transitions=[['io',IO_IP_TABLE_NAME,ioIpRows,createDerivedIoIpRow],['analog',ANALOG_IP_TABLE_NAME,analogIpRows,createDerivedAnalogIpRow]];
       transitions.forEach(([type,category,rows,factory])=>{
-        const memberships=specialIpDirectMemberships[type],prefix=`${sourceTableName}\u0000`,desired=new Set(representatives.filter(item=>item.def.category===category).map(item=>specialIpMembershipKey(sourceTableName,logicalNodeId(item))));
+        const matchingVersions=sourceItems.filter(item=>item.def.category===category);
+        const memberships=specialIpDirectMemberships[type],prefix=`${sourceTableName}\u0000`,desired=new Set(matchingVersions.map(item=>specialIpMembershipKey(sourceTableName,logicalNodeId(item))));
         [...memberships].filter(key=>key.startsWith(prefix)&&!desired.has(key)).forEach(key=>memberships.delete(key));
         desired.forEach(key=>memberships.add(key));
-        representatives.filter(item=>desired.has(specialIpMembershipKey(sourceTableName,logicalNodeId(item)))).forEach(item=>projectSpecialIpChain(type,category,rows,factory,item,sourceTableName,sourceHierarchy));
+        matchingVersions.forEach(item=>projectSpecialIpChain(type,category,rows,factory,item,sourceTableName,sourceHierarchy));
         reconcileSpecialIpSourceProjection(type,rows,sourceTableName);
       });
     }
     function reconcileSpecialIpSourceProjection(type,rows,sourceTableName) {
-      const directMemberships=specialIpDirectMemberships[type];
+      const directMemberships=specialIpDirectMemberships[type],category=type==='io'?IO_IP_TABLE_NAME:ANALOG_IP_TABLE_NAME;
+      const matchingDefinitions=new Set(sourceRowsForProjection(sourceTableName).filter(item=>item.def.category===category).map(item=>item.def.id));
       rows.filter(row=>row.sourceTableName===sourceTableName).forEach(row=>{
-        row.projectionDirect=directMemberships.has(specialIpMembershipKey(sourceTableName,row.sourceNodeId));
+        const matchingIds=specialIpSourceDefinitionIds(row).filter(id=>matchingDefinitions.has(id));
+        row.projectionDirect=matchingIds.length>0&&directMemberships.has(specialIpMembershipKey(sourceTableName,row.sourceNodeId));
+        if(row.sourceDefinitionIds&&matchingIds.length){row.sourceDefinitionIds=matchingIds;row.sourceDefinitionId=matchingIds[0];}
+      });
+      // Once a node has a direct/manual Version, an obsolete source support Version is redundant.
+      rows.filter(row=>row.sourceTableName===sourceTableName&&row.sourceDefinitionId!==undefined&&!row.projectionDirect).forEach(row=>{
+        if(logicalVersions(rows,row).some(version=>version!==row&&(version.projectionDirect||version.sourceDefinitionId===undefined)))removeSpecialIpProjectionRow(type,rows,rows.indexOf(row));
       });
       pruneUnusedSpecialIpAncestors(type,rows,sourceTableName);
+      rows.forEach(row=>{row.parent=logicalNodeRepresentative(rows,logicalParentNodeId(row))?.id||null;});
       sortSpecialIpRows(type,rows);
     }
     function pruneUnusedSpecialIpAncestors(type,rows,sourceTableName) {
@@ -1270,19 +1310,22 @@
     }
     function syncWbsCategoryToSpecialIp(item,oldCategory,newCategory) {
       if(isSpecialIpTable()||oldCategory===newCategory)return null;
+      const {hierarchy:sourceHierarchy,item:sourceItem}=specialIpSourceContext(item);
+      if(!sourceItem)throw new Error('来源 Version 不存在');
+      item=sourceItem;
       const sourceTableName=activeTableName,sourceIdentity=specialIpSourceIdentity(sourceTableName,item.def.id);
       if(![IO_IP_TABLE_NAME,ANALOG_IP_TABLE_NAME].includes(oldCategory)&&[IO_IP_TABLE_NAME,ANALOG_IP_TABLE_NAME].includes(newCategory))specialIpPreviousCategories.set(sourceIdentity,oldCategory);
       const transitions=[['io','IO IP',ioIpRows,createDerivedIoIpRow],['analog','Analog IP',analogIpRows,createDerivedAnalogIpRow]];
       const changes=[];
       transitions.forEach(([type,category,rows,factory])=>{
         if(oldCategory===category&&newCategory!==category){
-          specialIpDirectMemberships[type].delete(specialIpMembershipKey(sourceTableName,logicalNodeId(item)));
+          if(!data[sourceHierarchy].some(candidate=>logicalNodeId(candidate)===logicalNodeId(item)&&candidate.def.category===category))specialIpDirectMemberships[type].delete(specialIpMembershipKey(sourceTableName,logicalNodeId(item)));
           const projected=rows.find(row=>sourceMatchesSpecialIpRow(row,item,sourceTableName));
           if(projected){projected.projectionDirect=false;reconcileSpecialIpSourceProjection(type,rows,sourceTableName);changes.push(`已从 ${category} 删除`);}
         }
         if(oldCategory!==category&&newCategory===category){
           specialIpDirectMemberships[type].add(specialIpMembershipKey(sourceTableName,logicalNodeId(item)));
-          projectSpecialIpChain(type,category,rows,factory,item,sourceTableName);
+          projectSpecialIpChain(type,category,rows,factory,item,sourceTableName,sourceHierarchy);
           reconcileSpecialIpSourceProjection(type,rows,sourceTableName);
           changes.push(`已新增至 ${category}`);
         }
@@ -1394,7 +1437,7 @@
     }
     function confirmSpecialIpDelete() {
       if(!pendingSpecialIpDelete)return;
-      const {item,type}=pendingSpecialIpDelete,rows=type==='io'?ioIpRows:analogIpRows;
+      const {item,type,sourceRows:deletedSourceRows=[item]}=pendingSpecialIpDelete,rows=type==='io'?ioIpRows:analogIpRows;
       if(logicalNodeHasChildren(rows,item)){
         closeSpecialIpDeleteModal();
         showToast('请先删除或移动该节点的子 Block');return;
@@ -1409,13 +1452,15 @@
         const sourceState=tableStateStore.get(item.sourceTableName);
         if(!sourceState){closeSpecialIpDeleteModal();showToast(`无法找到来源表 ${item.sourceTableName}`);return;}
         const sourceItems=['schematic','layout'].flatMap(hierarchy=>sourceState.data[hierarchy]);
-        const sourceDefinitions=[...new Map(sourceItems.filter(candidate=>candidate.def.id===item.sourceDefinitionId).map(candidate=>[candidate.def.id,candidate.def])).values()];
-        if(!sourceDefinitions.length){closeSpecialIpDeleteModal();showToast(`无法找到 ${item.sourceTableName} 中的来源 Block`);return;}
-        sourceDefinitions.forEach(definition=>definition.category=restoredCategory);
-        ['schematic','layout'].forEach(hierarchy=>{
-          const sourceItem=sourceState.data[hierarchy].find(candidate=>candidate.def.id===item.sourceDefinitionId);
-          if(!sourceItem)return;
-          (sourceState.changeHistory[hierarchy][item.sourceDefinitionId] ||= []).unshift(changeEvent(currentActorId,'Block Category',type==='io'?'IO IP':'Analog IP',restoredCategory,auditNow()));
+        const sourceIds=[...new Set(deletedSourceRows.flatMap(specialIpSourceDefinitionIds))];
+        if(sourceIds.some(id=>!sourceItems.some(candidate=>candidate.def.id===id))){closeSpecialIpDeleteModal();showToast(`无法找到 ${item.sourceTableName} 中的来源 Block`);return;}
+        sourceIds.forEach(id=>{
+          const baseline=specialIpPreviousCategories.get(specialIpSourceIdentity(item.sourceTableName,id))??'';
+          sourceItems.filter(candidate=>candidate.def.id===id).forEach(candidate=>{candidate.def.category=baseline;});
+          ['schematic','layout'].forEach(hierarchy=>{
+            if(!sourceState.data[hierarchy].some(candidate=>candidate.def.id===id))return;
+            (sourceState.changeHistory[hierarchy][id] ||= []).unshift(changeEvent(currentActorId,'Block Category',type==='io'?'IO IP':'Analog IP',baseline,auditNow()));
+          });
         });
       }
       const groupKey=specialIpGroupKey(item);
@@ -1455,8 +1500,10 @@
       renderWbs();showToast(`${item.block} 已更新`);
     }
     function switchPrototypeTable(tableName) {
+      flushPendingCategoryEdits();
       setTableSelectorValue(tableName);
       if(tableName===activeTableName)return;
+      closeDrawer(false);
       specialIpAddDraft=null;
       closeInlineAddMenu();
       if(!isSpecialIpTable())tableStateStore.set(activeTableName,captureTableState());
@@ -1465,7 +1512,6 @@
         restoreTableState(tableStateStore.get(tableName));
       }
       activeTableName=tableName;
-      Object.values(selectedVersionRows).forEach(selection=>selection.clear());
       resetWbsColumnFilters();
       if(isSpecialIpTable())renderWbs();
       else {
@@ -1521,8 +1567,9 @@
             railState[type][descriptor.def.id]=railState[type][oldId]||blankRail(type);
             delete railState[type][oldId];
             if(changeHistory[type][oldId]){changeHistory[type][descriptor.def.id]=[...(changeHistory[type][descriptor.def.id]||[]),...changeHistory[type][oldId]];delete changeHistory[type][oldId];}
-            item.def=descriptor.def;
           }
+          // JSON fallback clones do not retain object sharing, even when the Definition IDs match.
+          item.def=descriptor.def;
           item.tier=descriptor.tier;item.expanded=descriptor.expanded;
           railState[type][descriptor.def.id]||=blankRail(type);
           return item;
@@ -1704,6 +1751,7 @@
     try { latestChangeDrawerCollapsed=localStorage.getItem('de-wbs-latest-change-drawer-collapsed-v1')==='true'; }
     catch { /* Keep the in-session drawer state when storage is unavailable. */ }
     let selectedItem = null;
+    let drawerContext = null;
     let openChangeKey = null;
     let openChangeButton = null;
     let openCalculationButton = null;
@@ -1863,12 +1911,14 @@
       catch { /* Prototype still supports in-session resizing when storage is unavailable. */ }
     }
     const sharedFrozenColumnKeys=new Set(['block','round','category','reference']);
+    const measuredHeaderMinimums={schematic:{},layout:{},spf:{},io:{},analog:{}};
+    function headerMinimum(type,key,minimum) { return Math.max(minimum,measuredHeaderMinimums[type][key]||0); }
     function savedWbsColumnWidth(type,key) {
       if(['schematic','layout'].includes(type)&&sharedFrozenColumnKeys.has(key))return wbsColumnWidths.schematic?.[key]??wbsColumnWidths.layout?.[key];
       return wbsColumnWidths[type]?.[key];
     }
     function currentWbsColumnWidths(type=currentHierarchy) {
-      return wbsColumnDefinitions[type].map(([key,minimum])=>key==='latestChange'?(latestChangeDrawerCollapsed?8:44):Math.max(minimum,Number(savedWbsColumnWidth(type,key))||minimum));
+      return wbsColumnDefinitions[type].map(([key,minimum])=>key==='latestChange'?(latestChangeDrawerCollapsed?8:44):Math.max(headerMinimum(type,key,minimum),Number(savedWbsColumnWidth(type,key))||minimum));
     }
     function displayedWbsColumnWidths(definitions,widths) {
       if(!isWbsTableFullscreen())return [...widths];
@@ -1887,18 +1937,57 @@
       });
       return displayed;
     }
-    function assertWbsHeaderLabelsFit() {
-      const overflowing=[...wbsHead.querySelectorAll('.column-header-label, .io-ip-group-title')].filter(label=>{
+    function overflowingWbsHeaderLabels() {
+      return [...wbsHead.querySelectorAll('.column-header-label, .io-ip-group-title')].filter(label=>{
         if(label.closest('.change-column')||!label.getClientRects().length)return false;
         const lineHeight=parseFloat(getComputedStyle(label).lineHeight)||14;
         return label.scrollHeight>lineHeight*2+1;
-      }).map(label=>label.textContent.trim().replace(/\s+/g,' '));
+      });
+    }
+    // Strict assertion is available to tests, never used to interrupt live row binding.
+    function assertWbsHeaderLabelsFit() {
+      const overflowing=overflowingWbsHeaderLabels().map(label=>label.textContent.trim().replace(/\s+/g,' '));
       if(overflowing.length)throw new Error(`WBS 列字段名称超过两行：${overflowing.join('、')}`);
+    }
+    function fitWbsHeaderColumns(type,definitions,widths) {
+      definitions.forEach(([key,minimum],index)=>{if(key!=='latestChange')widths[index]=Math.max(widths[index],headerMinimum(type,key,minimum));});
+      const apply=()=>{
+        [...wbsColgroup.children].forEach((column,index)=>{column.style.width=`${widths[index]}px`;});
+        const total=widths.reduce((sum,width)=>sum+width,0);wbsTable.style.width=`${total}px`;wbsTable.style.minWidth=`${total}px`;
+      };
+      apply();
+      for(let attempt=0;attempt<12;attempt++){
+        const overflowing=overflowingWbsHeaderLabels();
+        if(!overflowing.length)break;
+        const indexes=new Set();
+        overflowing.forEach(label=>{
+          const header=label.closest('th');
+          if(header.dataset.columnKey){indexes.add(definitions.findIndex(([key])=>key===header.dataset.columnKey));return;}
+          let offset=0;
+          for(const sibling of header.parentElement.children){if(sibling===header)break;offset+=sibling.colSpan;}
+          for(let index=offset;index<offset+header.colSpan;index++)indexes.add(index);
+        });
+        let changed=false;
+        indexes.forEach(index=>{
+          if(index<0||!definitions[index]||definitions[index][0]==='latestChange')return;
+          const next=Math.min(600,widths[index]+Math.max(8,Math.ceil(widths[index]*.12)));
+          if(next<=widths[index])return;
+          changed=true;widths[index]=next;
+          const key=definitions[index][0],types=['schematic','layout'].includes(type)&&sharedFrozenColumnKeys.has(key)?['schematic','layout']:[type];
+          types.forEach(target=>measuredHeaderMinimums[target][key]=next);
+        });
+        if(!changed)break;
+        apply();
+      }
+      // Even an extreme font override must not leave the visible table without click handlers.
+      wbsHead.dataset.headerOverflow=String(overflowingWbsHeaderLabels().length);
+      definitions.forEach(([key,minimum])=>wbsHead.querySelector(`[data-column-key="${key}"] .column-resizer`)?.setAttribute('aria-valuemin',String(headerMinimum(type,key,minimum))));
     }
     function syncWbsColumnLayout(type,definitions,widths) {
       const displayedWidths=displayedWbsColumnWidths(definitions,widths);
       if(inlineAddDraft?.hierarchy===type)displayedWidths[0]=Math.max(displayedWidths[0],330);
       if(inlineAddDraft?.hierarchy===type&&inlineAddDraft.mode==='version')displayedWidths[1]=Math.max(displayedWidths[1],160);
+      fitWbsHeaderColumns(type,definitions,displayedWidths);
       [...wbsColgroup.children].forEach((column,index)=>{column.style.width=`${displayedWidths[index]}px`;});
       const totalWidth=displayedWidths.reduce((sum,width)=>sum+width,0);
       wbsTable.style.width=`${totalWidth}px`;
@@ -1915,7 +2004,6 @@
       workspace.style.setProperty('--wbs-change-width',`${changeWidth}px`);
       workspace.classList.toggle('latest-change-drawer-collapsed',latestChangeDrawerCollapsed);
       wbsHead.querySelectorAll('.column-resizer').forEach((handle,index)=>handle.setAttribute('aria-valuenow',String(displayedWidths[index])));
-      assertWbsHeaderLabelsFit();
     }
     function refreshWbsColumnLayout() { return isIoIpTable()?refreshSpecialIpColumnLayout('io',ioIpColumnDefinitions):isAnalogIpTable()?refreshSpecialIpColumnLayout('analog',analogIpColumnDefinitions):syncWbsColumnLayout(currentHierarchy,wbsColumnDefinitions[currentHierarchy],currentWbsColumnWidths()); }
     function applyWbsColumnLayout() {
@@ -1989,7 +2077,7 @@
       syncWbsColumnLayout(type,definitions,widths);
     }
     function currentSpecialIpColumnWidths(type,definitions) {
-      return definitions.map(([key,minimum])=>key==='latestChange'?(latestChangeDrawerCollapsed?8:44):Math.max(minimum,Number(wbsColumnWidths[type]?.[key])||minimum));
+      return definitions.map(([key,minimum])=>key==='latestChange'?(latestChangeDrawerCollapsed?8:44):Math.max(headerMinimum(type,key,minimum),Number(wbsColumnWidths[type]?.[key])||minimum));
     }
     function assignSpecialIpHeaderKeys(type,definitions) {
       const directIndexes=type==='io'?[0,1,2,3,4,5,26]:[0,1,2,3,4,5,16,26];
@@ -2004,6 +2092,7 @@
       displayedWidths[1]=Math.max(displayedWidths[1],165+(maxTier-1)*17);
       if(specialIpAddDraft?.type===type&&specialIpAddDraft.mode==='block')displayedWidths[1]=Math.max(displayedWidths[1],330);
       if(specialIpAddDraft?.type===type&&specialIpAddDraft.mode==='version')displayedWidths[2]=Math.max(displayedWidths[2],170);
+      fitWbsHeaderColumns(type,definitions,displayedWidths);
       [...wbsColgroup.children].forEach((column,index)=>{column.style.width=`${displayedWidths[index]}px`;});
       const totalWidth=displayedWidths.reduce((sum,width)=>sum+width,0);
       wbsTable.style.width=`${totalWidth}px`;wbsTable.style.minWidth=`${totalWidth}px`;
@@ -2017,7 +2106,6 @@
       workspace.style.setProperty('--wbs-change-width',`${displayedWidths[displayedWidths.length-1]}px`);
       workspace.classList.toggle('latest-change-drawer-collapsed',latestChangeDrawerCollapsed);
       definitions.forEach(([key],index)=>wbsHead.querySelector(`[data-column-key="${key}"] .column-resizer`)?.setAttribute('aria-valuenow',String(displayedWidths[index])));
-      assertWbsHeaderLabelsFit();
     }
     function refreshSpecialIpColumnLayout(type,definitions) {
       syncSpecialIpColumnLayout(type,definitions,currentSpecialIpColumnWidths(type,definitions));
@@ -2214,7 +2302,7 @@
       document.getElementById('inlineDraftTier')?.addEventListener('change',event=>{applyInlineDraftTier(Number(event.target.value));renderWbs();});
       document.getElementById('confirmInlineDraft')?.addEventListener('click',event=>{event.stopPropagation();confirmInlineDraft();});
       document.getElementById('cancelInlineDraft')?.addEventListener('click',event=>{event.stopPropagation();cancelInlineDraft();});
-      if(inlineAddDraft.focus){inlineAddDraft.focus=false;requestAnimationFrame(()=>document.getElementById(inlineAddDraft.mode==='version'?'inlineDraftVersion':'inlineDraftName')?.focus());}
+      if(inlineAddDraft.focus){const draft=inlineAddDraft,target=draft.mode==='version'?'inlineDraftVersion':'inlineDraftName';draft.focus=false;requestAnimationFrame(()=>{if(inlineAddDraft===draft)document.getElementById(target)?.focus();});}
     }
     function cancelInlineDraft(notify=true) { inlineAddDraft=null;renderWbs();if(notify)showToast('已取消草稿'); }
     function insertInlineItem(item,type,anchor,mode) {
@@ -2380,7 +2468,7 @@
       });
       document.getElementById('confirmInlineDraft')?.addEventListener('click',event=>{event.stopPropagation();confirmSpecialIpAddDraft();});
       document.getElementById('cancelInlineDraft')?.addEventListener('click',event=>{event.stopPropagation();cancelSpecialIpAddDraft();});
-      if(specialIpAddDraft.focus){specialIpAddDraft.focus=false;requestAnimationFrame(()=>document.getElementById(specialIpAddDraft.mode==='version'?'specialIpDraftVersion':'specialIpDraftName')?.focus());}
+      if(specialIpAddDraft.focus){const draft=specialIpAddDraft,target=draft.mode==='version'?'specialIpDraftVersion':'specialIpDraftName';draft.focus=false;requestAnimationFrame(()=>{if(specialIpAddDraft===draft)document.getElementById(target)?.focus();});}
     }
     function specialIpTreeVisible(item,rows) {
       let parentNodeId=logicalParentNodeId(item);
@@ -2527,6 +2615,7 @@
 
     function renderWbs() {
       assertHierarchyIntegrity();
+      if(selectedSpecialIpItem&&![...ioIpRows,...analogIpRows].some(row=>row.id===selectedSpecialIpItem.id))closeDrawer(false);
       closeReviewAiPreview();
       const preservedRowChange=openChangeButton?.matches('[data-change-history]')?{hierarchy:currentHierarchy,itemId:openChangeButton.closest('tr[data-id]')?.dataset.id}:null;
       const preservedSpecialChange=openChangeButton?.matches('[data-special-change-history]')?{tableName:activeTableName,itemId:openChangeButton.closest('tr')?.dataset.ioId||openChangeButton.closest('tr')?.dataset.analogId}:null;
@@ -2626,6 +2715,7 @@
     }
 
     function selectVisibleVersion(item,type=currentHierarchy) {
+      flushPendingCategoryEdits();
       selectedVersionRows[type].set(blockMergeGroupKey(item),item.id);
       if(!['schematic','layout'].includes(type))return;
       const counterpartType=type==='schematic'?'layout':'schematic',counterpart=identityCounterpart(item,counterpartType);
@@ -2684,10 +2774,11 @@
     }
 
     function bindWbsRows() {
+      const hierarchy=currentHierarchy,tableName=activeTableName;
       wbsBody.querySelectorAll('tr[data-id]').forEach(tr => {
         const item = data[currentHierarchy].find(x => x.id === tr.dataset.id);
         tr.querySelector('.tree-toggle')?.addEventListener('click', e => { e.stopPropagation(); const group=logicalVersions(data[currentHierarchy],item),expanded=group.every(member=>member.expanded);setLogicalNodeExpanded(data[currentHierarchy],item,!expanded);renderWbs(); });
-        tr.querySelector('.block-name')?.addEventListener('click', e => { e.stopPropagation(); openDrawer(item); });
+        tr.querySelector('.block-name')?.addEventListener('click', e => { e.stopPropagation(); openDrawer(item,{tableName,hierarchy}); });
         tr.querySelector('[data-add-child]')?.addEventListener('click', e => { e.stopPropagation(); openInlineAddMenu(item,e.currentTarget); });
         tr.querySelector('[data-delete-instance]')?.addEventListener('click', e => { e.stopPropagation(); requestDeleteInstance(item,currentHierarchy); });
         tr.querySelector('[data-version-switch]')?.addEventListener('click',event=>event.stopPropagation());
@@ -2707,7 +2798,7 @@
           control.addEventListener('click', e => e.stopPropagation());
           control.addEventListener('change', event => {
             const field=event.currentTarget.dataset.edit,value=event.currentTarget.value;
-            if(field==='category')window.setTimeout(()=>updateTableField(item,field,value),0);
+            if(field==='category')queueCategoryEdit(item,hierarchy,value);
             else updateTableField(item,field,value);
           });
         });
@@ -2716,7 +2807,48 @@
       });
     }
 
+    function commitBlockCategory(item,value) {
+      const {item:sourceItem}=specialIpSourceContext(item);
+      if(!sourceItem||!blockCategories.includes(value)){showToast('Block Category 无效，请重新选择');return false;}
+      const oldValue=sourceItem.def.category;
+      if(oldValue!==value&&specialIpCategoryRemovalBlocked(sourceItem,oldValue,value)){
+        showToast(`请先删除或移动 ${oldValue} 中该 Block 的子节点`);renderWbs();return false;
+      }
+      const definitions=[...new Set([...data.schematic,...data.layout].filter(row=>row.def.id===sourceItem.def.id).map(row=>row.def))];
+      const oldCategories=definitions.map(def=>[def,def.category]);
+      const rowSnapshots=[ioIpRows,analogIpRows].map(rows=>[rows,rows.map(row=>[row,clonePrototypeState(row)])]);
+      const mapSnapshots=[specialIpPreviousCategories,...Object.values(specialIpStablePositions),...Object.values(specialIpStableSources),...Object.values(specialIpSourceRegionRanks),...Object.values(selectedSpecialIpVersions)].map(map=>[map,[...map]]);
+      const membershipSnapshots=Object.values(specialIpDirectMemberships).map(set=>[set,[...set]]);
+      const historySnapshot=clonePrototypeState(specialIpChangeHistory);
+      let incrementalError=null;
+      try{
+        definitions.forEach(def=>{def.category=value;});
+        if(![IO_IP_TABLE_NAME,ANALOG_IP_TABLE_NAME].includes(oldValue)&&[IO_IP_TABLE_NAME,ANALOG_IP_TABLE_NAME].includes(value))specialIpPreviousCategories.set(specialIpSourceIdentity(activeTableName,sourceItem.def.id),oldValue);
+        try{syncWbsCategoryToSpecialIp(sourceItem,oldValue,value);}catch(error){incrementalError=error;console.warn('Incremental Category projection failed; reconciling source Versions',error);}
+        reconcileActiveSourceCategoriesToSpecialIp();
+        assertHierarchyIntegrity();
+        for(const [type,category,rows] of [['io',IO_IP_TABLE_NAME,ioIpRows],['analog',ANALOG_IP_TABLE_NAME,analogIpRows]]){
+          const linked=rows.find(row=>sourceMatchesSpecialIpRow(row,sourceItem));
+          if(value===category&&!linked?.projectionDirect)throw new Error('来源 Version 缺少对应投影');
+          if(value!==category&&linked?.projectionDirect)throw new Error('来源 Version 存在过期投影');
+          if(value===category)selectedSpecialIpVersions[type].set(specialIpGroupKey(linked),linked.id);
+        }
+      }catch(error){
+        oldCategories.forEach(([def,category])=>{def.category=category;});
+        rowSnapshots.forEach(([rows,snapshots])=>{snapshots.forEach(([row,snapshot])=>{Object.keys(row).forEach(key=>delete row[key]);Object.assign(row,snapshot);});rows.splice(0,rows.length,...snapshots.map(([row])=>row));});
+        mapSnapshots.forEach(([map,entries])=>{map.clear();entries.forEach(([key,value])=>map.set(key,value));});
+        membershipSnapshots.forEach(([set,entries])=>{set.clear();entries.forEach(value=>set.add(value));});
+        Object.assign(specialIpChangeHistory,historySnapshot);
+        console.error('Block Category commit failed; transaction restored',error);
+        renderWbs();showToast('Block Category 保存失败，未改动原数据，请重试');return false;
+      }
+      if(oldValue!==value)recordDefinitionChange(sourceItem,['schematic','layout'],'Block Category',oldValue,value);
+      renderWbs();renderDashboard();renderDelay();
+      showToast(`Block Category 已更新${incrementalError?'；已从来源 Version 恢复同步':''}`);return true;
+    }
+
     function updateTableField(item, field, value) {
+      if(field==='category')return commitBlockCategory(item,value);
       const rail = railFor(item, currentHierarchy);
       const info = currentHierarchy === 'spf' ? spfInfoFor(item) : null;
       const normalized = field === 'reference' && value === '空' ? '' : field === 'round' ? normalizeVersion(value) : value;
@@ -2740,10 +2872,6 @@
           return;
         }
       }
-      if(field==='category'&&specialIpCategoryRemovalBlocked(item,oldValue,normalized)){
-        showToast(`请先删除或移动 ${oldValue} IP 中该 Block 的子节点`);renderWbs();return;
-      }
-      if (field === 'category') item.def.category = normalized;
       if (field === 'reference') item.def.reference = normalized;
       if (field === 'owner') item.def[currentHierarchy + 'Owner'] = normalized;
       if (field === 'schematicOwner') item.def.schematicOwner = normalized;
@@ -2759,28 +2887,12 @@
       }
       if (field === 'planned' || field === 'actual' || field === 'startDate') rail[field] = normalized;
       const labels = {round:'Version',category:'Block Category',reference:'Reference project',owner:hierarchyMeta[currentHierarchy].owner,schematicOwner:'Schematic Owner',layoutOwner:'Layout Owner',lvsPath:'LVS path',cdl:'cdl',gds:'gds',planWorkdays:'Plan workdays',actualWorkdays:'Actual workdays',resource:'Resource',planned:hierarchyMeta[currentHierarchy].date,actual:hierarchyMeta[currentHierarchy].actual,startDate:'Start date'};
-      if(field==='round'||field==='category'||field==='reference') recordDefinitionChange(item,['schematic','layout'],labels[field],oldValue,normalized);
+      if(field==='round'||field==='reference') recordDefinitionChange(item,['schematic','layout'],labels[field],oldValue,normalized);
       else if(field==='schematicOwner'||(field==='owner'&&currentHierarchy==='schematic')) recordDefinitionChange(item,['schematic','spf'],labels[field],oldValue,normalized);
       else if(field==='layoutOwner'||(field==='owner'&&currentHierarchy==='layout')) recordDefinitionChange(item,['layout','spf'],labels[field],oldValue,normalized);
       else recordChange(item,currentHierarchy,labels[field],oldValue,normalized);
-      let specialIpSyncMessage=null;
-      if(field==='category'){
-        let incrementalError=null;
-        try{
-          specialIpSyncMessage=syncWbsCategoryToSpecialIp(item,oldValue,normalized);
-        }catch(error){incrementalError=error;console.warn('Incremental Block Category projection failed; reconciling from source state',error);}
-        try{
-          reconcileActiveSourceCategoriesToSpecialIp();
-          if(incrementalError)specialIpSyncMessage=`已通过来源数据同步至 ${normalized}`;
-        }catch(error){
-          console.error('Block Category projection reconciliation failed',error);
-          item.def.category=oldValue;
-          try{reconcileActiveSourceCategoriesToSpecialIp();}catch(recoveryError){console.error('Block Category projection recovery failed',recoveryError);}
-          renderWbs();showToast('Block Category 更新失败，已恢复原值，请重试');return;
-        }
-      }
       renderWbs(); renderDashboard(); renderDelay();
-      showToast(`${labels[field]} 已更新${specialIpSyncMessage?`；${specialIpSyncMessage}`:''}`);
+      showToast(`${labels[field]} 已更新`);
     }
 
     function updateDefinitionCheck(item, type, index, checked, reopenDrawer=false) {
@@ -2951,19 +3063,27 @@
       showToast(wholeGroup?`${item.def.name} 整个 Block 已删除`:`已删除 ${targets.map(target=>itemVersion(target,type)).join('、')}`);
     }
     function deleteSpecialIpVersions(item,type,group,targets,wholeGroup) {
-      const rows=type==='io'?ioIpRows:analogIpRows,targetIds=new Set(targets.map(target=>target.id)),sourceRow=group.find(candidate=>candidate.sourceDefinitionId!==undefined&&candidate.sourceTableName),sourceSelected=sourceRow&&targetIds.has(sourceRow.id);
+      const rows=type==='io'?ioIpRows:analogIpRows,targetIds=new Set(targets.map(target=>target.id)),sourceRow=group.find(candidate=>candidate.sourceDefinitionId!==undefined&&candidate.sourceTableName);
       if(wholeGroup&&sourceRow){
         const groupKey=specialIpGroupKey(item);
-        pendingSpecialIpDelete={item:sourceRow,type};
+        pendingSpecialIpDelete={item:sourceRow,type,sourceRows:group.filter(candidate=>candidate.sourceDefinitionId!==undefined&&candidate.sourceTableName)};
         confirmSpecialIpDelete();
         group.filter(candidate=>candidate.id!==sourceRow.id).forEach(candidate=>{const index=rows.findIndex(row=>row.id===candidate.id);if(index>=0)removeSpecialIpProjectionRow(type,rows,index);specialIpStablePositions[type].delete(candidate.id);specialIpStableSources[type].delete(candidate.id);});
         pruneUnusedSpecialIpAncestors(type,rows,sourceRow.sourceTableName);
         selectedSpecialIpVersions[type].delete(groupKey);
         renderWbs();showToast(`${item.block} 整个 Block 已删除`);return;
       }
-      if(sourceSelected){
+      const removedSources=targets.filter(candidate=>candidate.sourceDefinitionId!==undefined&&candidate.sourceTableName);
+      if(removedSources.length){
         const fallback=group.filter(candidate=>!targetIds.has(candidate.id))[0];
-        if(fallback){const sourcePosition=specialIpStablePositions[type].get(sourceRow.id);fallback.sourceTableName=sourceRow.sourceTableName;fallback.sourceDefinitionId=sourceRow.sourceDefinitionId;fallback.sourceNodeId=sourceRow.sourceNodeId;fallback.projectionDirect=sourceRow.projectionDirect;if(Number.isFinite(sourcePosition))specialIpStablePositions[type].set(fallback.id,sourcePosition);specialIpStableSources[type].set(fallback.id,sourceRow.sourceTableName);}
+        if(fallback){
+          const removedSource=removedSources[0],sourcePosition=specialIpStablePositions[type].get(removedSource.id);
+          fallback.sourceDefinitionIds=[...new Set([...specialIpSourceDefinitionIds(fallback),...removedSources.flatMap(specialIpSourceDefinitionIds)])];
+          fallback.sourceTableName=removedSource.sourceTableName;fallback.sourceDefinitionId=fallback.sourceDefinitionIds[0];fallback.sourceNodeId=removedSource.sourceNodeId;
+          fallback.projectionDirect=fallback.projectionDirect||removedSources.some(row=>row.projectionDirect);
+          if(Number.isFinite(sourcePosition))specialIpStablePositions[type].set(fallback.id,sourcePosition);
+          specialIpStableSources[type].set(fallback.id,removedSource.sourceTableName);
+        }
       }
       targets.forEach(target=>{const index=rows.findIndex(candidate=>candidate.id===target.id);if(index>=0)removeSpecialIpProjectionRow(type,rows,index);specialIpStablePositions[type].delete(target.id);specialIpStableSources[type].delete(target.id);});
       const remaining=group.filter(candidate=>!targetIds.has(candidate.id)).sort((left,right)=>specialIpVersionRank(left)-specialIpVersionRank(right)),key=specialIpGroupKey(item);
@@ -3149,29 +3269,55 @@
         ${specialIpDetailSection('Comment',[['结论',item.comment]])}
         ${specialIpDetailSection('All check done & final review',[['Planned finish',item.finalReviewPlanned],['Actual finish',item.finalReviewActual],['Status',finalReviewStatus,true]])}`;
     }
-    function openSpecialIpDrawer(item,type) {
+    function resetDrawerTitleEditing() {
+      const title=document.getElementById('drawerTitle'),edit=document.getElementById('drawerTitleEdit');
+      title.onblur=null;title.onkeydown=null;title.contentEditable='false';
+      edit.onclick=null;edit.classList.remove('editing');edit.setAttribute('aria-pressed','false');
+    }
+    function currentDrawerItem(context=drawerContext) {
+      if(!context||context!==drawerContext||context.tableName!==activeTableName)return null;
+      if(context.special)return (context.type==='io'?ioIpRows:analogIpRows).find(row=>row.id===context.itemId)||null;
+      if(context.type!==currentHierarchy)return null;
+      return data[context.type].find(row=>row.id===context.itemId&&row.def.id===context.definitionId)||null;
+    }
+    function openSpecialIpDrawer(item,type,options={}) {
+      flushPendingCategoryEdits();
+      const expected=type==='io'?IO_IP_TABLE_NAME:ANALOG_IP_TABLE_NAME;
+      item=(type==='io'?ioIpRows:analogIpRows).find(row=>row.id===item?.id);
+      if(!item||activeTableName!==expected){showToast('Block 不在当前表中，请重新选择');return false;}
+      const body=document.getElementById('drawerBody'),scrollTop=options.preserveScroll?body.scrollTop:0,html=specialIpDrawerHtml(item,type);
+      resetDrawerTitleEditing();
+      const context=drawerContext={tableName:activeTableName,type,itemId:item.id,special:true};
       selectedItem=null;selectedSpecialIpItem=item;
+      selectedSpecialIpVersions[type].set(specialIpGroupKey(item),item.id);
       if(type==='io')selectedIoIpRowId=item.id;else selectedAnalogIpRowId=item.id;
       document.getElementById('drawerTitleEdit').hidden=true;
       document.getElementById('drawerTitle').textContent=item.block;
       document.getElementById('drawerSubtitle').textContent=`${type==='io'?'IO IP':'Analog IP'} · T${item.tier} · Block 详情`;
-      document.getElementById('drawerBody').innerHTML=specialIpDrawerHtml(item,type);
+      body.innerHTML=html;
       document.querySelectorAll('[data-special-drawer-version-id]').forEach(button=>button.addEventListener('click',()=>{
+        if(!currentDrawerItem(context))return;
         const rows=type==='io'?ioIpRows:analogIpRows,next=rows.find(candidate=>candidate.id===button.dataset.specialDrawerVersionId);
         if(!next)return;
-        const scrollTop=document.getElementById('drawerBody').scrollTop;
-        selectSpecialIpVersion(next,type);selectedSpecialIpItem=next;
-        document.getElementById('drawerTitle').textContent=next.block;
-        document.getElementById('drawerBody').innerHTML=specialIpDrawerHtml(next,type);
-        openSpecialIpDrawer(next,type);document.getElementById('drawerBody').scrollTop=scrollTop;
+        openSpecialIpDrawer(next,type,{preserveScroll:true});
       }));
-      document.querySelectorAll('[data-special-detail-edit]').forEach(control=>control.addEventListener('change',()=>applySpecialIpFieldChange(item,type,control.dataset.specialDetailEdit,control.value)));
+      document.querySelectorAll('[data-special-detail-edit]').forEach(control=>control.addEventListener('change',()=>{const live=currentDrawerItem(context);if(live)applySpecialIpFieldChange(live,type,control.dataset.specialDetailEdit,control.value);}));
       document.getElementById('drawerBackdrop').classList.add('open');
       document.getElementById('detailDrawer').classList.add('open');
+      body.scrollTop=scrollTop;
       renderWbs();
+      return true;
     }
     function openDrawer(item,options={}) {
+      flushPendingCategoryEdits();
+      const type=options.hierarchy||currentHierarchy;
+      if((options.tableName&&options.tableName!==activeTableName)||type!==currentHierarchy){showToast('表视图已切换，请重新选择 Block');return false;}
+      item=data[type]?.find(row=>row.id===item?.id&&row.def.id===item?.def?.id);
+      if(!item||!Array.isArray(railFor(item,type)?.checks)){showToast('Block 数据已变化，请在当前表重新选择');return false;}
       const drawerBody=document.getElementById('drawerBody'),scrollTop=options.preserveScroll?drawerBody.scrollTop:0;
+      const html=drawerHtml(item);
+      resetDrawerTitleEditing();
+      drawerContext={tableName:activeTableName,type,itemId:item.id,definitionId:item.def.id,special:false};
       document.getElementById('drawerTitleEdit').hidden=false;
       selectedSpecialIpItem=null;
       selectVisibleVersion(item,currentHierarchy);
@@ -3181,13 +3327,14 @@
       document.getElementById('drawerSubtitle').textContent = versionGroup.length>1
         ? `${currentHierarchy.toUpperCase()} · Tier ${item.tier} · ${versionGroup.length} Versions`
         : `${currentHierarchy.toUpperCase()} · Tier ${item.tier} · Version ${itemVersion(item,currentHierarchy)}`;
-      document.getElementById('drawerBody').innerHTML = drawerHtml(item);
+      drawerBody.innerHTML = html;
       document.getElementById('drawerBackdrop').classList.add('open');
       document.getElementById('detailDrawer').classList.add('open');
       bindDrawerTitle(item);
       bindDrawer(item);
-      if(options.preserveScroll)drawerBody.scrollTop=scrollTop;
+      drawerBody.scrollTop=scrollTop;
       renderWbs();
+      return true;
     }
 
     function drawerHtml(item) {
@@ -3238,6 +3385,7 @@
 
     function bindDrawerTitle(item) {
       const title=document.getElementById('drawerTitle'),edit=document.getElementById('drawerTitleEdit');
+      const context=drawerContext;
       let cancelled=false;
       const stopEditing=()=>{
         title.contentEditable='false';
@@ -3245,6 +3393,7 @@
         edit.setAttribute('aria-pressed','false');
       };
       edit.onclick=()=>{
+        if(!currentDrawerItem(context))return;
         title.contentEditable='true';
         edit.classList.add('editing');
         edit.setAttribute('aria-pressed','true');
@@ -3257,19 +3406,25 @@
         if(event.key==='Escape'){event.preventDefault();event.stopPropagation();cancelled=true;title.textContent=item.def.name;title.blur();}
       };
       title.onblur=()=>{
+        if(!edit.classList.contains('editing'))return;
+        const live=currentDrawerItem(context);
         const nextName=title.textContent;
         stopEditing();
+        if(!live)return;
         if(cancelled){cancelled=false;return;}
-        updateBlockName(item,nextName);
+        updateBlockName(live,nextName);
       };
     }
 
     function bindDrawer(item) {
+      const context=drawerContext;
       document.querySelectorAll('[data-drawer-version-id]').forEach(button=>button.addEventListener('click',()=>{
+        if(!currentDrawerItem(context))return;
         const target=data[currentHierarchy].find(candidate=>candidate.id===button.dataset.drawerVersionId);
         if(target)openDrawer(target,{preserveScroll:true});
       }));
       document.querySelectorAll('[data-ai-routing]').forEach(button=>button.addEventListener('click',()=>{
+        const item=currentDrawerItem(context);if(!item)return;
         const enabled=button.dataset.aiRouting==='yes';
         detailState.aiRouting[item.def.id]=enabled;
         const toggle=button.closest('[data-ai-routing-toggle]');
@@ -3278,9 +3433,11 @@
         showToast(`AI Routing 已设为 ${enabled?'Yes':'No'}`);
       }));
       document.querySelectorAll('[data-check]').forEach(input => input.addEventListener('change', () => {
+        const item=currentDrawerItem(context);if(!item)return;
         updateDefinitionCheck(item,currentHierarchy,Number(input.dataset.check),input.checked,true);
       }));
       document.querySelectorAll('[data-spf-field]').forEach(input => input.addEventListener('change', () => {
+        const item=currentDrawerItem(context);if(!item)return;
         const v = spfInfoFor(item), field=input.dataset.spfField, oldValue=v[field];
         if(oldValue===input.value)return;
         v[field] = input.value;
@@ -3288,6 +3445,7 @@
         showToast('SPF 字段已更新'); openDrawer(item);
       }));
       document.querySelectorAll('[data-materials-field]').forEach(input=>input.addEventListener('change',()=>{
+        const item=currentDrawerItem(context);if(!item)return;
         const backup=backupFor(item,currentHierarchy), field=input.dataset.materialsField, oldValue=backup.materials[field];
         if(oldValue===input.value)return;
         backup.materials[field]=input.value;
@@ -3295,6 +3453,7 @@
         showToast(`${field==='text'?'Materials 文字说明':'Materials 链接'} 已更新`); openDrawer(item);
       }));
       document.querySelectorAll('[data-materials-upload]').forEach(input=>input.addEventListener('change',()=>{
+        const item=currentDrawerItem(context);if(!item)return;
         const files=[...input.files], allowed=/\.(ppt|pptx|xls|xlsx|doc|docx)$/i;
         const accepted=files.filter(file=>allowed.test(file.name)), rejected=files.filter(file=>!allowed.test(file.name));
         const backup=backupFor(item,currentHierarchy);
@@ -3306,6 +3465,7 @@
         showToast(message); openDrawer(item);
       }));
       document.querySelectorAll('[data-remove-attachment]').forEach(button=>button.addEventListener('click',()=>{
+        const item=currentDrawerItem(context);if(!item)return;
         const backup=backupFor(item,currentHierarchy), index=Number(button.dataset.removeAttachment), attachment=backup.materials.attachments[index];
         if(!attachment)return;
         URL.revokeObjectURL(attachment.url);
@@ -3314,6 +3474,7 @@
         showToast(`${attachment.name} 已移除`); openDrawer(item);
       }));
       document.querySelectorAll('[data-backup-field]').forEach(input=>input.addEventListener('change',()=>{
+        const item=currentDrawerItem(context);if(!item)return;
         const backup=backupFor(item,currentHierarchy), field=input.dataset.backupField, oldValue=backup[field];
         if(oldValue===input.value)return;
         backup[field]=input.value;
@@ -3410,6 +3571,8 @@
     }
 
     function setHierarchy(type) {
+      flushPendingCategoryEdits();
+      if(type!==currentHierarchy)closeDrawer(false);
       inlineAddDraft=null;closeInlineAddMenu();
       currentHierarchy = type;
       document.querySelectorAll('[data-hierarchy]').forEach(b=>b.classList.toggle('active',b.dataset.hierarchy===type));
@@ -3562,6 +3725,7 @@
       setTableSelectorValue(embeddedImportState.tableName);
       activeTableName=embeddedImportState.tableName;
       resetWbsColumnFilters();
+      Object.values(selectedVersionRows).forEach(selection=>selection.clear());
       currentHierarchy=['schematic','layout','spf'].find(type=>data[type].length)||'schematic';
       tableStateStore.set(activeTableName,captureTableState());
       reconcileActiveSourceCategoriesToSpecialIp();
@@ -3589,6 +3753,7 @@
     }
     function closeSameTierDuplicateModal() { document.getElementById('sameTierDuplicateModal').classList.remove('open'); }
     function showPage(name) {
+      if(!document.getElementById(name+'Page')?.classList.contains('active'))closeDrawer(false);
       if(name!=='wbs'){inlineAddDraft=null;closeInlineAddMenu();}
       document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===name+'Page'));
       document.querySelectorAll('.nav button[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===name));
@@ -3613,7 +3778,7 @@
       syncWbsTableFullscreen();
     }
     function toggleWbsTableFullscreen() { return isWbsTableFullscreen()?exitWbsTableFullscreen():enterWbsTableFullscreen(); }
-    function closeDrawer() { document.getElementById('drawerBackdrop').classList.remove('open'); document.getElementById('detailDrawer').classList.remove('open'); selectedItem=null;selectedSpecialIpItem=null;selectedIoIpRowId=null;selectedAnalogIpRowId=null;renderWbs(); }
+    function closeDrawer(rerender=true) { drawerContext=null;resetDrawerTitleEditing();document.getElementById('drawerBackdrop').classList.remove('open'); document.getElementById('detailDrawer').classList.remove('open');document.getElementById('drawerBody').replaceChildren();selectedItem=null;selectedSpecialIpItem=null;selectedIoIpRowId=null;selectedAnalogIpRowId=null;if(rerender)renderWbs(); }
     function setSidebarCollapsed(collapsed) {
       document.body.classList.toggle('sidebar-collapsed', collapsed);
       const button = document.getElementById('sidebarToggle');
