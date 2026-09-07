@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="de-wbs-build" content="2026-09-07-source-selection-deltas-v10">
+  <meta name="de-wbs-build" content="2026-09-08-category-visibility-v11">
   <title>DE-WBS Prototype v1</title>
   <style>
     :root {
@@ -1333,8 +1333,9 @@
       const nodeOrder=sourceOrder.get(logicalNodeId(item))??sourceOrder.size;
       let projected=rows.find(row=>row.sourceTableName===sourceTableName&&retainedSpecialIpSourceIds(row).includes(item.def.id))||restoreDormantSpecialIpRow(type,rows,item,sourceTableName);
       if(!projected){projected=factory(item,sourceTableName);projected.sourceStablePosition=sourceDerivedStablePosition(type,sourceTableName,nodeOrder);insertDerivedSpecialIpRow(type,rows,projected);}
-      // Local Add Versions return with their group, even if a previously unprojected source Version reactivates it.
-      for(const [id,row] of dormantSpecialIpRows[type])if(logicalNodeId(row)===logicalNodeId(projected)&&!retainedSpecialIpSourceIds(row).length){dormantSpecialIpRows[type].delete(id);insertDerivedSpecialIpRow(type,rows,row);}
+      // Restore local Versions and the actual manual subtree with this source group, not unrelated source paths.
+      const retainedRows=[...rows,...dormantSpecialIpRows[type].values()],rootIds=new Set([logicalNodeId(projected)]);
+      for(const [id,row] of dormantSpecialIpRows[type])if(!retainedSpecialIpSourceIds(row).length&&(rootIds.has(logicalNodeId(row))||rowIsDescendantOf(row,rootIds,retainedRows))){dormantSpecialIpRows[type].delete(id);insertDerivedSpecialIpRow(type,rows,row);}
       syncSpecialIpSourceValues(projected,item);
       projected.sourceOrder=nodeOrder;
       projected.sourceStablePosition=sourceDerivedStablePosition(type,sourceTableName,nodeOrder);
@@ -1375,21 +1376,18 @@
       rows.filter(row=>row.sourceTableName===sourceTableName&&row.sourceDefinitionId!==undefined&&!row.projectionDirect).forEach(row=>{
         if(logicalVersions(rows,row).some(version=>version!==row&&(version.projectionDirect||version.sourceDefinitionId===undefined)))removeSpecialIpProjectionRow(type,rows,rows.indexOf(row),true);
       });
-      pruneUnusedSpecialIpAncestors(type,rows,sourceTableName);
+      suspendInactiveSpecialIpGroups(type,rows,sourceTableName);
       rows.forEach(row=>{row.parent=logicalNodeRepresentative(rows,logicalParentNodeId(row))?.id||null;});
       sortSpecialIpRows(type,rows);
     }
-    function pruneUnusedSpecialIpAncestors(type,rows,sourceTableName) {
-      let removedAny=true;
-      while(removedAny){
-        removedAny=false;
-        const nodeIds=[...new Set(rows.filter(row=>row.sourceTableName===sourceTableName).map(logicalNodeId))];
-        for(let nodeIndex=nodeIds.length-1;nodeIndex>=0;nodeIndex--){
-          const nodeId=nodeIds[nodeIndex],versions=rows.filter(row=>logicalNodeId(row)===nodeId),representative=versions[0];
-          if(!representative||versions.some(version=>version.projectionDirect)||logicalNodeHasChildren(rows,representative))continue;
-          versions.forEach(version=>{const index=rows.findIndex(row=>row.id===version.id);if(index>=0)removeSpecialIpProjectionRow(type,rows,index,true);});
-          removedAny=true;
-        }
+    function suspendInactiveSpecialIpGroups(type,rows,sourceTableName) {
+      const nodeIds=[...new Set(rows.filter(row=>row.sourceTableName===sourceTableName).map(logicalNodeId))];
+      for(const nodeId of nodeIds){
+        const versions=rows.filter(row=>logicalNodeId(row)===nodeId);
+        if(!versions.length||versions.some(version=>version.projectionDirect))continue;
+        // Category exit is not trash: keep every local descendant and its Versions intact, but outside active rows.
+        const rootIds=new Set([nodeId]),subtree=rows.filter(row=>rootIds.has(logicalNodeId(row))||rowIsDescendantOf(row,rootIds,rows));
+        subtree.forEach(row=>removeSpecialIpProjectionRow(type,rows,rows.indexOf(row),true));
       }
     }
     function syncWbsCategoryToSpecialIp(item,oldCategory,newCategory) {
@@ -1416,12 +1414,13 @@
       });
       return changes.join('；')||null;
     }
-    function specialIpCategoryRemovalBlocked(item,oldCategory,newCategory) {
-      if(isSpecialIpTable()||oldCategory===newCategory)return false;
-      const type=oldCategory==='IO IP'?'io':oldCategory==='Analog IP'?'analog':null;
-      if(!type)return false;
-      const rows=type==='io'?ioIpRows:analogIpRows,linked=rows.find(row=>sourceMatchesSpecialIpRow(row,item,activeTableName));
-      return Boolean(linked&&logicalNodeHasChildren(rows,linked));
+    function specialIpSourceDeletionBlocked(item) {
+      if(isSpecialIpTable())return false;
+      // Destructive source deletion still cannot orphan either active or retained manual children.
+      return ['io','analog'].some(type=>{
+        const rows=[...(type==='io'?ioIpRows:analogIpRows),...dormantSpecialIpRows[type].values()];
+        return rows.some(row=>row.sourceTableName===activeTableName&&retainedSpecialIpSourceIds(row).includes(item.def.id)&&logicalNodeHasChildren(rows,row));
+      });
     }
     function createManualSpecialIpRow(type,draft) {
       const temporary={def:{id:`manual-${Date.now()}`,name:draft.block,round:normalizeVersion(draft.version),reference:draft.referenceProject,schematicOwner:draft.schematicOwner,layoutOwner:draft.layoutOwner}};
@@ -2960,9 +2959,6 @@
       const {item:sourceItem}=specialIpSourceContext(item);
       if(!sourceItem||!blockCategories.includes(value)){showToast('Block Category 无效，请重新选择');return false;}
       const oldValue=sourceItem.def.category;
-      if(oldValue!==value&&specialIpCategoryRemovalBlocked(sourceItem,oldValue,value)){
-        showToast(`请先删除或移动 ${oldValue} 中该 Block 的子节点`);renderWbs();return false;
-      }
       const definitions=[...new Set([...data.schematic,...data.layout].filter(row=>row.def.id===sourceItem.def.id).map(row=>row.def))];
       const oldCategories=definitions.map(def=>[def,def.category]);
       const rowSnapshots=[ioIpRows,analogIpRows].map(rows=>[rows,rows.map(row=>[row,clonePrototypeState(row)])]);
@@ -3176,7 +3172,7 @@
       if(removingWholeNode&&targets.some(([targetType,target])=>logicalNodeHasChildren(data[targetType],target)))return showToast('请先删除或移动该节点的子 Block');
       if(['schematic','layout'].includes(type)){
         const source=specialIpSourceContext(item).item;
-        if(source&&specialIpCategoryRemovalBlocked(source,source.def.category,''))return showToast('请先删除或移动特殊表中该 Block 的子节点');
+        if(source&&specialIpSourceDeletionBlocked(source))return showToast('请先删除或移动特殊表中该 Block 的子节点（包括已隐藏记录）');
       }
       const version=itemVersion(item,type);
       if (!skipConfirm&&!confirm(`确认删除 ${item.def.name} · T${item.tier} · ${version}？`)) return;
@@ -3233,7 +3229,7 @@
       const blockName=special?item.block:item.def.name;
       const rows=special?(type==='io'?ioIpRows:analogIpRows):data[type];
       if(wholeGroup&&logicalNodeHasChildren(rows,item)){showToast('请先删除或移动该 Block 的子节点');return;}
-      if(!special&&['schematic','layout'].includes(type)&&targets.some(target=>specialIpCategoryRemovalBlocked(target,target.def.category,''))){showToast('请先删除或移动特殊表中该 Block 的子节点');return;}
+      if(!special&&['schematic','layout'].includes(type)&&targets.some(target=>specialIpSourceDeletionBlocked(target))){showToast('请先删除或移动特殊表中该 Block 的子节点（包括已隐藏记录）');return;}
       if(wholeGroup&&!confirm(`确认删除 ${blockName} · T${item.tier} 的全部 ${group.length} 个 Version？`))return;
       pendingVersionDelete=null;
       document.getElementById('versionDeleteModal').classList.remove('open');
@@ -3254,7 +3250,7 @@
         pendingSpecialIpDelete={item:sourceRow,type,wholeGroup:true,sourceRows:group.filter(candidate=>candidate.sourceDefinitionId!==undefined&&candidate.sourceTableName)};
         confirmSpecialIpDelete();
         group.filter(candidate=>candidate.id!==sourceRow.id).forEach(candidate=>{const index=rows.findIndex(row=>row.id===candidate.id);if(index>=0)removeSpecialIpProjectionRow(type,rows,index);specialIpStablePositions[type].delete(candidate.id);specialIpStableSources[type].delete(candidate.id);});
-        pruneUnusedSpecialIpAncestors(type,rows,sourceRow.sourceTableName);
+        suspendInactiveSpecialIpGroups(type,rows,sourceRow.sourceTableName);
         selectedSpecialIpVersions[type].delete(groupKey);
         renderWbs();showToast(`${item.block} 整个 Block 已删除`);return;
       }
