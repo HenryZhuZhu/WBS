@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="de-wbs-build" content="2026-09-07-manual-ip-defaults-v3">
   <title>DE-WBS Prototype v1</title>
   <style>
     :root {
@@ -882,17 +883,18 @@
     };
     const currentActorId = 'lin';
 
+    // Built-in demo seed only: special IP Categories are selected by the user, not prefilled.
     const common = {
       top: { id:'top', name:'CE_TOP', round:'3rd', category:'Controller', reference:'DPJQC', blockOwner:'Yan Sun', schematicOwner:'Ming Zhao', layoutOwner:'Tao He' },
       core: { id:'core', name:'CORE_ARRAY', round:'2nd', category:'Banklogic', reference:'DPKRC', blockOwner:'Lei Wang', schematicOwner:'Han Li', layoutOwner:'Nina Gao' },
       row: { id:'row', name:'ROW_CTRL', round:'1st', category:'Row+Refresh+RHR', reference:'DPLSA', blockOwner:'Lei Wang', schematicOwner:'Qin Yang', layoutOwner:'Eric Lin' },
-      senseV1: { id:'sense-v1', name:'SENSE_AMP', round:'1st', category:'Analog IP', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Ming Zhao', layoutOwner:'Nina Gao' },
-      sense: { id:'sense', name:'SENSE_AMP', round:'2nd', category:'Analog IP', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Ming Zhao', layoutOwner:'Nina Gao' },
-      senseT4: { id:'sense-t4', name:'SENSE_AMP', round:'3rd', category:'Analog IP', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Qin Yang', layoutOwner:'Eric Lin' },
-      senseSpfV2: { id:'sense-spf-v2', name:'SENSE_AMP', round:'2nd', category:'Analog IP', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Han Li', layoutOwner:'Tao He' },
-      senseSpfT4: { id:'sense-spf-t4', name:'SENSE_AMP', round:'3rd', category:'Analog IP', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Qin Yang', layoutOwner:'Eric Lin' },
+      senseV1: { id:'sense-v1', name:'SENSE_AMP', round:'1st', category:'', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Ming Zhao', layoutOwner:'Nina Gao' },
+      sense: { id:'sense', name:'SENSE_AMP', round:'2nd', category:'', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Ming Zhao', layoutOwner:'Nina Gao' },
+      senseT4: { id:'sense-t4', name:'SENSE_AMP', round:'3rd', category:'', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Qin Yang', layoutOwner:'Eric Lin' },
+      senseSpfV2: { id:'sense-spf-v2', name:'SENSE_AMP', round:'2nd', category:'', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Han Li', layoutOwner:'Tao He' },
+      senseSpfT4: { id:'sense-spf-t4', name:'SENSE_AMP', round:'3rd', category:'', reference:'DPMXB', blockOwner:'Ming Zhao', schematicOwner:'Qin Yang', layoutOwner:'Eric Lin' },
       bitcell: { id:'bitcell', name:'BITCELL', round:'3rd', category:'Data path', reference:'DPNQC', blockOwner:'Ming Zhao', schematicOwner:'Han Li', layoutOwner:'Tao He' },
-      io: { id:'io', name:'IO_RING', round:'1st', category:'IO IP', reference:'', blockOwner:'Yan Sun', schematicOwner:'Ivy Xu', layoutOwner:'Eric Lin' },
+      io: { id:'io', name:'IO_RING', round:'1st', category:'', reference:'', blockOwner:'Yan Sun', schematicOwner:'Ivy Xu', layoutOwner:'Eric Lin' },
       dft: { id:'dft', name:'MBIST_CTRL', round:'4th', category:'DFT', reference:'DPQTA', blockOwner:'Kai Ding', schematicOwner:'Kai Ding', layoutOwner:'Sora Pan' },
       pwr: { id:'pwr', name:'DLDO_MAIN', round:'5th', category:'DLDO', reference:'DPMXB', blockOwner:'Rui Jiang', schematicOwner:'Rui Jiang', layoutOwner:'Tao He' }
     };
