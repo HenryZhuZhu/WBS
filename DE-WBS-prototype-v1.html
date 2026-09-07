@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DE-WBS Prototype v1</title>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     :root {
       --bg: #f4f6f8;
@@ -73,12 +72,17 @@
     .sidebar-foot .sidebar-toggle { margin: 0; }
     .sidebar-toggle:hover { color: white; border-color: #4c9aff; background: #2b4050; }
     .sidebar-toggle svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
-    .project-picker { display: flex; gap: 10px; align-items: center; }
+    .project-picker { min-width: 0; display: flex; gap: 10px; align-items: center; }
     .project-picker strong { color: var(--text); }
-    .project-picker select { border: 0; font-weight: 700; color: var(--text); background: transparent; padding: 6px 18px 6px 4px; }
-    #tableSelect { width: 104px; }
     .table-picker-label { margin-left: 10px; color: var(--text-3); }
-    .top-actions { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+    .table-switcher { min-width: 0; max-width: min(650px, calc(100vw - var(--sidebar) - 500px)); display: flex; align-items: center; overflow-x: auto; border: 1px solid var(--line-strong); border-radius: 5px; background: #f3f6f9; scrollbar-width: none; }
+    .table-switcher::-webkit-scrollbar { display: none; }
+    .table-switcher button { height: 30px; flex: 0 0 auto; border: 0; border-right: 1px solid var(--line); padding: 0 6px; color: var(--text-2); background: transparent; font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .table-switcher button:last-child { border-right: 0; }
+    .table-switcher button:hover { color: var(--blue); background: var(--blue-soft); }
+    .table-switcher button:focus-visible { position: relative; z-index: 1; outline: 2px solid #81aee8; outline-offset: -2px; }
+    .table-switcher button.active { color: white; background: var(--blue); }
+    .top-actions { margin-left: auto; flex: 0 0 auto; display: flex; gap: 10px; align-items: center; }
     .topbar-user { min-width: 142px; height: 38px; display: flex; align-items: center; gap: 9px; margin-left: 2px; padding-left: 12px; border-left: 1px solid var(--line); }
     .topbar-user-copy { min-width: 0; line-height: 1.25; }
     .topbar-user-copy strong { display: block; color: var(--text); font-size: 12px; }
@@ -668,7 +672,7 @@
         <span style="color:var(--text-3)">Project</span>
         <strong>DDCPC</strong>
         <span class="table-picker-label">表名称</span>
-        <select id="tableSelect" aria-label="选择表名称"><option>ChanEdgel</option><option>ChanLeft</option><option>ChanMid</option><option>IO IP</option><option>Analog IP</option></select>
+        <div class="table-switcher" id="tableSelect" role="radiogroup" aria-label="选择表名称"><button class="active" type="button" data-table-name="ChanEdgel" role="radio" aria-checked="true">ChanEdgel</button><button type="button" data-table-name="ChanLeft" role="radio" aria-checked="false" tabindex="-1">ChanLeft</button><button type="button" data-table-name="ChanMid" role="radio" aria-checked="false" tabindex="-1">ChanMid</button><button type="button" data-table-name="IO IP" role="radio" aria-checked="false" tabindex="-1">IO IP</button><button type="button" data-table-name="Analog IP" role="radio" aria-checked="false" tabindex="-1">Analog IP</button></div>
       </div>
       <div class="top-actions">
         <button class="icon-btn notification-btn" id="notificationBtn" title="通知" aria-label="通知">
@@ -1446,6 +1450,7 @@
       renderWbs();showToast(`${item.block} 已更新`);
     }
     function switchPrototypeTable(tableName) {
+      setTableSelectorValue(tableName);
       if(tableName===activeTableName)return;
       specialIpAddDraft=null;
       closeInlineAddMenu();
@@ -1464,6 +1469,20 @@
         setHierarchy(currentHierarchy);renderDashboard();renderDelay();
       }
       showToast(`已切换到表 ${tableName}`);
+    }
+    function tableSelectorNames() { return [...document.querySelectorAll('#tableSelect [data-table-name]')].map(button=>button.dataset.tableName); }
+    function addTableSelectorOption(tableName) {
+      if(tableSelectorNames().includes(tableName))return;
+      const button=document.createElement('button');
+      button.type='button';button.dataset.tableName=tableName;button.setAttribute('role','radio');button.setAttribute('aria-checked','false');button.tabIndex=-1;button.textContent=tableName;
+      document.getElementById('tableSelect').appendChild(button);
+    }
+    function setTableSelectorValue(tableName) {
+      document.querySelectorAll('#tableSelect [data-table-name]').forEach(button=>{
+        const active=button.dataset.tableName===tableName;
+        button.classList.toggle('active',active);button.setAttribute('aria-checked',String(active));button.tabIndex=active?0:-1;
+        if(active)button.scrollIntoView({block:'nearest',inline:'nearest'});
+      });
     }
 
     function row(id, def, parent, tier, checks, planned, actual, tierTop=false) {
@@ -1591,7 +1610,7 @@
     function auditNow() { return new Date().toLocaleString('sv-SE', {hour12:false}).slice(0,16); }
     function historyFor(item, type=currentHierarchy) { return changeHistory[type][item.def.id] ||= []; }
     function backupFor(item, type=currentHierarchy) {
-      const tableName = document.getElementById('tableSelect').value;
+      const tableName = activeTableName;
       const key = `${tableName}:${type}:${item.def.id}`;
       return backupState[key] ||= {materials:{text:`/project/DDCPC/${tableName}/${item.def.name}/materials`,link:'',attachments:[]},comments:''};
     }
@@ -3397,8 +3416,23 @@
       layout:['Tier1','Tier2','Tier3','Tier4','Tier5','Tier6','Version','Block Category','Reference project','Layout Owner','Start date','Plan finish','Actual finish','Plan workdays','Actual workdays','Resource',...checkLabels.layout],
       spf:['Tier1','Tier2','Tier3','Tier4','Version','Schematic Owner','Layout Owner','LVS path','cdl','gds','Planned SPF release','Actual SPF release',...checkLabels.spf]
     };
-    function downloadEmbeddedTemplate() {
-      if(!window.XLSX)return showToast('Excel 组件未加载，请联网后重试');
+    const sheetJsUrl='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+    let sheetJsLoadPromise=null;
+    function loadSheetJs() {
+      if(window.XLSX)return Promise.resolve(window.XLSX);
+      if(sheetJsLoadPromise)return sheetJsLoadPromise;
+      sheetJsLoadPromise=new Promise((resolve,reject)=>{
+        const script=document.createElement('script');
+        const timeout=window.setTimeout(()=>{script.remove();sheetJsLoadPromise=null;reject(new Error('Excel 组件加载超时'));},12000);
+        script.src=sheetJsUrl;script.async=true;
+        script.addEventListener('load',()=>{window.clearTimeout(timeout);if(window.XLSX)resolve(window.XLSX);else{sheetJsLoadPromise=null;reject(new Error('Excel 组件加载失败'));}},{once:true});
+        script.addEventListener('error',()=>{window.clearTimeout(timeout);script.remove();sheetJsLoadPromise=null;reject(new Error('Excel 组件加载失败'))},{once:true});
+        document.head.appendChild(script);
+      });
+      return sheetJsLoadPromise;
+    }
+    async function downloadEmbeddedTemplate() {
+      try{await loadSheetJs();}catch(error){showToast(`${error.message}，请检查网络后重试`);return;}
       const workbook=XLSX.utils.book_new();
       const guide=[['DDCPC WBS Excel 导入模板'],['填写规则'],['1. 不要修改 Schematic、Layout、SPF Sheet 名称或首行字段。'],['2. 每行只在一个 Tier 列填写 Block；子节点可省略重复的上级 Tier。'],['3. Version 仅填写 1st、2nd、3rd、4th、5th 之一。'],['4. 日期格式使用 YYYY-MM-DD；Check item 填 1/0、Yes/No、Done/Ongoing 或 ✓。'],['5. 空 Sheet 允许保留，但至少填写一张 hierarchy。']];
       XLSX.utils.book_append_sheet(workbook,XLSX.utils.aoa_to_sheet(guide),'填写说明');
@@ -3407,18 +3441,18 @@
       showToast('模板已下载');
     }
     async function readEmbeddedExcel(file) {
-      if(!window.XLSX){showToast('Excel 解析组件未加载；请联网后重试，或使用内置示例');return;}
       try{
+        await loadSheetJs();
         const workbook=XLSX.read(await file.arrayBuffer(),{type:'array',cellDates:false});
         embeddedImportState.excelWorkbook={};
         workbook.SheetNames.forEach(name=>{embeddedImportState.excelWorkbook[name]=XLSX.utils.sheet_to_json(workbook.Sheets[name],{header:1,defval:'',raw:false});});
         embeddedImportState.excelFileName=file.name;embeddedImportState.workbook=embeddedImportState.excelWorkbook;embeddedImportState.fileName=file.name;embeddedImportState.configs={};renderEmbeddedImport();showToast(`已读取 ${file.name}`);
-      }catch(error){showToast(`Excel 读取失败：${error.message}`);}
+      }catch(error){showToast(`Excel 读取失败：${error.message}；请检查网络后重试`);}
     }
     function beginEmbeddedMapping() {
       embeddedImportState.tableName=document.getElementById('eiTableName').value.trim();
       if(!embeddedImportState.tableName)return showToast('请填写新表名称');
-      const existing=[...document.querySelectorAll('#tableSelect option')].map(option=>option.value.toLowerCase());
+      const existing=tableSelectorNames().map(name=>name.toLowerCase());
       if(existing.includes(embeddedImportState.tableName.toLowerCase()))return showToast('表名称已存在，请使用新名称');
       embeddedImportState.workbook=embeddedImportState.excelWorkbook;
       if(!embeddedImportState.workbook)return showToast('请先上传已填写模板');
@@ -3500,9 +3534,8 @@
       synchronizeSchematicLayoutIdentityRows();
       initializeLogicalBlockNodes('spf',data.spf);
       data.layout.forEach(item=>{item.tierTop=logicalNodeHasChildren(data.layout,item);});
-      const tableSelect=document.getElementById('tableSelect');
-      if(![...tableSelect.options].some(option=>option.value===embeddedImportState.tableName))tableSelect.add(new Option(embeddedImportState.tableName,embeddedImportState.tableName));
-      tableSelect.value=embeddedImportState.tableName;
+      addTableSelectorOption(embeddedImportState.tableName);
+      setTableSelectorValue(embeddedImportState.tableName);
       activeTableName=embeddedImportState.tableName;
       resetWbsColumnFilters();
       currentHierarchy=['schematic','layout','spf'].find(type=>data[type].length)||'schematic';
@@ -3623,7 +3656,13 @@
     document.getElementById('specialIpDeleteModal').addEventListener('click',event=>{if(event.target===event.currentTarget)closeSpecialIpDeleteModal();});
     document.getElementById('confirmSpecialIpDelete').addEventListener('click',confirmSpecialIpDelete);
     document.getElementById('refreshDashboard').addEventListener('click',()=>{renderDashboard();showToast('状态已按最新 check 和日期重新计算');});
-    document.getElementById('tableSelect').addEventListener('change',event=>switchPrototypeTable(event.target.value));
+    document.getElementById('tableSelect').addEventListener('click',event=>{const button=event.target.closest('[data-table-name]');if(button)switchPrototypeTable(button.dataset.tableName);});
+    document.getElementById('tableSelect').addEventListener('keydown',event=>{
+      if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+      const buttons=[...event.currentTarget.querySelectorAll('[data-table-name]')],current=Math.max(0,buttons.indexOf(document.activeElement));
+      const next=event.key==='Home'?0:event.key==='End'?buttons.length-1:(current+(event.key==='ArrowRight'?1:-1)+buttons.length)%buttons.length;
+      event.preventDefault();buttons[next].focus();switchPrototypeTable(buttons[next].dataset.tableName);
+    });
     document.getElementById('wbsFullscreenToggle').addEventListener('click',toggleWbsTableFullscreen);
     document.getElementById('wbsFullscreenExit').addEventListener('click',exitWbsTableFullscreen);
     document.getElementById('delaySort').addEventListener('click',()=>{renderDelay();showToast('已按延误天数从高到低排序');});
