@@ -213,6 +213,7 @@
       font-size: 11px;
       box-shadow: none;
     }
+    .review-ai-inline-editor { min-height: 30px; resize: none; overflow: hidden; line-height: 18px; }
     .editable-cell .cell-editor .date-input { padding-right: 7px; }
     .editable-cell .cell-editor .numeric-input { padding-right: 7px; font-variant-numeric: tabular-nums; }
     .editable-cell .cell-editor input[list]::-webkit-calendar-picker-indicator,
@@ -241,11 +242,11 @@
     .io-ip-head .io-ip-leaf-row th { top: 38px; height: 42px; z-index: 5; background: #f7f9fb; border-right: 1px solid #edf0f3; }
     .io-ip-head .io-ip-base-header { top: 0; z-index: 9; text-align: left !important; background: #f3f7fb !important; }
     .io-ip-head .io-ip-single-header { top: 0; z-index: 6; text-align: left !important; background: #edf3f9 !important; }
-    .io-ip-head .io-ip-group-title { display: block; overflow: hidden; text-overflow: ellipsis; font-weight: 700; }
-    .io-ip-source-column, .io-ip-reference-column, .io-ip-schematic-owner-column, .io-ip-layout-owner-column { position: sticky; z-index: 2; background: white; }
-    .io-ip-head th.io-ip-source-column, .io-ip-head th.frozen-block-column, th.io-ip-reference-column, th.io-ip-schematic-owner-column, th.io-ip-layout-owner-column { z-index: 9 !important; }
-    tbody tr:hover td.io-ip-source-column, tbody tr:hover td.io-ip-reference-column, tbody tr:hover td.io-ip-schematic-owner-column, tbody tr:hover td.io-ip-layout-owner-column { background: #f7faff; }
-    tbody tr.selected td.io-ip-source-column, tbody tr.selected td.io-ip-reference-column, tbody tr.selected td.io-ip-schematic-owner-column, tbody tr.selected td.io-ip-layout-owner-column { background: #eef5ff; }
+    .io-ip-head .io-ip-group-title { display: block; overflow-wrap: anywhere; white-space: normal; line-height: 14px; font-weight: 700; }
+    .io-ip-source-column, .io-ip-version-column, .io-ip-reference-column, .io-ip-schematic-owner-column, .io-ip-layout-owner-column { position: sticky; z-index: 2; background: white; }
+    .io-ip-head th.io-ip-source-column, .io-ip-head th.io-ip-version-column, .io-ip-head th.frozen-block-column, th.io-ip-reference-column, th.io-ip-schematic-owner-column, th.io-ip-layout-owner-column { z-index: 9 !important; }
+    tbody tr:hover td.io-ip-source-column, tbody tr:hover td.io-ip-version-column, tbody tr:hover td.io-ip-reference-column, tbody tr:hover td.io-ip-schematic-owner-column, tbody tr:hover td.io-ip-layout-owner-column { background: #f7faff; }
+    tbody tr.selected td.io-ip-source-column, tbody tr.selected td.io-ip-version-column, tbody tr.selected td.io-ip-reference-column, tbody tr.selected td.io-ip-schematic-owner-column, tbody tr.selected td.io-ip-layout-owner-column { background: #eef5ff; }
     td.io-ip-source-column.source-region { vertical-align: middle; text-align: center; color: #405269; background: #f3f7fb; border-right: 1px solid #d6e0ea; border-bottom-color: #cbd7e3; font-weight: 700; }
     td.io-ip-source-column.source-region span { display: inline-block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
     .io-ip-table .block-name { cursor: pointer; }
@@ -260,7 +261,7 @@
     .last-frozen-column { border-right: 1px solid var(--line); box-shadow: 8px 0 14px rgba(26, 39, 52, .08); }
     .column-header-content { width: 100%; height: 100%; max-width: 100%; display: inline-flex; align-items: center; gap: 3px; padding-right: 12px; vertical-align: middle; }
     .column-header-content.has-filter { padding-right: 38px; }
-    .column-header-label { min-width: 0; flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .column-header-label { min-width: 0; flex: 0 1 auto; overflow-wrap: anywhere; white-space: normal; line-height: 14px; }
     .column-filter-trigger { position: absolute; right: 14px; top: 50%; width: 18px; height: 18px; display: grid; place-items: center; border: 0; border-radius: 3px; padding: 0; color: #8995a2; background: transparent; transform: translateY(-50%); }
     .column-filter-trigger:hover, .column-filter-trigger:focus-visible, .column-filter-trigger.active { outline: 0; color: var(--blue); background: var(--blue-soft); }
     .column-filter-trigger.filtered { color: white; background: var(--blue); }
@@ -295,7 +296,6 @@
     .row-add { font-size: 17px; line-height: 1; }
     .row-add:hover, .row-add:focus-visible { outline: 0; color: var(--blue); border-color: #9cc1f5; background: var(--blue-soft); }
     .row-delete:hover { color: var(--red); border-color: #efb7b4; background: var(--red-soft); }
-    .row-delete:disabled { color: #b4bdc7; border-color: transparent; background: transparent; cursor: not-allowed; }
     .row-delete svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     .tree-toggle { width: 16px; height: 20px; flex: 0 0 16px; border: 0; background: transparent; color: var(--text-3); padding: 0; font-size: 11px; }
     .tree-toggle.hidden { visibility: hidden; }
@@ -383,6 +383,8 @@
     .column-filter-option span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .column-filter-option.select-all { color: var(--blue); font-weight: 700; }
     .column-filter-foot { padding: 8px 9px; border-top: 1px solid var(--line); display: flex; justify-content: flex-end; gap: 6px; }
+    .review-ai-preview { position: fixed; z-index: 160; width: min(420px, calc(100vw - 20px)); display: none; overflow: auto; border: 1px solid #b9cadb; border-radius: 7px; padding: 10px 12px; color: var(--text); background: white; box-shadow: var(--shadow); white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; line-height: 1.55; }
+    .review-ai-preview.open { display: block; animation: enter .12s ease-out; }
     .change-popover-close:hover { background: #eef2f6; color: var(--text); }
     .change-popover-list { max-height: 360px; overflow: auto; padding: 3px 12px 10px; }
     .change-record { display: grid; grid-template-columns: 30px 1fr; gap: 9px; padding: 11px 0; border-bottom: 1px solid #edf0f3; }
@@ -435,6 +437,8 @@
     .ai-routing-toggle[data-value="yes"] .ai-routing-option[data-ai-routing="yes"], .ai-routing-toggle[data-value="no"] .ai-routing-option[data-ai-routing="no"] { color: white; }
     .ai-routing-option:focus-visible { outline: 2px solid #81aee8; outline-offset: -3px; border-radius: 4px; }
     .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
+    .special-ip-long-text { grid-column: 1 / -1; }
+    .field.special-ip-long-text textarea { min-height: 120px; line-height: 1.5; }
     .field label { display: block; color: var(--text-3); font-size: 11px; margin-bottom: 4px; }
     .field strong { display: block; font-size: 13px; }
     .field input, .field select, .field textarea { width: 100%; border: 1px solid var(--line-strong); border-radius: 5px; padding: 7px 8px; background: white; }
@@ -771,6 +775,8 @@
     <div class="column-filter-foot"><button class="btn" id="columnFilterClear">清除筛选</button><button class="btn primary" id="columnFilterApply">应用</button></div>
   </aside>
 
+  <aside class="review-ai-preview" id="reviewAiPreview" role="tooltip" aria-hidden="true"></aside>
+
   <aside class="inline-add-menu" id="inlineAddMenu" role="menu" aria-label="新增 Block 或 Version">
     <button id="inlineAddVersion" type="button" role="menuitem"><span class="inline-add-menu-icon">+</span><strong>添加 Version</strong><small id="inlineAddVersionHint">为当前 Block 增加版本</small></button>
     <button id="inlineAddBlock" type="button" role="menuitem"><span class="inline-add-menu-icon">+</span><strong>添加 Block</strong><small>选择添加为同级或下一级 Block</small></button>
@@ -826,14 +832,6 @@
       <div class="modal-head"><h3 id="specialIpDeleteTitle">删除 Block</h3><button class="drawer-close" data-close-special-ip-delete aria-label="关闭">×</button></div>
       <div class="modal-body"><p class="validation-intro" id="specialIpDeleteIntro"></p></div>
       <div class="modal-foot"><button class="btn" data-close-special-ip-delete>取消</button><button class="btn primary" id="confirmSpecialIpDelete">确认删除</button></div>
-    </div>
-  </div>
-
-  <div class="modal-backdrop" id="specialIpE3Modal" role="alertdialog" aria-modal="true" aria-labelledby="specialIpE3Title" aria-describedby="specialIpE3Intro">
-    <div class="modal">
-      <div class="modal-head"><h3 id="specialIpE3Title">新增同名 Block</h3><button class="drawer-close" data-close-special-ip-e3 aria-label="关闭">×</button></div>
-      <div class="modal-body"><p class="validation-intro" id="specialIpE3Intro">是否确认新增同名Block，新增后不允许删除</p></div>
-      <div class="modal-foot"><button class="btn" data-close-special-ip-e3>取消</button><button class="btn primary" id="confirmSpecialIpE3">确认</button></div>
     </div>
   </div>
 
@@ -902,7 +900,7 @@
       row('sch-sense-v1', common.senseV1, 'sch-core', 3, [1,1,1,0,0], '2026-08-18', ''),
       row('sch-sense', common.sense, 'sch-core', 3, [1,1,1,1,1], '2026-08-20', '2026-08-19'),
       row('sch-sense-t4', common.senseT4, 'sch-sense', 4, [0,0,0,0,0], '2026-09-05', ''),
-      row('sch-bit', common.bitcell, 'sch-core', 4, [1,1,1,1,1], '2026-08-08', '2026-08-07'),
+      row('sch-bit', common.bitcell, 'sch-core', 3, [1,1,1,1,1], '2026-08-08', '2026-08-07'),
       row('sch-io', common.io, 'sch-top', 2, [1,1,0,0,0], '2026-09-02', ''),
       row('sch-dft', common.dft, 'sch-top', 2, [0,0,0,0,0], '2026-09-08', ''),
       row('sch-pwr', common.pwr, 'sch-top', 2, [1,1,1,1,0], '2026-08-24', '')
@@ -914,7 +912,7 @@
       row('lay-sense-v1', common.senseV1, 'lay-core', 3, [1,1,0,0], '2026-08-18', ''),
       row('lay-sense', common.sense, 'lay-core', 3, [1,1,1,1], '2026-08-21', '2026-08-21'),
       row('lay-sense-t4', common.senseT4, 'lay-sense', 4, [0,0,0,0], '2026-09-05', ''),
-      row('lay-bit', common.bitcell, 'lay-core', 4, [1,1,1,1], '2026-08-15', '2026-08-17'),
+      row('lay-bit', common.bitcell, 'lay-core', 3, [1,1,1,1], '2026-08-15', '2026-08-17'),
       row('lay-io', common.io, 'lay-top', 2, [1,0,0,0], '2026-09-10', ''),
       row('lay-dft', common.dft, 'lay-top', 2, [0,0,0,0], '2026-09-16', ''),
       row('lay-pwr', common.pwr, 'lay-top', 2, [1,1,1,0], '2026-08-30', '', true)
@@ -930,6 +928,73 @@
       row('spf-pwr', common.pwr, 'spf-top', 2, [1,1,1,1], '2026-09-03', '')
     ];
     const data = { schematic, layout, spf };
+    function initializeLogicalBlockNodes(type,rows) {
+      const recordToNode=new Map(),nodesByKey=new Map();
+      rows.forEach((record,index)=>{
+        const parentNodeId=record.parentNodeId!==undefined?record.parentNodeId:record.parent?recordToNode.get(record.parent)||null:null;
+        const key=`${parentNodeId||'__root__'}|${record.def.name.trim().toLowerCase()}|${record.tier}`;
+        let nodeId=record.nodeId||nodesByKey.get(key);
+        if(!nodeId){nodeId=`${type}-block-${record.id}`;nodesByKey.set(key,nodeId);}
+        else nodesByKey.set(key,nodeId);
+        record.nodeId=nodeId;
+        record.parentNodeId=parentNodeId;
+        record.nodeOrder=index;
+        recordToNode.set(record.id,nodeId);
+      });
+    }
+    Object.entries(data).forEach(([type,rows])=>initializeLogicalBlockNodes(type,rows));
+    function logicalNodeId(item) { return item?.nodeId||item?.id||null; }
+    function logicalParentNodeId(item) { return item?.parentNodeId??null; }
+    function logicalVersions(rows,item) { const nodeId=logicalNodeId(item);return rows.filter(candidate=>logicalNodeId(candidate)===nodeId); }
+    function logicalNodeRepresentative(rows,nodeId) { return rows.find(candidate=>logicalNodeId(candidate)===nodeId)||null; }
+    function logicalChildRows(rows,item) { const nodeId=logicalNodeId(item);return rows.filter(candidate=>logicalParentNodeId(candidate)===nodeId); }
+    function logicalNodeHasChildren(rows,item) { return logicalChildRows(rows,item).length>0; }
+    function setLogicalNodeExpanded(rows,item,expanded) { logicalVersions(rows,item).forEach(version=>version.expanded=expanded); }
+    function hierarchyIntegrityIssues(label,rows) {
+      const nodes=new Map(),issues=[];
+      rows.forEach(record=>{
+        const nodeId=logicalNodeId(record),existing=nodes.get(nodeId);
+        if(existing&&(existing.parentNodeId!==logicalParentNodeId(record)||existing.tier!==record.tier))issues.push(`${label}: ${record.def?.name||record.block} 的 Version 层级不一致`);
+        else if(!existing)nodes.set(nodeId,{nodeId,parentNodeId:logicalParentNodeId(record),tier:record.tier,name:record.def?.name||record.block});
+      });
+      nodes.forEach(node=>{
+        if(node.parentNodeId&&!nodes.has(node.parentNodeId)){issues.push(`${label}: ${node.name} 的 Parent 不存在`);return;}
+        if(node.parentNodeId){const parent=nodes.get(node.parentNodeId);if(node.tier!==parent.tier+1)issues.push(`${label}: ${node.name} T${node.tier} 与 Parent ${parent.name} T${parent.tier} 不连续`);}
+        const visited=new Set([node.nodeId]);let parentNodeId=node.parentNodeId;
+        while(parentNodeId){if(visited.has(parentNodeId)){issues.push(`${label}: ${node.name} 存在 Parent 循环`);break;}visited.add(parentNodeId);parentNodeId=nodes.get(parentNodeId)?.parentNodeId||null;}
+      });
+      return issues;
+    }
+    function sourceRowsForProjection(sourceTableName) {
+      const snapshot=tableStateStore?.get(sourceTableName);
+      return snapshot?.data?[...snapshot.data.schematic,...snapshot.data.layout]:sourceTableName===activeTableName?[...data.schematic,...data.layout]:[];
+    }
+    function specialProjectionIntegrityIssues(label,rows) {
+      const issues=[],nodes=new Map();
+      rows.forEach(row=>{if(!nodes.has(logicalNodeId(row)))nodes.set(logicalNodeId(row),row);});
+      nodes.forEach(node=>{
+        if(!node.sourceNodeId||!node.sourceTableName)return;
+        const sourceRows=sourceRowsForProjection(node.sourceTableName),source=sourceRows.find(record=>logicalNodeId(record)===node.sourceNodeId);
+        if(!source){issues.push(`${label}: ${node.block} 的来源 Block 不存在`);return;}
+        const expectedParentNodeId=logicalParentNodeId(source),projectedParent=logicalParentNodeId(node)?nodes.get(logicalParentNodeId(node)):null;
+        if(expectedParentNodeId&&!projectedParent)issues.push(`${label}: ${node.block} 缺少来源 Parent`);
+        else if(!expectedParentNodeId&&projectedParent)issues.push(`${label}: ${node.block} 不应有 Parent`);
+        else if(expectedParentNodeId&&projectedParent?.sourceNodeId!==expectedParentNodeId)issues.push(`${label}: ${node.block} 投影了错误的 Parent ${projectedParent?.block||''}`);
+      });
+      return issues;
+    }
+    function assertHierarchyIntegrity() {
+      const issues=[
+        ...hierarchyIntegrityIssues('Schematic',data.schematic),
+        ...hierarchyIntegrityIssues('Layout',data.layout),
+        ...hierarchyIntegrityIssues('SPF',data.spf),
+        ...hierarchyIntegrityIssues('IO IP',ioIpRows),
+        ...specialProjectionIntegrityIssues('IO IP',ioIpRows),
+        ...hierarchyIntegrityIssues('Analog IP',analogIpRows),
+        ...specialProjectionIntegrityIssues('Analog IP',analogIpRows)
+      ];
+      if(issues.length)throw new Error(`Hierarchy integrity failed:\n${issues.join('\n')}`);
+    }
     const railState = { schematic:{}, layout:{}, spf:{} };
     Object.entries(data).forEach(([type, instances]) => instances.forEach(instance => {
       const normalizedChecks = [...instance.checks];
@@ -974,16 +1039,16 @@
       }
     };
     const structureChanges = {
-      schematic: [changeEvent('lin','删除 Block / Instance','LEGACY_CTRL · sch-legacy · T3','已删除','2026-08-26 08:35')],
-      layout: [changeEvent('nina','移动 Instance','SENSE_AMP · T2','SENSE_AMP · T3','2026-08-26 09:02')],
-      spf: [changeEvent('eric','新增 Block / Instance','不存在','SENSE_AMP · spf-peri · T3','2026-08-25 15:16')]
+      schematic: [changeEvent('lin','删除 Block','LEGACY_CTRL · T3','已删除','2026-08-26 08:35')],
+      layout: [changeEvent('nina','移动 Block','SENSE_AMP · T2','SENSE_AMP · T3','2026-08-26 09:02')],
+      spf: [changeEvent('eric','新增 Block','不存在','SENSE_AMP · T3','2026-08-25 15:16')]
     };
     const IO_IP_TABLE_NAME = 'IO IP';
     const ANALOG_IP_TABLE_NAME = 'Analog IP';
     const ioProcessStatusOptions = ['', 'Ongoing', 'Done', 'Ongoing（delay）'];
     const ioYesNoOptions = ['', 'Yes', 'No'];
     const ioIpColumnDefinitions = [
-      ['sourceTableName',105],['block',165],['referenceProject',115],['schematicOwner',120],['layoutOwner',120],
+      ['sourceTableName',105],['block',165],['version',100],['referenceProject',115],['schematicOwner',120],['layoutOwner',120],
       ['hookupDeadline',108],['hookupStatus',125],['specReviewDeadline',108],['specReviewStatus',125],
       ['preSimDeadline',108],['preSimStatus',125],['preSimReviewAi',125],['preSimReviewAiStatus',125],
       ['schReleasePlanFinish',108],['schReleaseActualFinish',108],['schReleaseStatus',125],
@@ -993,18 +1058,20 @@
     ];
     const ioIpRows = [];
     const analogIpColumnDefinitions = [
-      ['sourceTableName',105],['block',165],['referenceProject',115],['schematicOwner',120],['layoutOwner',120],
+      ['sourceTableName',105],['block',165],['version',100],['referenceProject',115],['schematicOwner',120],['layoutOwner',120],
       ['releasePlanned',108],['releaseActual',108],['releaseStatus',125],
       ['coWorkRlsSchematicEmail',190],['coWorkFloorplanDoneEmail',175],['coWorkFloorplanConfirmEmail',190],['coWorkRoutingDoneEmail',175],
       ['layoutFinishPlanned',108],['layoutFinishActual',108],['layoutFinishStatus',125],['layoutModifyEmail',165],
-      ['qualityOwner',120],['qualityDeadline',108],['qualityStatus',125],['dcEmDeadline',108],['dcEmStatus',125],['pdcShareStatus',135],
+      ['qualityOwner',120],['qualityDeadline',108],['qualityStatus',125],['dcEmDeadline',108],['dcEmStatus',125],['pdcShareStatus',157],
       ['spfSimPlanned',108],['spfSimActual',108],['spfSimStatus',125],['comment',190],
       ['finalReviewPlanned',108],['finalReviewActual',108],['finalReviewStatus',125],['latestChange',44]
     ];
     const analogIpRows = [];
-    [ioIpRows,analogIpRows].forEach(rows=>rows.forEach(item=>Object.assign(item,{sourceTableName:item.sourceTableName||'',sourceRegionName:item.sourceRegionName||'',tier:item.tier||1,parent:item.parent||null,expanded:item.expanded!==false})));
+    [ioIpRows,analogIpRows].forEach(rows=>rows.forEach(item=>Object.assign(item,{sourceTableName:item.sourceTableName||'',sourceRegionName:item.sourceRegionName||'',version:normalizeVersion(item.version),tier:item.tier||1,parent:item.parent||null,expanded:item.expanded!==false})));
     const specialIpStablePositions = {io:new Map(),analog:new Map()};
     const specialIpStableSources = {io:new Map(),analog:new Map()};
+    const specialIpSourceRegionRanks = {io:new Map(),analog:new Map()};
+    const specialIpDirectMemberships = {io:new Set(),analog:new Set()};
     const specialIpPreviousCategories = new Map();
     const specialIpChangeHistory = {io:{},analog:{}};
     const specialIpStructureChanges = {io:[],analog:[]};
@@ -1012,8 +1079,9 @@
     let selectedAnalogIpRowId = null;
     let selectedSpecialIpItem = null;
     let specialIpAddDraft = null;
+    let specialIpAddAnchor = null;
+    const selectedSpecialIpVersions = {io:new Map(),analog:new Map()};
     let pendingSpecialIpDelete = null;
-    let pendingSpecialIpE3 = null;
     const backupState = {};
     const tableStateStore = new Map();
     let activeTableName = 'ChanEdgel';
@@ -1040,18 +1108,33 @@
     function isAnalogIpTable(tableName=activeTableName) { return tableName===ANALOG_IP_TABLE_NAME; }
     function isSpecialIpTable(tableName=activeTableName) { return isIoIpTable(tableName)||isAnalogIpTable(tableName); }
     function specialIpSourceIdentity(sourceTableName,sourceDefinitionId) { return `${sourceTableName}\u0000${sourceDefinitionId}`; }
+    function specialIpMembershipKey(sourceTableName,sourceNodeId) { return `${sourceTableName}\u0000${sourceNodeId}`; }
     function derivedSpecialIpRowId(type,item,sourceTableName) { return `${type}-derived-${encodeURIComponent(sourceTableName)}-${item.def.id}`; }
-    function sourceMatchesSpecialIpRow(row,item,sourceTableName=activeTableName) { return row.sourceTableName===sourceTableName&&row.sourceDefinitionId===item.def.id; }
+    function sourceMatchesSpecialIpRow(row,item,sourceTableName=activeTableName) { return row.sourceTableName===sourceTableName&&row.sourceNodeId===logicalNodeId(item); }
+    function specialIpGroupKey(item) { return logicalNodeId(item)||`${logicalParentNodeId(item)||'__root__'}|${item.block.trim().toLowerCase()}|${item.tier}`; }
+    function specialIpVersionRank(item) { const rank=versionOptions.indexOf(normalizeVersion(item.version));return rank<0?versionOptions.length:rank; }
+    function specialIpVersionGroup(item,type) {
+      const rows=type==='io'?ioIpRows:analogIpRows,key=specialIpGroupKey(item);
+      return rows.filter(candidate=>specialIpGroupKey(candidate)===key).sort((left,right)=>specialIpVersionRank(left)-specialIpVersionRank(right));
+    }
+    function availableSpecialIpVersions(item,type) {
+      const existing=new Set(specialIpVersionGroup(item,type).map(candidate=>normalizeVersion(candidate.version)));
+      return versionOptions.filter(version=>!existing.has(version));
+    }
+    function selectedSpecialIpVersion(item,type) {
+      const group=specialIpVersionGroup(item,type),key=specialIpGroupKey(item),selected=group.find(candidate=>candidate.id===selectedSpecialIpVersions[type].get(key))||group[0];
+      if(selected)selectedSpecialIpVersions[type].set(key,selected.id);
+      return selected||item;
+    }
     function effectiveSpecialIpSource(item,rows) {
       if(item.sourceTableName)return item.sourceTableName;
       if(item.sourceRegionName)return item.sourceRegionName;
-      const byId=new Map(rows.map(row=>[row.id,row]));
-      let parentId=item.parent;
-      while(parentId){
-        const parent=byId.get(parentId);
+      let parentNodeId=logicalParentNodeId(item);
+      while(parentNodeId){
+        const parent=logicalNodeRepresentative(rows,parentNodeId);
         if(!parent)return '';
         if(parent.sourceTableName)return parent.sourceTableName;
-        parentId=parent.parent;
+        parentNodeId=logicalParentNodeId(parent);
       }
       return '';
     }
@@ -1061,13 +1144,8 @@
         const previous=Math.max(-1,...positions.filter(position=>position<next));
         return (previous+next)/2;
       }
-      return Math.max(-1,...positions)+1;
-    }
-    function specialIpStablePositionAfter(type,anchorId) {
-      const positions=specialIpStablePositions[type],anchorPosition=positions.get(anchorId);
-      if(!Number.isFinite(anchorPosition))return Math.max(-1,...positions.values())+1;
-      const nextPosition=Math.min(Infinity,...[...positions.values()].filter(position=>position>anchorPosition));
-      return Number.isFinite(nextPosition)?(anchorPosition+nextPosition)/2:anchorPosition+1;
+      const previous=Math.max(-1,...positions),previousRow=rows[index-1],nodeSourcePosition=previousRow?logicalVersions(rows,previousRow).map(version=>version.sourceStablePosition).find(Number.isFinite):null;
+      return Number.isFinite(nodeSourcePosition)?Math.max(previous+1,nodeSourcePosition+900):previous+1;
     }
     function newDerivedSpecialIpStablePosition(type,sourceTableName) {
       const positions=specialIpStablePositions[type],sources=specialIpStableSources[type];
@@ -1076,6 +1154,23 @@
       const previous=Math.max(...sourcePositions),next=Math.min(Infinity,...[...positions.values()].filter(position=>position>previous));
       return Number.isFinite(next)?(previous+next)/2:previous+1;
     }
+    function specialIpSourceRegionBase(type,sourceTableName) {
+      const ranks=specialIpSourceRegionRanks[type];
+      if(!ranks.has(sourceTableName))ranks.set(sourceTableName,ranks.size);
+      return ranks.get(sourceTableName)*1_000_000_000;
+    }
+    function sourceHierarchyNodeOrder(type=currentHierarchy) {
+      const order=new Map();
+      hierarchyOrderedItems(type).forEach(item=>{const nodeId=logicalNodeId(item);if(!order.has(nodeId))order.set(nodeId,order.size);});
+      return order;
+    }
+    function sourceDerivedStablePosition(type,sourceTableName,sourceOrder) {
+      return specialIpSourceRegionBase(type,sourceTableName)+sourceOrder*1000;
+    }
+    function sortSpecialIpRows(type,rows) {
+      const positions=specialIpStablePositions[type],originalIndex=new Map(rows.map((row,index)=>[row.id,index]));
+      rows.sort((left,right)=>(positions.get(left.id)??Infinity)-(positions.get(right.id)??Infinity)||(originalIndex.get(left.id)-originalIndex.get(right.id)));
+    }
     function insertDerivedSpecialIpRow(type,rows,created) {
       const stablePositions=specialIpStablePositions[type],storedPosition=stablePositions.get(created.id);
       if(Number.isFinite(storedPosition)){
@@ -1083,25 +1178,71 @@
         rows.splice(restoreIndex<0?rows.length:restoreIndex,0,created);
         return;
       }
-      const stablePosition=newDerivedSpecialIpStablePosition(type,created.sourceTableName);
+      const stablePosition=Number.isFinite(created.sourceStablePosition)?created.sourceStablePosition:newDerivedSpecialIpStablePosition(type,created.sourceTableName);
       stablePositions.set(created.id,stablePosition);
       specialIpStableSources[type].set(created.id,created.sourceTableName);
       const insertIndex=rows.findIndex(row=>stablePositions.get(row.id)>stablePosition);
       rows.splice(insertIndex<0?rows.length:insertIndex,0,created);
     }
     function createDerivedIoIpRow(item,sourceTableName='') {
-      return {id:derivedSpecialIpRowId('io',item,sourceTableName),sourceTableName,sourceDefinitionId:item.def.id,block:item.def.name,tier:1,parent:null,expanded:true,referenceProject:item.def.reference||'',schematicOwner:item.def.schematicOwner||'',layoutOwner:item.def.layoutOwner||'',hookupDeadline:'',hookupStatus:'',specReviewDeadline:'',specReviewStatus:'',preSimDeadline:'',preSimStatus:'',preSimReviewAi:'',preSimReviewAiStatus:'',schReleasePlanFinish:'',schReleaseActualFinish:'',coWorkRlsSchematicEmail:'',coWorkFloorplanDoneEmail:'',coWorkFloorplanConfirmEmail:'',coWorkLayoutStatus:'',coWorkRoutingCheck:'',coWorkRoutingDoneEmail:'',layoutFinishPlanned:'',layoutFinishActual:'',layoutModifyEmail:'',qualityOwner:'',qualityDeadline:'',qualityStatus:'',postSimDeadline:'',postSimStatus:''};
+      const id=derivedSpecialIpRowId('io',item,sourceTableName);
+      return {id,nodeId:`io-block-${encodeURIComponent(sourceTableName)}-${logicalNodeId(item)}`,parentNodeId:null,sourceNodeId:logicalNodeId(item),sourceTableName,sourceDefinitionId:item.def.id,projectionDirect:false,version:normalizeVersion(item.def.round),block:item.def.name,tier:item.tier||1,parent:null,expanded:true,referenceProject:item.def.reference||'',schematicOwner:item.def.schematicOwner||'',layoutOwner:item.def.layoutOwner||'',hookupDeadline:'',hookupStatus:'',specReviewDeadline:'',specReviewStatus:'',preSimDeadline:'',preSimStatus:'',preSimReviewAi:'',preSimReviewAiStatus:'',schReleasePlanFinish:'',schReleaseActualFinish:'',coWorkRlsSchematicEmail:'',coWorkFloorplanDoneEmail:'',coWorkFloorplanConfirmEmail:'',coWorkLayoutStatus:'',coWorkRoutingCheck:'',coWorkRoutingDoneEmail:'',layoutFinishPlanned:'',layoutFinishActual:'',layoutModifyEmail:'',qualityOwner:'',qualityDeadline:'',qualityStatus:'',postSimDeadline:'',postSimStatus:''};
     }
     function createDerivedAnalogIpRow(item,sourceTableName='') {
-      return {id:derivedSpecialIpRowId('analog',item,sourceTableName),sourceTableName,sourceDefinitionId:item.def.id,block:item.def.name,tier:1,parent:null,expanded:true,referenceProject:item.def.reference||'',schematicOwner:item.def.schematicOwner||'',layoutOwner:item.def.layoutOwner||'',releasePlanned:'',releaseActual:'',releaseStatus:'',coWorkRlsSchematicEmail:'',coWorkFloorplanDoneEmail:'',coWorkFloorplanConfirmEmail:'',coWorkRoutingDoneEmail:'',layoutFinishPlanned:'',layoutFinishActual:'',layoutModifyEmail:'',qualityOwner:'',qualityDeadline:'',qualityStatus:'',dcEmDeadline:'',dcEmStatus:'',pdcShareStatus:'',spfSimPlanned:'',spfSimActual:'',comment:'',finalReviewPlanned:'',finalReviewActual:''};
+      const id=derivedSpecialIpRowId('analog',item,sourceTableName);
+      return {id,nodeId:`analog-block-${encodeURIComponent(sourceTableName)}-${logicalNodeId(item)}`,parentNodeId:null,sourceNodeId:logicalNodeId(item),sourceTableName,sourceDefinitionId:item.def.id,projectionDirect:false,version:normalizeVersion(item.def.round),block:item.def.name,tier:item.tier||1,parent:null,expanded:true,referenceProject:item.def.reference||'',schematicOwner:item.def.schematicOwner||'',layoutOwner:item.def.layoutOwner||'',releasePlanned:'',releaseActual:'',releaseStatus:'',coWorkRlsSchematicEmail:'',coWorkFloorplanDoneEmail:'',coWorkFloorplanConfirmEmail:'',coWorkRoutingDoneEmail:'',layoutFinishPlanned:'',layoutFinishActual:'',layoutModifyEmail:'',qualityOwner:'',qualityDeadline:'',qualityStatus:'',dcEmDeadline:'',dcEmStatus:'',pdcShareStatus:'',spfSimPlanned:'',spfSimActual:'',comment:'',finalReviewPlanned:'',finalReviewActual:''};
     }
-    function removeDerivedSpecialIpRow(type,item,sourceTableName=activeTableName) {
-      const rows=type==='io'?ioIpRows:analogIpRows,index=rows.findIndex(row=>sourceMatchesSpecialIpRow(row,item,sourceTableName));
-      if(index<0)return false;
+    function removeSpecialIpProjectionRow(type,rows,index) {
+      if(index<0)return null;
       const [removed]=rows.splice(index,1);
       delete specialIpChangeHistory[type][removed.id];
       if(selectedSpecialIpItem?.id===removed.id)closeDrawer();
-      return true;
+      return removed;
+    }
+    function sourceProjectionChain(item) {
+      const sourceRows=data[currentHierarchy],chain=[];
+      let current=item;
+      while(current){chain.unshift(current);current=logicalParentNodeId(current)?logicalNodeRepresentative(sourceRows,logicalParentNodeId(current)):null;}
+      return chain;
+    }
+    function projectSpecialIpChain(type,category,rows,factory,item,sourceTableName) {
+      const chain=sourceProjectionChain(item),sourceOrder=sourceHierarchyNodeOrder(currentHierarchy);
+      let parentProjected=null;
+      chain.forEach(sourceItem=>{
+        let projected=rows.find(row=>sourceMatchesSpecialIpRow(row,sourceItem,sourceTableName));
+        const nodeOrder=sourceOrder.get(logicalNodeId(sourceItem))??sourceOrder.size;
+        if(!projected){projected=factory(sourceItem,sourceTableName);projected.sourceStablePosition=sourceDerivedStablePosition(type,sourceTableName,nodeOrder);insertDerivedSpecialIpRow(type,rows,projected);}
+        projected.sourceOrder=nodeOrder;
+        projected.sourceStablePosition=sourceDerivedStablePosition(type,sourceTableName,nodeOrder);
+        logicalVersions(rows,projected).forEach((version,index)=>{const rank=versionOptions.indexOf(normalizeVersion(version.version)),position=projected.sourceStablePosition+(rank>=0?rank+1:index+6)*10;specialIpStablePositions[type].set(version.id,position);specialIpStableSources[type].set(version.id,sourceTableName);});
+        projected.tier=sourceItem.tier||1;
+        projected.parent=parentProjected?.id||null;
+        projected.parentNodeId=parentProjected?logicalNodeId(parentProjected):null;
+        projected.projectionDirect=specialIpDirectMemberships[type].has(specialIpMembershipKey(sourceTableName,logicalNodeId(sourceItem)));
+        parentProjected=projected;
+      });
+      sortSpecialIpRows(type,rows);
+    }
+    function reconcileSpecialIpSourceProjection(type,rows,sourceTableName) {
+      const directMemberships=specialIpDirectMemberships[type];
+      rows.filter(row=>row.sourceTableName===sourceTableName).forEach(row=>{
+        row.projectionDirect=directMemberships.has(specialIpMembershipKey(sourceTableName,row.sourceNodeId));
+      });
+      pruneUnusedSpecialIpAncestors(type,rows,sourceTableName);
+      sortSpecialIpRows(type,rows);
+    }
+    function pruneUnusedSpecialIpAncestors(type,rows,sourceTableName) {
+      let removedAny=true;
+      while(removedAny){
+        removedAny=false;
+        const nodeIds=[...new Set(rows.filter(row=>row.sourceTableName===sourceTableName).map(logicalNodeId))];
+        for(let nodeIndex=nodeIds.length-1;nodeIndex>=0;nodeIndex--){
+          const nodeId=nodeIds[nodeIndex],versions=rows.filter(row=>logicalNodeId(row)===nodeId),representative=versions[0];
+          if(!representative||versions.some(version=>version.projectionDirect)||logicalNodeHasChildren(rows,representative))continue;
+          versions.forEach(version=>{const index=rows.findIndex(row=>row.id===version.id);if(index>=0)removeSpecialIpProjectionRow(type,rows,index);});
+          removedAny=true;
+        }
+      }
     }
     function syncWbsCategoryToSpecialIp(item,oldCategory,newCategory) {
       if(isSpecialIpTable()||oldCategory===newCategory)return null;
@@ -1110,9 +1251,15 @@
       const transitions=[['io','IO IP',ioIpRows,createDerivedIoIpRow],['analog','Analog IP',analogIpRows,createDerivedAnalogIpRow]];
       const changes=[];
       transitions.forEach(([type,category,rows,factory])=>{
-        if(oldCategory===category&&newCategory!==category&&removeDerivedSpecialIpRow(type,item,sourceTableName))changes.push(`已从 ${category} 删除`);
-        if(oldCategory!==category&&newCategory===category&&!rows.some(row=>sourceMatchesSpecialIpRow(row,item,sourceTableName))){
-          insertDerivedSpecialIpRow(type,rows,factory(item,sourceTableName));
+        if(oldCategory===category&&newCategory!==category){
+          specialIpDirectMemberships[type].delete(specialIpMembershipKey(sourceTableName,logicalNodeId(item)));
+          const projected=rows.find(row=>sourceMatchesSpecialIpRow(row,item,sourceTableName));
+          if(projected){projected.projectionDirect=false;reconcileSpecialIpSourceProjection(type,rows,sourceTableName);changes.push(`已从 ${category} 删除`);}
+        }
+        if(oldCategory!==category&&newCategory===category){
+          specialIpDirectMemberships[type].add(specialIpMembershipKey(sourceTableName,logicalNodeId(item)));
+          projectSpecialIpChain(type,category,rows,factory,item,sourceTableName);
+          reconcileSpecialIpSourceProjection(type,rows,sourceTableName);
           changes.push(`已新增至 ${category}`);
         }
       });
@@ -1123,49 +1270,62 @@
       const type=oldCategory==='IO IP'?'io':oldCategory==='Analog IP'?'analog':null;
       if(!type)return false;
       const rows=type==='io'?ioIpRows:analogIpRows,linked=rows.find(row=>sourceMatchesSpecialIpRow(row,item,activeTableName));
-      return Boolean(linked&&rows.some(child=>child.parent===linked.id));
+      return Boolean(linked&&logicalNodeHasChildren(rows,linked));
     }
     function createManualSpecialIpRow(type,draft) {
-      const temporary={def:{id:`manual-${Date.now()}`,name:draft.block,reference:draft.referenceProject,schematicOwner:draft.schematicOwner,layoutOwner:draft.layoutOwner}};
+      const temporary={def:{id:`manual-${Date.now()}`,name:draft.block,round:normalizeVersion(draft.version),reference:draft.referenceProject,schematicOwner:draft.schematicOwner,layoutOwner:draft.layoutOwner}};
       const created=type==='io'?createDerivedIoIpRow(temporary):createDerivedAnalogIpRow(temporary);
       created.id=`${type}-manual-${Date.now()}-${Math.random().toString(36).slice(2,7)}`;
       delete created.sourceDefinitionId;
-      created.sourceRegionName=draft.sourceRegionName||'';created.tier=draft.tier;created.parent=draft.parent;created.expanded=true;
+      created.sourceTableName=draft.mode==='version'?draft.sourceTableName||'':'';
+      created.sourceRegionName=draft.sourceRegionName||'';created.tier=draft.tier;created.parent=draft.parent;created.parentNodeId=draft.parentNodeId??null;created.nodeId=draft.mode==='version'?draft.nodeId:`${type}-block-${Date.now()}-${Math.random().toString(36).slice(2,7)}`;created.expanded=true;
       return created;
     }
-    function createE3SpecialIpRow(item,type,rows) {
-      const temporary={def:{id:`e3-${Date.now()}`,name:item.block,reference:item.referenceProject,schematicOwner:item.schematicOwner,layoutOwner:item.layoutOwner}};
-      const created=type==='io'?createDerivedIoIpRow(temporary,item.sourceTableName):createDerivedAnalogIpRow(temporary,item.sourceTableName);
-      created.id=`${type}-e3-${Date.now()}-${Math.random().toString(36).slice(2,7)}`;
-      delete created.sourceDefinitionId;
-      created.sourceRegionName=item.sourceRegionName||effectiveSpecialIpSource(item,rows);
-      created.tier=item.tier;created.parent=item.parent;created.expanded=true;
-      created.e3Generated=true;created.e3SourceRowId=item.id;
-      return created;
-    }
-    function startSpecialIpAddDraft(item,type) {
+    function startSpecialIpBlockDraft(item,type) {
       const rows=type==='io'?ioIpRows:analogIpRows;
-      specialIpAddDraft={type,anchorId:item.id,block:'',tier:item.tier,parent:item.parent,sourceRegionName:effectiveSpecialIpSource(item,rows),referenceProject:'',schematicOwner:'',layoutOwner:'',focus:true};
+      specialIpAddDraft={mode:'block',type,anchorId:item.id,version:'',block:'',tier:item.tier,parent:item.parent,parentNodeId:logicalParentNodeId(item),nodeId:null,sourceRegionName:effectiveSpecialIpSource(item,rows),referenceProject:'',schematicOwner:'',layoutOwner:'',focus:true};
+      closeInlineAddMenu();renderWbs();
+    }
+    function startSpecialIpVersionDraft(item,type) {
+      const rows=type==='io'?ioIpRows:analogIpRows;
+      specialIpAddDraft={mode:'version',type,anchorId:item.id,version:'',block:item.block,tier:item.tier,parent:item.parent,parentNodeId:logicalParentNodeId(item),nodeId:logicalNodeId(item),sourceTableName:item.sourceTableName||'',sourceRegionName:item.sourceRegionName||effectiveSpecialIpSource(item,rows),referenceProject:item.referenceProject||'',schematicOwner:item.schematicOwner||'',layoutOwner:item.layoutOwner||'',focus:true};
+      closeInlineAddMenu();renderWbs();
+    }
+    function specialIpDisplayItems(type) {
+      const rows=type==='io'?ioIpRows:analogIpRows,nodes=[],byNodeId=new Map();
+      rows.forEach((item,index)=>{const nodeId=logicalNodeId(item);if(byNodeId.has(nodeId))return;const node={nodeId,parentNodeId:logicalParentNodeId(item),index,item};byNodeId.set(nodeId,node);nodes.push(node);});
+      const childrenByParent=new Map();
+      nodes.forEach(node=>{const key=node.parentNodeId||'__root__';if(!childrenByParent.has(key))childrenByParent.set(key,[]);childrenByParent.get(key).push(node);});
+      childrenByParent.forEach(children=>children.sort((left,right)=>left.index-right.index));
+      const result=[],visited=new Set(),append=node=>{if(visited.has(node.nodeId))return;visited.add(node.nodeId);result.push(selectedSpecialIpVersion(node.item,type));(childrenByParent.get(node.nodeId)||[]).forEach(append);};
+      (childrenByParent.get('__root__')||[]).forEach(append);
+      nodes.forEach(append);
+      return result.filter(Boolean);
+    }
+    function selectSpecialIpVersion(item,type) {
+      selectedSpecialIpVersions[type].set(specialIpGroupKey(item),item.id);
+      if(type==='io')selectedIoIpRowId=item.id;else selectedAnalogIpRowId=item.id;
       renderWbs();
     }
     function cancelSpecialIpAddDraft(notify=true) {
       specialIpAddDraft=null;renderWbs();if(notify)showToast('已取消草稿');
     }
     function specialIpSubtreeBoundaryIndex(rows,anchor) {
-      const ancestorIds=new Set([anchor.id]);
-      let boundaryIndex=rows.indexOf(anchor);
-      rows.forEach((candidate,index)=>{if(candidate.id===anchor.id||rowIsDescendantOf(candidate,ancestorIds,rows))boundaryIndex=Math.max(boundaryIndex,index);});
+      const group=specialIpVersionGroup(anchor,specialIpAddDraft?.type||specialIpType()),ancestorIds=new Set([logicalNodeId(anchor)]);
+      let boundaryIndex=Math.max(...group.map(item=>rows.indexOf(item)));
+      rows.forEach((candidate,index)=>{if(ancestorIds.has(candidate.id)||rowIsDescendantOf(candidate,ancestorIds,rows))boundaryIndex=Math.max(boundaryIndex,index);});
       return boundaryIndex;
     }
     function specialIpDraftIndex(items,type) {
       if(!specialIpAddDraft||specialIpAddDraft.type!==type)return-1;
       const rows=type==='io'?ioIpRows:analogIpRows,anchor=rows.find(item=>item.id===specialIpAddDraft.anchorId);
       if(!anchor)return items.length;
-      const anchorIndex=items.indexOf(anchor);
+      const visibleAnchor=items.find(item=>specialIpGroupKey(item)===specialIpGroupKey(anchor)),anchorIndex=items.indexOf(visibleAnchor);
+      if(specialIpAddDraft.mode==='version')return anchorIndex<0?items.length:anchorIndex;
       if(specialIpAddDraft.tier!==anchor.tier)return anchorIndex<0?items.length:anchorIndex+1;
-      const ancestorIds=new Set([anchor.id]);
+      const ancestorIds=new Set([logicalNodeId(anchor)]);
       let boundaryIndex=anchorIndex;
-      items.forEach((candidate,index)=>{if(candidate.id===anchor.id||rowIsDescendantOf(candidate,ancestorIds,rows))boundaryIndex=Math.max(boundaryIndex,index);});
+      items.forEach((candidate,index)=>{if(ancestorIds.has(candidate.id)||rowIsDescendantOf(candidate,ancestorIds,rows))boundaryIndex=Math.max(boundaryIndex,index);});
       return boundaryIndex<0?items.length:boundaryIndex+1;
     }
     function confirmSpecialIpAddDraft() {
@@ -1174,19 +1334,30 @@
         document.getElementById('specialIpDraftName')?.classList.add('inline-invalid');
         showToast('Block 名称必填');return;
       }
+      if(draft.mode==='version'&&!normalizeVersion(draft.version)){
+        document.getElementById('specialIpDraftVersion')?.classList.add('inline-invalid');
+        showToast('Version 必选');return;
+      }
       const rows=draft.type==='io'?ioIpRows:analogIpRows,anchor=rows.find(item=>item.id===draft.anchorId),anchorIndex=rows.indexOf(anchor),created=createManualSpecialIpRow(draft.type,{...draft,block:draft.block.trim()});
-      const insertIndex=anchorIndex<0?rows.length:draft.tier===anchor.tier?specialIpSubtreeBoundaryIndex(rows,anchor)+1:anchorIndex+1;
-      specialIpStablePositions[draft.type].set(created.id,specialIpStablePositionBeforeActive(draft.type,rows,insertIndex));
+      const normalizedName=draft.block.trim().toLowerCase(),normalizedVersion=normalizeVersion(draft.version),duplicate=rows.find(candidate=>candidate.block.trim().toLowerCase()===normalizedName&&candidate.tier===draft.tier&&normalizeVersion(candidate.version)===normalizedVersion);
+      if(duplicate){
+        document.getElementById(draft.mode==='version'?'specialIpDraftVersion':'specialIpDraftName')?.classList.add('inline-invalid');
+        openSameTierDuplicateModal([{name:draft.block.trim(),tier:draft.tier,version:normalizedVersion||'空',errors:[`${draft.block.trim()} · T${draft.tier} · ${normalizedVersion||'空'} 已存在`]}]);return;
+      }
+      const anchorGroup=specialIpVersionGroup(anchor,draft.type),insertIndex=draft.mode==='version'?Math.max(...anchorGroup.map(item=>rows.indexOf(item)))+1:anchorIndex<0?rows.length:draft.tier===anchor.tier?specialIpSubtreeBoundaryIndex(rows,anchor)+1:Math.max(...anchorGroup.map(item=>rows.indexOf(item)))+1;
+      const sourceBase=draft.mode==='version'?anchor.sourceStablePosition:null,versionRank=versionOptions.indexOf(normalizeVersion(created.version)),stablePosition=Number.isFinite(sourceBase)&&versionRank>=0?sourceBase+(versionRank+1)*10:specialIpStablePositionBeforeActive(draft.type,rows,insertIndex);
+      specialIpStablePositions[draft.type].set(created.id,stablePosition);
       specialIpStableSources[draft.type].set(created.id,draft.sourceRegionName||'');
       rows.splice(insertIndex,0,created);
-      specialIpStructureChanges[draft.type].unshift(changeEvent(currentActorId,'新增 Block','不存在',created.block,auditNow()));
+      sortSpecialIpRows(draft.type,rows);
+      if(draft.mode==='version')selectedSpecialIpVersions[draft.type].set(specialIpGroupKey(created),created.id);
+      specialIpStructureChanges[draft.type].unshift(changeEvent(currentActorId,draft.mode==='version'?'新增 Version':'新增 Block','不存在',`${created.block} · T${created.tier} · ${created.version||'空'}`,auditNow()));
       specialIpChangeHistory[draft.type][created.id]=[];
       specialIpAddDraft=null;renderWbs();showToast(`${created.block} 已创建`);
     }
     function deleteSpecialIpRow(item,type) {
       const rows=type==='io'?ioIpRows:analogIpRows;
-      if(item.e3Generated)return showToast('该 Block 由 Layout modify email E3 生成，不允许删除');
-      if(rows.some(child=>child.parent===item.id))return showToast('请先删除或移动该节点的子 Block');
+      if(logicalNodeHasChildren(rows,item))return showToast('请先删除或移动该节点的子 Block');
       pendingSpecialIpDelete={item,type};
       const previousCategory=item.sourceDefinitionId!==undefined?specialIpPreviousCategories.get(specialIpSourceIdentity(item.sourceTableName,item.sourceDefinitionId))??'':null;
       document.getElementById('specialIpDeleteIntro').textContent=previousCategory===null?`确认删除 ${item.block}？`:`确认删除 ${item.block}？删除后 ${item.sourceTableName} 表中的 Block Category 将恢复为 ${previousCategory||'空'}。`;
@@ -1200,7 +1371,7 @@
     function confirmSpecialIpDelete() {
       if(!pendingSpecialIpDelete)return;
       const {item,type}=pendingSpecialIpDelete,rows=type==='io'?ioIpRows:analogIpRows;
-      if(rows.some(child=>child.parent===item.id)){
+      if(logicalNodeHasChildren(rows,item)){
         closeSpecialIpDeleteModal();
         showToast('请先删除或移动该节点的子 Block');return;
       }
@@ -1223,19 +1394,35 @@
           (sourceState.changeHistory[hierarchy][item.sourceDefinitionId] ||= []).unshift(changeEvent(currentActorId,'Block Category',type==='io'?'IO IP':'Analog IP',restoredCategory,auditNow()));
         });
       }
-      rows.splice(index,1);
+      const groupKey=specialIpGroupKey(item);
+      if(derived)specialIpDirectMemberships[type].delete(specialIpMembershipKey(item.sourceTableName,item.sourceNodeId));
+      removeSpecialIpProjectionRow(type,rows,index);
+      if(derived)reconcileSpecialIpSourceProjection(type,rows,item.sourceTableName);
+      if(!rows.some(candidate=>specialIpGroupKey(candidate)===groupKey))selectedSpecialIpVersions[type].delete(groupKey);
       if(!derived){
         specialIpStablePositions[type].delete(item.id);
         specialIpStableSources[type].delete(item.id);
       }
       if(specialIpAddDraft?.anchorId===item.id)specialIpAddDraft=null;
       specialIpStructureChanges[type].unshift(changeEvent(currentActorId,'删除 Block',item.block,'已删除',auditNow()));
-      delete specialIpChangeHistory[type][item.id];
       if(selectedSpecialIpItem?.id===item.id)closeDrawer();
       if(type==='io'&&selectedIoIpRowId===item.id)selectedIoIpRowId=null;
       if(type==='analog'&&selectedAnalogIpRowId===item.id)selectedAnalogIpRowId=null;
       closeSpecialIpDeleteModal();
       renderWbs();showToast(derived?`${item.block} 已删除；${item.sourceTableName} Block Category 已恢复为 ${restoredCategory||'空'}`:`${item.block} 已删除`);
+    }
+    function requestSpecialIpDelete(item,type) {
+      const group=specialIpVersionGroup(item,type);
+      if(group.length>1)return openSpecialIpVersionDeleteModal(item,group,type);
+      deleteSpecialIpRow(item,type);
+    }
+    function openSpecialIpVersionDeleteModal(item,group,type) {
+      pendingVersionDelete={special:true,item,type,group,selected:new Set()};
+      document.getElementById('versionDeleteTitle').textContent=`删除 ${item.block} · T${item.tier}`;
+      document.getElementById('versionDeleteIntro').textContent='请选择需要删除的 Version，可多选。仅删除选中记录，其他 Version 不受影响。';
+      renderVersionDeleteOptions();
+      document.getElementById('versionDeleteModal').classList.add('open');
+      document.querySelector('#versionDeleteModal [data-version-delete-id]:not(:disabled)')?.focus();
     }
     function applySpecialIpFieldChange(item,type,field,newValue) {
       const oldValue=item[field];
@@ -1243,35 +1430,10 @@
       recordSpecialIpChange(item,type,field,oldValue,newValue);item[field]=newValue;
       renderWbs();showToast(`${item.block} 已更新`);
     }
-    function requestSpecialIpE3(item,type,newValue) {
-      if(newValue!=='Yes'||item.layoutModifyEmail==='Yes')return applySpecialIpFieldChange(item,type,'layoutModifyEmail',newValue);
-      pendingSpecialIpE3={item,type};
-      document.getElementById('specialIpE3Modal').classList.add('open');
-      requestAnimationFrame(()=>document.getElementById('confirmSpecialIpE3').focus());
-    }
-    function closeSpecialIpE3Modal() {
-      document.getElementById('specialIpE3Modal').classList.remove('open');
-      pendingSpecialIpE3=null;
-      renderWbs();
-    }
-    function confirmSpecialIpE3() {
-      if(!pendingSpecialIpE3)return;
-      const {item,type}=pendingSpecialIpE3,rows=type==='io'?ioIpRows:analogIpRows,index=rows.findIndex(candidate=>candidate.id===item.id);
-      if(index<0){closeSpecialIpE3Modal();return;}
-      const created=createE3SpecialIpRow(item,type,rows);
-      recordSpecialIpChange(item,type,'layoutModifyEmail',item.layoutModifyEmail,'Yes');item.layoutModifyEmail='Yes';
-      specialIpStablePositions[type].set(created.id,specialIpStablePositionAfter(type,item.id));
-      specialIpStableSources[type].set(created.id,effectiveSpecialIpSource(item,rows));
-      rows.splice(index+1,0,created);
-      specialIpStructureChanges[type].unshift(changeEvent(currentActorId,'Layout modify email E3 新增同名 Block','不存在',created.block,auditNow()));
-      specialIpChangeHistory[type][created.id]=[];
-      document.getElementById('specialIpE3Modal').classList.remove('open');
-      pendingSpecialIpE3=null;
-      renderWbs();showToast(`${created.block} 已新增，且不允许删除`);
-    }
     function switchPrototypeTable(tableName) {
       if(tableName===activeTableName)return;
       specialIpAddDraft=null;
+      closeInlineAddMenu();
       if(!isSpecialIpTable())tableStateStore.set(activeTableName,captureTableState());
       if(!isSpecialIpTable(tableName)){
         if(!tableStateStore.has(tableName))tableStateStore.set(tableName,captureTableState());
@@ -1288,8 +1450,8 @@
       showToast(`已切换到表 ${tableName}`);
     }
 
-    function row(id, def, parent, tier, checks, planned, actual, tierTop=false, instance='') {
-      return { id, def, parent, tier, checks, planned, actual, tierTop, instance, expanded:true };
+    function row(id, def, parent, tier, checks, planned, actual, tierTop=false) {
+      return { id, def, parent, tier, checks, planned, actual, tierTop, expanded:true };
     }
     function sharedIdentityTypes(type) { return ['schematic','layout'].includes(type)?['schematic','layout']:[type]; }
     function identityCounterpart(item,targetType) { return data[targetType].find(candidate=>candidate.def.id===item.def.id)||null; }
@@ -1300,7 +1462,7 @@
       ['schematic','layout'].forEach(type=>hierarchyOrderedItems(type).forEach(item=>{
         const key=identityRowKey(item,type);
         if(descriptorByKey.has(key))return;
-        const parent=data[type].find(candidate=>candidate.id===item.parent);
+        const parent=logicalNodeRepresentative(data[type],logicalParentNodeId(item));
         const descriptor={key,def:item.def,tier:item.tier,parentKey:parent?identityRowKey(parent,type):null,expanded:item.expanded};
         descriptorByKey.set(key,descriptor);descriptors.push(descriptor);
       }));
@@ -1330,8 +1492,9 @@
       ['schematic','layout'].forEach(type=>{
         const byKey=new Map(rowsByType[type].map(item=>[identityRowKey(item,type),item]));
         rowsByType[type].forEach((item,index)=>item.parent=descriptors[index].parentKey?byKey.get(descriptors[index].parentKey)?.id||null:null);
+        initializeLogicalBlockNodes(type,rowsByType[type]);
       });
-      data.layout.forEach(item=>item.tierTop=data.layout.some(child=>child.parent===item.id));
+      data.layout.forEach(item=>item.tierTop=logicalNodeHasChildren(data.layout,item));
     }
     function changeEvent(actor, field, oldValue, newValue, time, effect='') { return {actor,field,oldValue,newValue,time,effect}; }
     function parseDate(value) { return value ? new Date(value + 'T12:00:00') : null; }
@@ -1472,7 +1635,7 @@
     function specialIpType() { return isIoIpTable()?'io':'analog'; }
     function specialIpHistoryFor(item,type=specialIpType()) { return (specialIpChangeHistory[type][item.id] ||= []); }
     function specialIpFieldLabel(type,field) {
-      const commonLabels={referenceProject:'Reference project',schematicOwner:'Schematic owner',layoutOwner:'Layout owner',layoutFinishPlanned:'Layout finish Planned finish',layoutFinishActual:'Layout finish Actual finish',layoutModifyEmail:'Layout modify email E3',qualityOwner:'Layout quality Owner',qualityDeadline:'Layout quality Deadline',qualityStatus:'Layout quality Status'};
+      const commonLabels={version:'Version',referenceProject:'Reference project',schematicOwner:'Schematic owner',layoutOwner:'Layout owner',layoutFinishPlanned:'Layout finish Planned finish',layoutFinishActual:'Layout finish Actual finish',layoutModifyEmail:'Layout modify email E3',qualityOwner:'Layout quality Owner',qualityDeadline:'Layout quality Deadline',qualityStatus:'Layout quality Status'};
       const labels=type==='io'?{
         ...commonLabels,hookupDeadline:'Hookup Deadline',hookupStatus:'Hookup Status',specReviewDeadline:'Spec&Reviewb Deadline',specReviewStatus:'Spec&Reviewb Status',preSimDeadline:'Pre_sim CRC Deadline',preSimStatus:'Pre_sim CRC Status',preSimReviewAi:'Pre_sim Review AI',preSimReviewAiStatus:'Pre_sim Review AI Status',schReleasePlanFinish:'SCH release Plan finish',schReleaseActualFinish:'SCH release Actual finish',coWorkRlsSchematicEmail:'Rls schematic email A1/A2',coWorkFloorplanDoneEmail:'Floorplan done email B',coWorkFloorplanConfirmEmail:'Floorplan confirm email B',coWorkLayoutStatus:'Layout Status',coWorkRoutingCheck:'Layout routing check with design',coWorkRoutingDoneEmail:'Routing done email D',postSimDeadline:'Post_sim CRC Deadline',postSimStatus:'Post_sim CRC Status'
       }:{
@@ -1515,7 +1678,7 @@
         ['block',165],['round',100],['category',100],['reference',105],['schematicProgress',135],['planned',135],['actual',100],['schematicOwner',110],['checks',110],['overallCheck',175],['layoutProgress',120],['latestChange',44]
       ],
       layout: [
-        ['block',165],['round',100],['category',100],['reference',105],['schematicProgress',135],['layoutOwner',110],['planWorkdays',88],['resource',75],['startDate',95],['planFinish',105],['actualFinish',105],['layoutProgress',120],['checks',100],['layoutQualified',165],['latestChange',44]
+        ['block',165],['round',100],['category',100],['reference',105],['schematicProgress',135],['layoutOwner',110],['planWorkdays',106],['resource',83],['startDate',95],['planFinish',105],['actualFinish',105],['layoutProgress',120],['checks',100],['layoutQualified',165],['latestChange',44]
       ],
       spf: [
         ['block',165],['round',100],['schematicOwner',110],['layoutOwner',110],['checks',110],['spfReady',150],['lvsPath',130],['cdl',130],['gds',130],['plannedSpf',110],['actualSpf',110],['latestChange',44]
@@ -1684,6 +1847,14 @@
       });
       return displayed;
     }
+    function assertWbsHeaderLabelsFit() {
+      const overflowing=[...wbsHead.querySelectorAll('.column-header-label, .io-ip-group-title')].filter(label=>{
+        if(label.closest('.change-column')||!label.getClientRects().length)return false;
+        const lineHeight=parseFloat(getComputedStyle(label).lineHeight)||14;
+        return label.scrollHeight>lineHeight*2+1;
+      }).map(label=>label.textContent.trim().replace(/\s+/g,' '));
+      if(overflowing.length)throw new Error(`WBS 列字段名称超过两行：${overflowing.join('、')}`);
+    }
     function syncWbsColumnLayout(type,definitions,widths) {
       const displayedWidths=displayedWbsColumnWidths(definitions,widths);
       if(inlineAddDraft?.hierarchy===type)displayedWidths[0]=Math.max(displayedWidths[0],330);
@@ -1704,6 +1875,7 @@
       workspace.style.setProperty('--wbs-change-width',`${changeWidth}px`);
       workspace.classList.toggle('latest-change-drawer-collapsed',latestChangeDrawerCollapsed);
       wbsHead.querySelectorAll('.column-resizer').forEach((handle,index)=>handle.setAttribute('aria-valuenow',String(displayedWidths[index])));
+      assertWbsHeaderLabelsFit();
     }
     function refreshWbsColumnLayout() { return isIoIpTable()?refreshSpecialIpColumnLayout('io',ioIpColumnDefinitions):isAnalogIpTable()?refreshSpecialIpColumnLayout('analog',analogIpColumnDefinitions):syncWbsColumnLayout(currentHierarchy,wbsColumnDefinitions[currentHierarchy],currentWbsColumnWidths()); }
     function applyWbsColumnLayout() {
@@ -1780,7 +1952,7 @@
       return definitions.map(([key,minimum])=>key==='latestChange'?(latestChangeDrawerCollapsed?8:44):Math.max(minimum,Number(wbsColumnWidths[type]?.[key])||minimum));
     }
     function assignSpecialIpHeaderKeys(type,definitions) {
-      const directIndexes=type==='io'?[0,1,2,3,4,25]:[0,1,2,3,4,15,25];
+      const directIndexes=type==='io'?[0,1,2,3,4,5,26]:[0,1,2,3,4,5,16,26];
       const topHeaders=[...wbsHead.querySelectorAll('.io-ip-group-row > th')].filter(header=>header.rowSpan===2&&!header.classList.contains('change-column'));
       topHeaders.forEach((header,index)=>header.dataset.columnKey=definitions[directIndexes[index]][0]);
       const directSet=new Set(directIndexes),secondIndexes=definitions.map((_,index)=>index).filter(index=>!directSet.has(index)&&definitions[index][0]!=='latestChange');
@@ -1790,19 +1962,22 @@
       const displayedWidths=displayedWbsColumnWidths(definitions,widths);
       const rows=type==='io'?ioIpRows:analogIpRows,maxTier=Math.max(1,...rows.map(item=>item.tier||1));
       displayedWidths[1]=Math.max(displayedWidths[1],165+(maxTier-1)*17);
-      if(specialIpAddDraft?.type===type)displayedWidths[1]=Math.max(displayedWidths[1],330);
+      if(specialIpAddDraft?.type===type&&specialIpAddDraft.mode==='block')displayedWidths[1]=Math.max(displayedWidths[1],330);
+      if(specialIpAddDraft?.type===type&&specialIpAddDraft.mode==='version')displayedWidths[2]=Math.max(displayedWidths[2],170);
       [...wbsColgroup.children].forEach((column,index)=>{column.style.width=`${displayedWidths[index]}px`;});
       const totalWidth=displayedWidths.reduce((sum,width)=>sum+width,0);
       wbsTable.style.width=`${totalWidth}px`;wbsTable.style.minWidth=`${totalWidth}px`;
       tableWrap.querySelectorAll('.io-ip-source-column').forEach(cell=>{cell.style.left='0px';});
       tableWrap.querySelectorAll('.frozen-block-column').forEach(cell=>{cell.style.left=`${displayedWidths[0]}px`;});
-      tableWrap.querySelectorAll('.io-ip-reference-column').forEach(cell=>{cell.style.left=`${displayedWidths[0]+displayedWidths[1]}px`;});
-      tableWrap.querySelectorAll('.io-ip-schematic-owner-column').forEach(cell=>{cell.style.left=`${displayedWidths[0]+displayedWidths[1]+displayedWidths[2]}px`;});
-      tableWrap.querySelectorAll('.io-ip-layout-owner-column').forEach(cell=>{cell.style.left=`${displayedWidths[0]+displayedWidths[1]+displayedWidths[2]+displayedWidths[3]}px`;});
+      tableWrap.querySelectorAll('.io-ip-version-column').forEach(cell=>{cell.style.left=`${displayedWidths[0]+displayedWidths[1]}px`;});
+      tableWrap.querySelectorAll('.io-ip-reference-column').forEach(cell=>{cell.style.left=`${displayedWidths[0]+displayedWidths[1]+displayedWidths[2]}px`;});
+      tableWrap.querySelectorAll('.io-ip-schematic-owner-column').forEach(cell=>{cell.style.left=`${displayedWidths[0]+displayedWidths[1]+displayedWidths[2]+displayedWidths[3]}px`;});
+      tableWrap.querySelectorAll('.io-ip-layout-owner-column').forEach(cell=>{cell.style.left=`${displayedWidths[0]+displayedWidths[1]+displayedWidths[2]+displayedWidths[3]+displayedWidths[4]}px`;});
       const workspace=tableWrap.closest('.workspace');
       workspace.style.setProperty('--wbs-change-width',`${displayedWidths[displayedWidths.length-1]}px`);
       workspace.classList.toggle('latest-change-drawer-collapsed',latestChangeDrawerCollapsed);
       definitions.forEach(([key],index)=>wbsHead.querySelector(`[data-column-key="${key}"] .column-resizer`)?.setAttribute('aria-valuenow',String(displayedWidths[index])));
+      assertWbsHeaderLabelsFit();
     }
     function refreshSpecialIpColumnLayout(type,definitions) {
       syncSpecialIpColumnLayout(type,definitions,currentSpecialIpColumnWidths(type,definitions));
@@ -1869,10 +2044,11 @@
     function closeInlineAddMenu() {
       document.getElementById('inlineAddMenu').classList.remove('open');
       inlineAddAnchor=null;
+      specialIpAddAnchor=null;
     }
     function inlineVersionGroup(item,type=currentHierarchy) {
       if(!item)return[];
-      return data[type].filter(candidate=>(candidate.parent||null)===(item.parent||null)&&blockMergeKey(candidate)===blockMergeKey(item)).sort((left,right)=>versionRank(left,type)-versionRank(right,type));
+      return logicalVersions(data[type],item).sort((left,right)=>versionRank(left,type)-versionRank(right,type));
     }
     function availableInlineVersions(item,type=currentHierarchy) {
       const existing=new Set(inlineVersionGroup(item,type).map(candidate=>itemVersion(candidate,type)));
@@ -1888,15 +2064,26 @@
       menu.style.top=`${Math.min(window.innerHeight-125,rect.bottom+5)}px`;
       menu.classList.add('open');
     }
+    function openSpecialIpAddMenu(item,type,button) {
+      if(specialIpAddDraft){specialIpAddDraft=null;renderWbs();}
+      inlineAddAnchor=null;
+      specialIpAddAnchor={item,type};
+      const available=availableSpecialIpVersions(item,type),menu=document.getElementById('inlineAddMenu'),rect=button.getBoundingClientRect();
+      document.getElementById('inlineAddVersion').disabled=!available.length;
+      document.getElementById('inlineAddVersionHint').textContent=available.length?`可添加：${available.join('、')}`:'已包含全部 Version';
+      menu.style.left=`${Math.min(window.innerWidth-262,rect.left)}px`;
+      menu.style.top=`${Math.min(window.innerHeight-125,rect.bottom+5)}px`;
+      menu.classList.add('open');
+    }
     function inlineDraftBase(anchor=null) {
-      return {hierarchy:currentHierarchy,anchorId:anchor?.id||null,name:'',version:'',tier:anchor?.tier||1,parent:anchor?.parent||null,category:'',reference:'',schematicOwner:'',layoutOwner:'',planned:'',actual:'',startDate:'',planWorkdays:'',resource:'',lvsPath:'',cdl:'',gds:'',focus:true};
+      return {hierarchy:currentHierarchy,anchorId:anchor?.id||null,nodeId:null,name:'',version:'',tier:anchor?.tier||1,parent:anchor?.parent||null,parentNodeId:anchor?logicalParentNodeId(anchor):null,category:'',reference:'',schematicOwner:'',layoutOwner:'',planned:'',actual:'',startDate:'',planWorkdays:'',resource:'',lvsPath:'',cdl:'',gds:'',focus:true};
     }
     function startInlineBlockDraft(anchor=null) {
       inlineAddDraft={...inlineDraftBase(anchor),mode:'block'};
       closeInlineAddMenu();renderWbs();
     }
     function startInlineVersionDraft(anchor) {
-      inlineAddDraft={...inlineDraftBase(anchor),mode:'version',name:anchor.def.name,tier:anchor.tier,parent:anchor.parent,category:anchor.def.category,reference:anchor.def.reference};
+      inlineAddDraft={...inlineDraftBase(anchor),mode:'version',nodeId:logicalNodeId(anchor),name:anchor.def.name,tier:anchor.tier,parent:anchor.parent,parentNodeId:logicalParentNodeId(anchor),category:anchor.def.category,reference:anchor.def.reference};
       closeInlineAddMenu();renderWbs();
     }
     function inlineDraftAnchor(type=currentHierarchy) {
@@ -1904,16 +2091,15 @@
       return data[type].find(item=>item.id===inlineAddDraft.anchorId)||null;
     }
     function rowIsDescendantOf(candidate,ancestorIds,rows) {
-      const byId=new Map(rows.map(item=>[item.id,item]));
-      let parentId=candidate.parent;
-      while(parentId){
-        if(ancestorIds.has(parentId))return true;
-        parentId=byId.get(parentId)?.parent||null;
+      let parentNodeId=logicalParentNodeId(candidate);
+      while(parentNodeId){
+        if(ancestorIds.has(parentNodeId))return true;
+        parentNodeId=logicalParentNodeId(logicalNodeRepresentative(rows,parentNodeId));
       }
       return false;
     }
     function hierarchySubtreeBoundary(type,anchor,ordered=hierarchyOrderedItems(type)) {
-      const instances=data[type],anchorGroup=instances.filter(item=>blockMergeGroupKey(item)===blockMergeGroupKey(anchor)),ancestorIds=new Set(anchorGroup.map(item=>item.id));
+      const instances=data[type],anchorGroup=logicalVersions(instances,anchor),ancestorIds=new Set([logicalNodeId(anchor)]);
       let boundary=anchorGroup[anchorGroup.length-1]||anchor;
       ordered.forEach(candidate=>{if(ancestorIds.has(candidate.id)||rowIsDescendantOf(candidate,ancestorIds,instances))boundary=candidate;});
       const boundaryGroup=instances.filter(item=>blockMergeGroupKey(item)===blockMergeGroupKey(boundary));
@@ -1922,13 +2108,13 @@
     function inlineDraftIndex(items) {
       if(!inlineAddDraft||inlineAddDraft.hierarchy!==currentHierarchy)return-1;
       const name=inlineAddDraft.name.trim().toLowerCase();
-      const matching=items.filter(item=>(item.parent||null)===(inlineAddDraft.parent||null)&&item.tier===inlineAddDraft.tier&&item.def.name.trim().toLowerCase()===name);
+      const matching=items.filter(item=>logicalParentNodeId(item)===(inlineAddDraft.parentNodeId||null)&&item.tier===inlineAddDraft.tier&&item.def.name.trim().toLowerCase()===name);
       const anchor=inlineDraftAnchor();
       const group=anchor?items.filter(item=>blockMergeGroupKey(item)===blockMergeGroupKey(anchor)):[];
       if(inlineAddDraft.mode==='version'&&group.length)return items.indexOf(group[0]);
       if(inlineAddDraft.mode==='block'&&group.length){
         if(inlineAddDraft.tier!==anchor.tier)return items.indexOf(group[group.length-1])+1;
-        const instances=data[currentHierarchy],anchorGroup=instances.filter(item=>blockMergeGroupKey(item)===blockMergeGroupKey(anchor)),ancestorIds=new Set(anchorGroup.map(item=>item.id));
+        const instances=data[currentHierarchy],anchorGroup=logicalVersions(instances,anchor),ancestorIds=new Set([logicalNodeId(anchor)]);
         let boundaryIndex=items.indexOf(group[group.length-1]);
         items.forEach((candidate,index)=>{if(ancestorIds.has(candidate.id)||rowIsDescendantOf(candidate,ancestorIds,instances))boundaryIndex=Math.max(boundaryIndex,index);});
         return boundaryIndex+1;
@@ -1976,6 +2162,7 @@
       if(!anchor)return;
       inlineAddDraft.tier=tier;
       inlineAddDraft.parent=tier===anchor.tier?anchor.parent:anchor.id;
+      inlineAddDraft.parentNodeId=tier===anchor.tier?logicalParentNodeId(anchor):logicalNodeId(anchor);
     }
     function bindInlineDraft() {
       if(!inlineAddDraft||inlineAddDraft.hierarchy!==currentHierarchy)return;
@@ -1991,7 +2178,7 @@
     }
     function cancelInlineDraft(notify=true) { inlineAddDraft=null;renderWbs();if(notify)showToast('已取消草稿'); }
     function insertInlineItem(item,type,anchor,mode) {
-      const instances=data[type],matching=instances.filter(candidate=>(candidate.parent||null)===(item.parent||null)&&blockMergeKey(candidate)===blockMergeKey(item));
+      const instances=data[type],matching=instances.filter(candidate=>logicalNodeId(candidate)===logicalNodeId(item));
       if(matching.length){item.displayAfterId=matching.find(candidate=>candidate.displayAfterId)?.displayAfterId||null;instances.splice(instances.indexOf(matching[matching.length-1])+1,0,item);return;}
       if(mode==='block'&&anchor){
         const group=instances.filter(candidate=>blockMergeGroupKey(candidate)===blockMergeGroupKey(anchor));
@@ -2009,12 +2196,14 @@
       if(errors.length){if(errors.some(error=>error.includes('已存在')))openSameTierDuplicateModal([{name:draft.name,tier:draft.tier,version:normalizeVersion(draft.version)||'空',errors}]);else showToast('请填写必填项');return;}
       const targetTypes=sharedIdentityTypes(currentHierarchy),version=normalizeVersion(draft.version),base=draft.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||`block-${Date.now()}`;
       const def={id:`${base}-${Date.now().toString().slice(-6)}`,name:draft.name.trim(),round:currentHierarchy==='spf'?'':version,category:draft.category||'',reference:draft.reference==='空'?'':draft.reference||'',blockOwner:'',schematicOwner:draft.schematicOwner||'',layoutOwner:draft.layoutOwner||''};
-      const sourceAnchor=inlineDraftAnchor(currentHierarchy),sourceParent=draft.parent?data[currentHierarchy].find(item=>item.id===draft.parent):null;
+      const sourceAnchor=inlineDraftAnchor(currentHierarchy),sourceParent=draft.parentNodeId?logicalNodeRepresentative(data[currentHierarchy],draft.parentNodeId):null;
       const anchorsByType=Object.fromEntries(targetTypes.map(type=>[type,type===currentHierarchy?sourceAnchor:identityCounterpart(sourceAnchor,type)]));
       const parentsByType=Object.fromEntries(targetTypes.map(type=>[type,type===currentHierarchy?sourceParent:sourceParent?identityCounterpart(sourceParent,type):null]));
       targetTypes.forEach(type=>{
         const anchor=anchorsByType[type],parent=parentsByType[type];
         const item=row(`${type.slice(0,3)}-${def.id}-${data[type].length+1}`,def,parent?.id||null,draft.tier,Array(checkLabels[type].length).fill(0),'','');
+        item.nodeId=draft.mode==='version'&&anchor?logicalNodeId(anchor):`${type}-block-${def.id}-${Date.now()}-${type}`;
+        item.parentNodeId=draft.mode==='version'&&anchor?logicalParentNodeId(anchor):parent?logicalNodeId(parent):draft.parentNodeId||null;
         insertInlineItem(item,type,anchor,draft.mode);
         if(draft.mode==='version')selectedVersionRows[type].set(blockMergeGroupKey(item),item.id);
         const rail=railState[type][def.id]=blankRail(type);
@@ -2041,7 +2230,47 @@
       return `<td><div class="editable-cell"><div class="cell-display ${value?'':'empty'}">${display}</div><div class="cell-editor choice"><select class="cell-select" data-io-edit="${field}">${optionsHtml(options,value)}</select></div></div></td>`;
     }
     function ioIpTextCell(field,value) {
+      if(field==='preSimReviewAi')return `<td><div class="editable-cell review-ai-cell" data-review-ai-preview tabindex="0"><div class="cell-display ${value?'':'empty'}">${value?esc(value):''}</div><div class="cell-editor"><textarea class="cell-input review-ai-inline-editor" data-io-edit="${field}" aria-label="Review AI">${esc(value)}</textarea></div></div></td>`;
       return `<td><div class="editable-cell"><div class="cell-display ${value?'':'empty'}">${value?esc(value):''}</div><div class="cell-editor"><input class="cell-input" type="text" data-io-edit="${field}" value="${esc(value)}"></div></div></td>`;
+    }
+    let reviewAiPreviewCell=null,reviewAiPreviewCloseTimer=null;
+    function closeReviewAiPreview() {
+      clearTimeout(reviewAiPreviewCloseTimer);
+      const preview=document.getElementById('reviewAiPreview');
+      preview.classList.remove('open');preview.setAttribute('aria-hidden','true');preview.textContent='';
+      reviewAiPreviewCell=null;
+    }
+    function positionReviewAiPreview(cell) {
+      const preview=document.getElementById('reviewAiPreview'),rect=cell.getBoundingClientRect(),margin=10,gap=6;
+      const width=Math.min(420,window.innerWidth-margin*2);
+      const below=window.innerHeight-rect.bottom-gap-margin,above=rect.top-gap-margin,placeBelow=below>=180||below>=above;
+      const availableHeight=Math.max(60,placeBelow?below:above);
+      preview.style.width=`${width}px`;preview.style.maxHeight=`${availableHeight}px`;
+      const height=Math.min(preview.scrollHeight,availableHeight);
+      const left=Math.min(window.innerWidth-width-margin,Math.max(margin,rect.left));
+      const top=placeBelow?rect.bottom+gap:Math.max(margin,rect.top-height-gap);
+      preview.style.left=`${left}px`;preview.style.top=`${top}px`;
+    }
+    function showReviewAiPreview(cell) {
+      clearTimeout(reviewAiPreviewCloseTimer);
+      const value=cell.querySelector('[data-io-edit="preSimReviewAi"]')?.value||'';
+      if(!value.trim())return closeReviewAiPreview();
+      const preview=document.getElementById('reviewAiPreview');
+      reviewAiPreviewCell=cell;preview.textContent=value;preview.classList.add('open');preview.setAttribute('aria-hidden','false');
+      positionReviewAiPreview(cell);
+    }
+    function scheduleReviewAiPreviewClose() {
+      clearTimeout(reviewAiPreviewCloseTimer);
+      reviewAiPreviewCloseTimer=setTimeout(()=>{const preview=document.getElementById('reviewAiPreview');if(!reviewAiPreviewCell?.matches(':hover')&&!preview.matches(':hover')&&!reviewAiPreviewCell?.contains(document.activeElement))closeReviewAiPreview();},80);
+    }
+    function bindReviewAiPreview(tableRow) {
+      const cell=tableRow.querySelector('[data-review-ai-preview]'),input=cell?.querySelector('[data-io-edit="preSimReviewAi"]');
+      if(!cell||!input)return;
+      cell.addEventListener('mouseenter',()=>showReviewAiPreview(cell));
+      cell.addEventListener('mouseleave',scheduleReviewAiPreviewClose);
+      cell.addEventListener('focusin',()=>showReviewAiPreview(cell));
+      cell.addEventListener('focusout',scheduleReviewAiPreviewClose);
+      input.addEventListener('input',()=>showReviewAiPreview(cell));
     }
     function ioIpDateCell(field,value) {
       return `<td><div class="editable-cell"><div class="cell-display ${value?'':'empty'}">${value?esc(value):''}</div><div class="cell-editor"><input class="cell-input date-input" type="date" data-io-edit="${field}" value="${esc(value)}"></div></div></td>`;
@@ -2049,10 +2278,19 @@
     function ioIpDerivedStatusCell(value) {
       return `<td>${value?`<span class="status ${ioIpStatusClass(value)}">${esc(value)}</span>`:''}</td>`;
     }
+    function specialIpVersionCell(value,attribute='data-io-edit') {
+      const normalized=normalizeVersion(value),options=`<option value="" disabled ${normalized?'':'selected'}>请选择</option>${versionOptions.map(option=>`<option value="${option}" ${option===normalized?'selected':''}>${option}</option>`).join('')}`;
+      return `<td class="io-ip-version-column"><div class="editable-cell"><div class="cell-display ${normalized?'':'empty'}">${esc(normalized)}</div><div class="cell-editor choice"><select class="cell-select" ${attribute}="version" aria-label="Version，单选">${options}</select></div></div></td>`;
+    }
+    function specialIpVersionSwitcherCell(item,type) {
+      const group=specialIpVersionGroup(item,type);
+      if(group.length<=1)return specialIpVersionCell(item.version,type==='io'?'data-io-edit':'data-analog-edit');
+      const current=normalizeVersion(item.version),options=group.map(candidate=>`<option value="${esc(candidate.id)}" ${candidate.id===item.id?'selected':''}>${esc(normalizeVersion(candidate.version))}</option>`).join(''),title=`当前展示 Version：${current}`;
+      return `<td class="io-ip-version-column"><div class="editable-cell version-switcher" tabindex="0"><div class="cell-display" title="${esc(title)}">${esc(current)}</div><div class="cell-editor choice"><select class="cell-select" data-special-version-switch aria-label="${esc(item.block)} 当前展示 Version：${esc(current)}" title="${esc(title)}">${options}</select></div></div></td>`;
+    }
     function specialIpBlockCell(item,type) {
-      const rows=type==='io'?ioIpRows:analogIpRows,hasChildren=rows.some(child=>child.parent===item.id),expanded=item.expanded!==false,levelPad=(item.tier-1)*17;
-      const deleteDisabled=item.e3Generated;
-      return `<td class="frozen-column frozen-block-column"><div class="block-cell" style="padding-left:${levelPad}px"><button class="tree-toggle ${hasChildren?'':'hidden'}" type="button" title="${expanded?'收起':'展开'}下级 Block" aria-label="${expanded?'收起':'展开'} ${esc(item.block)} 的下级 Block" aria-expanded="${expanded}">${expanded?'▾':'▸'}</button><div class="block-main"><div class="block-title-line"><span class="block-name-wrap"><span class="block-name">${esc(item.block)}</span><span class="tier">T${item.tier}</span><span class="row-actions"><button class="row-action row-add" data-special-ip-add type="button" title="新增 Block" aria-label="在 ${esc(item.block)} 行新增 Block">+</button><button class="row-action row-delete" data-special-ip-delete type="button" title="${deleteDisabled?'该 Block 由 Layout modify email E3 生成，不允许删除':`删除 ${esc(item.block)} Block`}" aria-label="${deleteDisabled?`${esc(item.block)} 不允许删除`:`删除 ${esc(item.block)} Block`}" ${deleteDisabled?'disabled':''}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6v14H5V6"></path><path d="M10 11v5M14 11v5"></path></svg></button></span></span></div></div></div></td>`;
+      const rows=type==='io'?ioIpRows:analogIpRows,group=specialIpVersionGroup(item,type),hasChildren=logicalNodeHasChildren(rows,item),expanded=group.every(member=>member.expanded!==false),levelPad=(item.tier-1)*17;
+      return `<td class="frozen-column frozen-block-column"><div class="block-cell" style="padding-left:${levelPad}px"><button class="tree-toggle ${hasChildren?'':'hidden'}" type="button" title="${expanded?'收起':'展开'}下级 Block" aria-label="${expanded?'收起':'展开'} ${esc(item.block)} 的下级 Block" aria-expanded="${expanded}">${expanded?'▾':'▸'}</button><div class="block-main"><div class="block-title-line"><span class="block-name-wrap"><span class="block-name">${esc(item.block)}</span><span class="tier">T${item.tier}</span><span class="row-actions"><button class="row-action row-add" data-special-ip-add type="button" title="新增 Block" aria-label="在 ${esc(item.block)} 行新增 Block">+</button><button class="row-action row-delete" data-special-ip-delete type="button" title="删除 ${esc(item.block)} Block" aria-label="删除 ${esc(item.block)} Block"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6v14H5V6"></path><path d="M10 11v5M14 11v5"></path></svg></button></span></span></div></div></div></td>`;
     }
     function specialIpSourceMergePlan(items,allRows,merge=true) {
       const plan=new Map();
@@ -2079,13 +2317,14 @@
       return `<select class="inline-tier-select" id="specialIpDraftTier" aria-label="Tier"><option value="${anchor.tier}" ${draft.tier===anchor.tier?'selected':''}>T${anchor.tier}（同级）</option><option value="${anchor.tier+1}" ${draft.tier===anchor.tier+1?'selected':''}>T${anchor.tier+1}（下一级）</option></select>`;
     }
     function specialIpDraftRowHtml(type,definitions) {
-      const draft=specialIpAddDraft,blankCells=definitions.slice(5,-1).map(()=>'<td></td>').join('');
+      const draft=specialIpAddDraft,anchor=(type==='io'?ioIpRows:analogIpRows).find(item=>item.id===draft.anchorId),available=draft.mode==='version'?availableSpecialIpVersions(anchor,type):versionOptions,blankCells=definitions.slice(6,-1).map(()=>'<td></td>').join(''),versionOptionsHtml=`<option value="">选择 Version</option>${available.map(version=>`<option value="${version}" ${draft.version===version?'selected':''}>${version}</option>`).join('')}`;
       return `<tr class="inline-draft-row" data-special-ip-draft-row>
-        <td class="io-ip-source-column"></td>
-        <td class="frozen-column frozen-block-column inline-draft-block"><div class="block-cell" style="padding-left:${(draft.tier-1)*17}px"><span class="tree-toggle hidden"></span><span class="inline-draft-name">${inlineDraftInput('block',draft.block,'id="specialIpDraftName" placeholder="输入 Block 名称" data-special-ip-draft')}</span>${specialIpTierControl()}${inlineDraftActions()}</div></td>
-        <td class="io-ip-reference-column">${inlineDraftInput('referenceProject',draft.referenceProject,'list="referenceProjects" placeholder="Reference project" data-special-ip-draft')}</td>
-        <td class="io-ip-schematic-owner-column">${inlineDraftInput('schematicOwner',draft.schematicOwner,'list="schematicOwners" placeholder="Schematic Owner" data-special-ip-draft')}</td>
-        <td class="io-ip-layout-owner-column last-frozen-column">${inlineDraftInput('layoutOwner',draft.layoutOwner,'list="layoutOwners" placeholder="Layout Owner" data-special-ip-draft')}</td>
+        <td class="io-ip-source-column"><span>${esc(draft.mode==='version'?draft.sourceTableName||draft.sourceRegionName||'':'')}</span></td>
+        <td class="frozen-column frozen-block-column inline-draft-block"><div class="block-cell" style="padding-left:${(draft.tier-1)*17}px"><span class="tree-toggle hidden"></span>${draft.mode==='version'?`<span class="inline-draft-locked-name">${esc(draft.block)}</span><span class="tier">T${draft.tier}</span>`:`<span class="inline-draft-name">${inlineDraftInput('block',draft.block,'id="specialIpDraftName" placeholder="输入 Block 名称" data-special-ip-draft')}</span>${specialIpTierControl()}${inlineDraftActions()}`}</div></td>
+        <td class="io-ip-version-column"><div class="${draft.mode==='version'?'inline-version-draft-control':''}"><select id="specialIpDraftVersion" data-inline-field="version" data-special-ip-draft aria-label="Version">${versionOptionsHtml}</select>${draft.mode==='version'?inlineDraftActions():''}</div></td>
+        <td class="io-ip-reference-column">${draft.mode==='version'?esc(draft.referenceProject||''):inlineDraftInput('referenceProject',draft.referenceProject,'list="referenceProjects" placeholder="Reference project" data-special-ip-draft')}</td>
+        <td class="io-ip-schematic-owner-column">${draft.mode==='version'?esc(draft.schematicOwner||''):inlineDraftInput('schematicOwner',draft.schematicOwner,'list="schematicOwners" placeholder="Schematic Owner" data-special-ip-draft')}</td>
+        <td class="io-ip-layout-owner-column last-frozen-column">${draft.mode==='version'?esc(draft.layoutOwner||''):inlineDraftInput('layoutOwner',draft.layoutOwner,'list="layoutOwners" placeholder="Layout Owner" data-special-ip-draft')}</td>
         ${blankCells}<td class="change-column"></td>
       </tr>`;
     }
@@ -2097,18 +2336,18 @@
       });
       document.getElementById('specialIpDraftTier')?.addEventListener('change',event=>{
         const rows=specialIpAddDraft.type==='io'?ioIpRows:analogIpRows,anchor=rows.find(item=>item.id===specialIpAddDraft.anchorId),tier=Number(event.target.value);
-        specialIpAddDraft.tier=tier;specialIpAddDraft.parent=tier===anchor.tier?anchor.parent:anchor.id;renderWbs();
+        specialIpAddDraft.tier=tier;specialIpAddDraft.parent=tier===anchor.tier?anchor.parent:anchor.id;specialIpAddDraft.parentNodeId=tier===anchor.tier?logicalParentNodeId(anchor):logicalNodeId(anchor);renderWbs();
       });
       document.getElementById('confirmInlineDraft')?.addEventListener('click',event=>{event.stopPropagation();confirmSpecialIpAddDraft();});
       document.getElementById('cancelInlineDraft')?.addEventListener('click',event=>{event.stopPropagation();cancelSpecialIpAddDraft();});
-      if(specialIpAddDraft.focus){specialIpAddDraft.focus=false;requestAnimationFrame(()=>document.getElementById('specialIpDraftName')?.focus());}
+      if(specialIpAddDraft.focus){specialIpAddDraft.focus=false;requestAnimationFrame(()=>document.getElementById(specialIpAddDraft.mode==='version'?'specialIpDraftVersion':'specialIpDraftName')?.focus());}
     }
     function specialIpTreeVisible(item,rows) {
-      let parentId=item.parent;
-      while(parentId){
-        const parent=rows.find(candidate=>candidate.id===parentId);
+      let parentNodeId=logicalParentNodeId(item);
+      while(parentNodeId){
+        const parent=logicalNodeRepresentative(rows,parentNodeId);
         if(!parent||parent.expanded===false)return false;
-        parentId=parent.parent;
+        parentNodeId=logicalParentNodeId(parent);
       }
       return true;
     }
@@ -2118,6 +2357,7 @@
       return `<tr data-io-id="${item.id}" class="${selectedIoIpRowId===item.id?'selected':''}">
         ${specialIpSourceCell(sourceMerge)}
         ${specialIpBlockCell(item,'io')}
+        ${specialIpVersionSwitcherCell(item,'io')}
         ${searchableEditorCell('referenceProject',item.referenceProject,'referenceProjects','输入可模糊搜索产品；选择空后单元格留白','io-ip-reference-column').replace('data-edit="referenceProject"','data-io-edit="referenceProject"')}
         ${searchableEditorCell('schematicOwner',item.schematicOwner,'schematicOwners','输入可模糊搜索 Schematic Owner','io-ip-schematic-owner-column').replace('data-edit="schematicOwner"','data-io-edit="schematicOwner"')}
         ${searchableEditorCell('layoutOwner',item.layoutOwner,'layoutOwners','输入可模糊搜索 Layout Owner','io-ip-layout-owner-column last-frozen-column').replace('data-edit="layoutOwner"','data-io-edit="layoutOwner"')}
@@ -2145,18 +2385,20 @@
     function bindIoIpRows() {
       wbsBody.querySelectorAll('tr[data-io-id]').forEach(tableRow=>{
         const item=ioIpRows.find(candidate=>candidate.id===tableRow.dataset.ioId);
-        tableRow.querySelector('.tree-toggle:not(.hidden)')?.addEventListener('click',event=>{event.stopPropagation();item.expanded=item.expanded===false;renderWbs();});
+        bindReviewAiPreview(tableRow);
+        tableRow.querySelector('.tree-toggle:not(.hidden)')?.addEventListener('click',event=>{event.stopPropagation();const group=specialIpVersionGroup(item,'io'),expanded=group.every(member=>member.expanded!==false);group.forEach(member=>member.expanded=!expanded);renderWbs();});
         tableRow.querySelector('.block-name')?.addEventListener('click',event=>{event.stopPropagation();openSpecialIpDrawer(item,'io');});
-        tableRow.querySelector('[data-special-ip-add]')?.addEventListener('click',event=>{event.stopPropagation();startSpecialIpAddDraft(item,'io');});
-        tableRow.querySelector('[data-special-ip-delete]')?.addEventListener('click',event=>{event.stopPropagation();deleteSpecialIpRow(item,'io');});
+        tableRow.querySelector('[data-special-ip-add]')?.addEventListener('click',event=>{event.stopPropagation();openSpecialIpAddMenu(item,'io',event.currentTarget);});
+        tableRow.querySelector('[data-special-ip-delete]')?.addEventListener('click',event=>{event.stopPropagation();requestSpecialIpDelete(item,'io');});
         tableRow.querySelectorAll('[data-io-edit]').forEach(control=>{
           control.addEventListener('click',event=>event.stopPropagation());
           control.addEventListener('change',()=>{
             const field=control.dataset.ioEdit,newValue=control.value==='空'?'':control.value;
-            if(field==='layoutModifyEmail')requestSpecialIpE3(item,'io',newValue);
-            else applySpecialIpFieldChange(item,'io',field,newValue);
+            applySpecialIpFieldChange(item,'io',field,newValue);
           });
         });
+        tableRow.querySelector('[data-special-version-switch]')?.addEventListener('click',event=>event.stopPropagation());
+        tableRow.querySelector('[data-special-version-switch]')?.addEventListener('change',event=>{event.stopPropagation();const selected=ioIpRows.find(candidate=>candidate.id===event.currentTarget.value);if(selected)selectSpecialIpVersion(selected,'io');});
         tableRow.querySelector('[data-special-change-history]')?.addEventListener('click',event=>{event.stopPropagation();openSpecialIpRowChangeHistory(item,'io',event.currentTarget);});
         tableRow.addEventListener('click',()=>{selectedIoIpRowId=item.id;renderWbs();});
       });
@@ -2164,18 +2406,18 @@
     function renderIoIpTable(preservedChange=null) {
       wbsHead.className='io-ip-head';
       wbsHead.innerHTML=`<tr class="io-ip-group-row">
-        <th class="io-ip-source-column io-ip-base-header" rowspan="2">Source</th><th class="frozen-column frozen-block-column io-ip-base-header" rowspan="2">Block</th><th class="io-ip-reference-column io-ip-base-header" rowspan="2">Reference project</th><th class="io-ip-schematic-owner-column io-ip-base-header" rowspan="2">Schematic owner</th><th class="io-ip-layout-owner-column last-frozen-column io-ip-base-header" rowspan="2">Layout owner</th>
+        <th class="io-ip-source-column io-ip-base-header" rowspan="2">Source</th><th class="frozen-column frozen-block-column io-ip-base-header" rowspan="2">Block</th><th class="io-ip-version-column io-ip-base-header" rowspan="2">Version</th><th class="io-ip-reference-column io-ip-base-header" rowspan="2">Reference project</th><th class="io-ip-schematic-owner-column io-ip-base-header" rowspan="2">Schematic owner</th><th class="io-ip-layout-owner-column last-frozen-column io-ip-base-header" rowspan="2">Layout owner</th>
         <th colspan="2"><span class="io-ip-group-title">Hookup</span></th><th colspan="2"><span class="io-ip-group-title">Spec&amp;Reviewb</span></th><th colspan="4"><span class="io-ip-group-title">Pre_sim result CRC review</span></th><th colspan="3"><span class="io-ip-group-title">SCH release for Layout</span></th><th colspan="6"><span class="io-ip-group-title">Schematic and Layout Co-work flow Check</span></th><th colspan="3"><span class="io-ip-group-title">Layout finish status（for layout）</span></th><th class="io-ip-single-header" rowspan="2">Layout modify email E3（Designer填）</th><th colspan="3"><span class="io-ip-group-title">Layout quality check（matching&amp;shielding）</span></th><th colspan="2"><span class="io-ip-group-title">Post_sim result CRC review</span></th>
         ${specialIpChangeHeaderHtml()}
       </tr><tr class="io-ip-leaf-row">
         <th>Deadline</th><th>Status</th><th>Deadline</th><th>Status</th><th>Deadline</th><th>Status</th><th>Review AI</th><th>Status</th><th>Plan finish</th><th>Actual finish</th><th>${calculatedHeader('Status','ioSchReleaseStatus')}</th>
-        <th>1.Rls schematic email A1/A2（Designer填）</th><th>2.Floorplan done email B（Layout填）</th><th>3.Floorplan confirm email B（Designer填）</th><th>4.Layout Status</th><th>5.Layout routing check with design</th><th>6.Routing done email D（Layout填）</th>
+        <th>Rls schematic email A1/A2（Designer填）</th><th>Floorplan done email B（Layout填）</th><th>Floorplan confirm email B（Designer填）</th><th>Layout Status</th><th>Layout routing check with design</th><th>Routing done email D（Layout填）</th>
         <th>Planned finish</th><th>Actual finish</th><th>${calculatedHeader('Status','ioLayoutFinishStatus')}</th><th>Owner</th><th>Deadline</th><th>Status</th><th>Deadline</th><th>Status</th>
       </tr>`;
       const query=document.getElementById('searchInput').value.trim().toLowerCase();
-      const items=ioIpRows.filter(item=>specialIpTreeVisible(item,ioIpRows)&&(!query||Object.values(item).some(value=>String(value).toLowerCase().includes(query)))&&matchesSpecialIpColumnFilters(item,'io'));
-      const rows=[],draftIndex=specialIpDraftIndex(items,'io'),sourcePlan=specialIpSourceMergePlan(items,ioIpRows,!specialIpAddDraft);items.forEach((item,index)=>{if(index===draftIndex)rows.push(specialIpDraftRowHtml('io',ioIpColumnDefinitions));rows.push(ioIpRowHtml(item,sourcePlan.get(item.id)));});if(draftIndex>=items.length)rows.push(specialIpDraftRowHtml('io',ioIpColumnDefinitions));
-      wbsBody.innerHTML=rows.length?rows.join(''):`<tr><td colspan="32"><div class="empty"><strong>${ioIpRows.length?'没有匹配的 IO IP Block':'暂无 IO IP Block'}</strong>${ioIpRows.length?'调整搜索词或筛选条件后重试':'请先在普通 WBS 表中将 Block Category 选择为 IO IP'}</div></td></tr>`;
+      const items=specialIpDisplayItems('io').filter(item=>specialIpTreeVisible(item,ioIpRows)&&(!query||Object.values(item).some(value=>String(value).toLowerCase().includes(query)))&&matchesSpecialIpColumnFilters(item,'io'));
+      const rows=[],draftIndex=specialIpDraftIndex(items,'io'),sourcePlan=specialIpSourceMergePlan(items,ioIpRows,!specialIpAddDraft);items.forEach((item,index)=>{if(index===draftIndex)rows.push(specialIpDraftRowHtml('io',ioIpColumnDefinitions));if(!(specialIpAddDraft?.type==='io'&&specialIpAddDraft.mode==='version'&&index===draftIndex))rows.push(ioIpRowHtml(item,sourcePlan.get(item.id)));});if(draftIndex>=items.length)rows.push(specialIpDraftRowHtml('io',ioIpColumnDefinitions));
+      wbsBody.innerHTML=rows.length?rows.join(''):`<tr><td colspan="33"><div class="empty"><strong>${ioIpRows.length?'没有匹配的 IO IP Block':'暂无 IO IP Block'}</strong>${ioIpRows.length?'调整搜索词或筛选条件后重试':'请先在普通 WBS 表中将 Block Category 选择为 IO IP'}</div></td></tr>`;
       applyIoIpColumnLayout();bindCalculationRules();bindIoIpRows();bindSpecialIpDraft();bindSpecialIpHistoryControls(items,'io',preservedChange);
     }
 
@@ -2186,6 +2428,7 @@
       return `<tr data-analog-id="${item.id}" class="${selectedAnalogIpRowId===item.id?'selected':''}">
         ${specialIpSourceCell(sourceMerge)}
         ${specialIpBlockCell(item,'analog')}
+        ${specialIpVersionSwitcherCell(item,'analog')}
         ${searchableEditorCell('referenceProject',item.referenceProject,'referenceProjects','输入可模糊搜索产品；选择空后单元格留白','io-ip-reference-column').replace('data-edit="referenceProject"','data-analog-edit="referenceProject"')}
         ${searchableEditorCell('schematicOwner',item.schematicOwner,'schematicOwners','输入可模糊搜索 Schematic Owner','io-ip-schematic-owner-column').replace('data-edit="schematicOwner"','data-analog-edit="schematicOwner"')}
         ${searchableEditorCell('layoutOwner',item.layoutOwner,'layoutOwners','输入可模糊搜索 Layout Owner','io-ip-layout-owner-column last-frozen-column').replace('data-edit="layoutOwner"','data-analog-edit="layoutOwner"')}
@@ -2207,14 +2450,16 @@
     function bindAnalogIpRows() {
       wbsBody.querySelectorAll('tr[data-analog-id]').forEach(tableRow=>{
         const item=analogIpRows.find(candidate=>candidate.id===tableRow.dataset.analogId);
-        tableRow.querySelector('.tree-toggle:not(.hidden)')?.addEventListener('click',event=>{event.stopPropagation();item.expanded=item.expanded===false;renderWbs();});
+        tableRow.querySelector('.tree-toggle:not(.hidden)')?.addEventListener('click',event=>{event.stopPropagation();const group=specialIpVersionGroup(item,'analog'),expanded=group.every(member=>member.expanded!==false);group.forEach(member=>member.expanded=!expanded);renderWbs();});
         tableRow.querySelector('.block-name')?.addEventListener('click',event=>{event.stopPropagation();openSpecialIpDrawer(item,'analog');});
-        tableRow.querySelector('[data-special-ip-add]')?.addEventListener('click',event=>{event.stopPropagation();startSpecialIpAddDraft(item,'analog');});
-        tableRow.querySelector('[data-special-ip-delete]')?.addEventListener('click',event=>{event.stopPropagation();deleteSpecialIpRow(item,'analog');});
+        tableRow.querySelector('[data-special-ip-add]')?.addEventListener('click',event=>{event.stopPropagation();openSpecialIpAddMenu(item,'analog',event.currentTarget);});
+        tableRow.querySelector('[data-special-ip-delete]')?.addEventListener('click',event=>{event.stopPropagation();requestSpecialIpDelete(item,'analog');});
         tableRow.querySelectorAll('[data-analog-edit]').forEach(control=>{
           control.addEventListener('click',event=>event.stopPropagation());
-          control.addEventListener('change',()=>{const field=control.dataset.analogEdit,newValue=control.value==='空'?'':control.value;if(field==='layoutModifyEmail')requestSpecialIpE3(item,'analog',newValue);else applySpecialIpFieldChange(item,'analog',field,newValue);});
+          control.addEventListener('change',()=>{const field=control.dataset.analogEdit,newValue=control.value==='空'?'':control.value;applySpecialIpFieldChange(item,'analog',field,newValue);});
         });
+        tableRow.querySelector('[data-special-version-switch]')?.addEventListener('click',event=>event.stopPropagation());
+        tableRow.querySelector('[data-special-version-switch]')?.addEventListener('change',event=>{event.stopPropagation();const selected=analogIpRows.find(candidate=>candidate.id===event.currentTarget.value);if(selected)selectSpecialIpVersion(selected,'analog');});
         tableRow.querySelector('[data-special-change-history]')?.addEventListener('click',event=>{event.stopPropagation();openSpecialIpRowChangeHistory(item,'analog',event.currentTarget);});
         tableRow.addEventListener('click',()=>{selectedAnalogIpRowId=item.id;renderWbs();});
       });
@@ -2222,25 +2467,27 @@
     function renderAnalogIpTable(preservedChange=null) {
       wbsHead.className='io-ip-head';
       wbsHead.innerHTML=`<tr class="io-ip-group-row">
-        <th class="io-ip-source-column io-ip-base-header" rowspan="2">Source</th><th class="frozen-column frozen-block-column io-ip-base-header" rowspan="2">Block</th><th class="io-ip-reference-column io-ip-base-header" rowspan="2">Reference project</th><th class="io-ip-schematic-owner-column io-ip-base-header" rowspan="2">Schematic owner</th><th class="io-ip-layout-owner-column last-frozen-column io-ip-base-header" rowspan="2">Layout owner</th>
+        <th class="io-ip-source-column io-ip-base-header" rowspan="2">Source</th><th class="frozen-column frozen-block-column io-ip-base-header" rowspan="2">Block</th><th class="io-ip-version-column io-ip-base-header" rowspan="2">Version</th><th class="io-ip-reference-column io-ip-base-header" rowspan="2">Reference project</th><th class="io-ip-schematic-owner-column io-ip-base-header" rowspan="2">Schematic owner</th><th class="io-ip-layout-owner-column last-frozen-column io-ip-base-header" rowspan="2">Layout owner</th>
         <th colspan="3"><span class="io-ip-group-title">Release for layout drawing</span></th><th colspan="4"><span class="io-ip-group-title">Schematic and Layout Co-work flow Check</span></th><th colspan="3"><span class="io-ip-group-title">Layout finish status（for layout）</span></th><th class="io-ip-single-header" rowspan="2">Layout modify email E3（Designer填）</th><th colspan="3"><span class="io-ip-group-title">Layout quality check（matching&amp;shielding）</span></th><th colspan="2"><span class="io-ip-group-title">DC EM（孙博文）</span></th><th colspan="1"><span class="io-ip-group-title">PDC share cm description for PTE deadline</span></th><th colspan="3"><span class="io-ip-group-title">Spf-sim finish review(for design)</span></th><th class="io-ip-single-header" rowspan="2">Comment</th><th colspan="3"><span class="io-ip-group-title">All check done &amp; final review</span></th>
         ${specialIpChangeHeaderHtml()}
       </tr><tr class="io-ip-leaf-row">
         <th>Planned finish</th><th>Actual finish</th><th>Status</th>
-        <th>1.Rls schematic email A1/A2（Designer填）</th><th>2.Floorplan done email B（Layout填）</th><th>3.Floorplan confirm email C（Designer填）</th><th>4.Routing done email D（Layout填）</th>
+        <th>Rls schematic email A1/A2（Designer填）</th><th>Floorplan done email B（Layout填）</th><th>Floorplan confirm email C（Designer填）</th><th>Routing done email D（Layout填）</th>
         <th>Planned finish</th><th>Actual finish</th><th>${calculatedHeader('Status','analogLayoutFinishStatus')}</th>
         <th>Owner</th><th>Dea dline</th><th>Status</th><th>Deadline</th><th>Status</th><th>Status</th>
         <th>Planned finish</th><th>Actual finish</th><th>${calculatedHeader('Status','analogSpfSimStatus')}</th>
         <th>Planned finish</th><th>Actual finish</th><th>${calculatedHeader('Status','analogFinalReviewStatus')}</th>
       </tr>`;
       const query=document.getElementById('searchInput').value.trim().toLowerCase();
-      const items=analogIpRows.filter(item=>specialIpTreeVisible(item,analogIpRows)&&(!query||Object.values(item).some(value=>String(value).toLowerCase().includes(query)))&&matchesSpecialIpColumnFilters(item,'analog'));
-      const rows=[],draftIndex=specialIpDraftIndex(items,'analog'),sourcePlan=specialIpSourceMergePlan(items,analogIpRows,!specialIpAddDraft);items.forEach((item,index)=>{if(index===draftIndex)rows.push(specialIpDraftRowHtml('analog',analogIpColumnDefinitions));rows.push(analogIpRowHtml(item,sourcePlan.get(item.id)));});if(draftIndex>=items.length)rows.push(specialIpDraftRowHtml('analog',analogIpColumnDefinitions));
-      wbsBody.innerHTML=rows.length?rows.join(''):`<tr><td colspan="30"><div class="empty"><strong>${analogIpRows.length?'没有匹配的 Analog IP Block':'暂无 Analog IP Block'}</strong>${analogIpRows.length?'调整搜索词或筛选条件后重试':'请先在普通 WBS 表中将 Block Category 选择为 Analog IP'}</div></td></tr>`;
+      const items=specialIpDisplayItems('analog').filter(item=>specialIpTreeVisible(item,analogIpRows)&&(!query||Object.values(item).some(value=>String(value).toLowerCase().includes(query)))&&matchesSpecialIpColumnFilters(item,'analog'));
+      const rows=[],draftIndex=specialIpDraftIndex(items,'analog'),sourcePlan=specialIpSourceMergePlan(items,analogIpRows,!specialIpAddDraft);items.forEach((item,index)=>{if(index===draftIndex)rows.push(specialIpDraftRowHtml('analog',analogIpColumnDefinitions));if(!(specialIpAddDraft?.type==='analog'&&specialIpAddDraft.mode==='version'&&index===draftIndex))rows.push(analogIpRowHtml(item,sourcePlan.get(item.id)));});if(draftIndex>=items.length)rows.push(specialIpDraftRowHtml('analog',analogIpColumnDefinitions));
+      wbsBody.innerHTML=rows.length?rows.join(''):`<tr><td colspan="31"><div class="empty"><strong>${analogIpRows.length?'没有匹配的 Analog IP Block':'暂无 Analog IP Block'}</strong>${analogIpRows.length?'调整搜索词或筛选条件后重试':'请先在普通 WBS 表中将 Block Category 选择为 Analog IP'}</div></td></tr>`;
       applyAnalogIpColumnLayout();bindCalculationRules();bindAnalogIpRows();bindSpecialIpDraft();bindSpecialIpHistoryControls(items,'analog',preservedChange);
     }
 
     function renderWbs() {
+      assertHierarchyIntegrity();
+      closeReviewAiPreview();
       const preservedRowChange=openChangeButton?.matches('[data-change-history]')?{hierarchy:currentHierarchy,itemId:openChangeButton.closest('tr[data-id]')?.dataset.id}:null;
       const preservedSpecialChange=openChangeButton?.matches('[data-special-change-history]')?{tableName:activeTableName,itemId:openChangeButton.closest('tr')?.dataset.ioId||openChangeButton.closest('tr')?.dataset.analogId}:null;
       closeChangePopover();
@@ -2269,8 +2516,8 @@
       const query = document.getElementById('searchInput').value.trim().toLowerCase();
       const all = hierarchyOrderedItems(currentHierarchy),displayItems=selectedHierarchyVersionItems(currentHierarchy,all);
       const visibleByTree = item => {
-        let p = item.parent;
-        while (p) { const parent = all.find(x => x.id === p); if (!parent || !parent.expanded) return false; p = parent.parent; }
+        let parentNodeId=logicalParentNodeId(item);
+        while(parentNodeId){const parent=logicalNodeRepresentative(all,parentNodeId);if(!parent||!parent.expanded)return false;parentNodeId=logicalParentNodeId(parent);}
         return true;
       };
       const items = displayItems.filter(item => {
@@ -2314,15 +2561,15 @@
     }
 
     function hierarchyOrderedItems(type) {
-      const instances=data[type],seen=new Set(),groups=[];
-      instances.forEach((item,index)=>{const key=blockMergeGroupKey(item);if(seen.has(key))return;seen.add(key);const items=instances.filter(candidate=>blockMergeGroupKey(candidate)===key).sort((left,right)=>versionRank(left,type)-versionRank(right,type));groups.push({tier:item.tier,index,items,displayAfterId:items.find(candidate=>candidate.displayAfterId)?.displayAfterId||null});});
-      const sorted=groups.sort((left,right)=>left.tier-right.tier||left.index-right.index),groupByItemId=new Map();
-      groups.forEach(group=>group.items.forEach(item=>groupByItemId.set(item.id,group)));
-      const anchored=new Set(groups.filter(group=>group.displayAfterId&&groupByItemId.has(group.displayAfterId)&&groupByItemId.get(group.displayAfterId)!==group)),ordered=[],appended=new Set();
-      const appendGroup=group=>{if(appended.has(group))return;appended.add(group);ordered.push(group);groups.filter(candidate=>anchored.has(candidate)&&group.items.some(item=>item.id===candidate.displayAfterId)).sort((left,right)=>left.index-right.index).forEach(appendGroup);};
-      sorted.filter(group=>!anchored.has(group)).forEach(appendGroup);
-      sorted.forEach(appendGroup);
-      return ordered.flatMap(group=>group.items);
+      const rows=data[type],nodes=[],byNodeId=new Map();
+      rows.forEach((item,index)=>{const nodeId=logicalNodeId(item);if(byNodeId.has(nodeId))return;const node={nodeId,parentNodeId:logicalParentNodeId(item),index,items:logicalVersions(rows,item).sort((left,right)=>versionRank(left,type)-versionRank(right,type))};byNodeId.set(nodeId,node);nodes.push(node);});
+      const childrenByParent=new Map();
+      nodes.forEach(node=>{const key=node.parentNodeId||'__root__';if(!childrenByParent.has(key))childrenByParent.set(key,[]);childrenByParent.get(key).push(node);});
+      childrenByParent.forEach(children=>children.sort((left,right)=>left.index-right.index));
+      const ordered=[],visited=new Set(),append=node=>{if(visited.has(node.nodeId))return;visited.add(node.nodeId);ordered.push(node);(childrenByParent.get(node.nodeId)||[]).forEach(append);};
+      (childrenByParent.get('__root__')||[]).forEach(append);
+      nodes.forEach(append);
+      return ordered.flatMap(node=>node.items);
     }
 
     function selectedHierarchyVersionItems(type,ordered=hierarchyOrderedItems(type)) {
@@ -2348,14 +2595,14 @@
     function itemVersion(item,type) { return type==='spf'?spfInfoFor(item).round:item.def.round||''; }
     function versionRank(item,type) { const rank=versionOptions.indexOf(itemVersion(item,type));return rank<0?versionOptions.length:rank; }
     function blockMergeKey(item) { return `${item.def.name.trim().toLowerCase()}|${item.tier}`; }
-    function blockMergeGroupKey(item) { return `${item.parent||'__root__'}|${blockMergeKey(item)}`; }
+    function blockMergeGroupKey(item) { return logicalNodeId(item)||`${logicalParentNodeId(item)||'__root__'}|${blockMergeKey(item)}`; }
     function rowHtml(item) {
       const type = currentHierarchy;
       const rail = railFor(item, type);
       const state = stateFor(item, type);
       const p = progress(item, type);
-      const mergeGroup=data[type].filter(candidate=>blockMergeGroupKey(candidate)===blockMergeGroupKey(item));
-      const hasChildren = mergeGroup.some(member=>data[type].some(child=>child.parent===member.id));
+      const mergeGroup=logicalVersions(data[type],item);
+      const hasChildren=logicalNodeHasChildren(data[type],item);
       const groupExpanded = mergeGroup.every(member=>member.expanded);
       const levelPad = (item.tier - 1) * 17;
       const late = state === 'delay';
@@ -2399,7 +2646,7 @@
     function bindWbsRows() {
       wbsBody.querySelectorAll('tr[data-id]').forEach(tr => {
         const item = data[currentHierarchy].find(x => x.id === tr.dataset.id);
-        tr.querySelector('.tree-toggle')?.addEventListener('click', e => { e.stopPropagation(); const group=data[currentHierarchy].filter(candidate=>blockMergeGroupKey(candidate)===blockMergeGroupKey(item)),expanded=group.every(member=>member.expanded);group.forEach(member=>member.expanded=!expanded);renderWbs(); });
+        tr.querySelector('.tree-toggle')?.addEventListener('click', e => { e.stopPropagation(); const group=logicalVersions(data[currentHierarchy],item),expanded=group.every(member=>member.expanded);setLogicalNodeExpanded(data[currentHierarchy],item,!expanded);renderWbs(); });
         tr.querySelector('.block-name')?.addEventListener('click', e => { e.stopPropagation(); openDrawer(item); });
         tr.querySelector('[data-add-child]')?.addEventListener('click', e => { e.stopPropagation(); openInlineAddMenu(item,e.currentTarget); });
         tr.querySelector('[data-delete-instance]')?.addEventListener('click', e => { e.stopPropagation(); requestDeleteInstance(item,currentHierarchy); });
@@ -2540,8 +2787,7 @@
       return data[type].filter(instance=>instance.def.id===item.def.id);
     }
     function directChildrenForDefinition(item, type) {
-      const parentIds = new Set(hierarchyInstancesForDefinition(item,type).map(instance=>instance.id));
-      return data[type].filter(instance=>parentIds.has(instance.parent));
+      return logicalChildRows(data[type],item).filter((candidate,index,rows)=>rows.findIndex(other=>logicalNodeId(other)===logicalNodeId(candidate))===index);
     }
     function incompleteDirectChildren(item, type) {
       return directChildrenForDefinition(item,type).filter(child=>!railFor(child,type).checks.every(Boolean)).map(child=>({
@@ -2566,8 +2812,7 @@
     }
     function closeCheckValidationModal() { document.getElementById('checkValidationModal').classList.remove('open'); }
     function reopenCompletedParents(item, type, reopened=new Set()) {
-      const parentIds = new Set(hierarchyInstancesForDefinition(item,type).map(instance=>instance.parent).filter(Boolean));
-      const parentInstances = data[type].filter(instance=>parentIds.has(instance.id));
+      const parentNodeId=logicalParentNodeId(item),parentInstances=parentNodeId?[logicalNodeRepresentative(data[type],parentNodeId)].filter(Boolean):[];
       parentInstances.forEach(parent=>{
         if (reopened.has(parent.def.id)) return;
         const parentRail = railFor(parent,type);
@@ -2585,7 +2830,7 @@
     }
 
     function mergedVersionGroup(item,type=currentHierarchy) {
-      return data[type].filter(candidate=>(candidate.parent||null)===(item.parent||null)&&blockMergeKey(candidate)===blockMergeKey(item)).sort((left,right)=>versionRank(left,type)-versionRank(right,type));
+      return logicalVersions(data[type],item).sort((left,right)=>versionRank(left,type)-versionRank(right,type));
     }
     function requestDeleteInstance(item,type) {
       const group=mergedVersionGroup(item,type);
@@ -2594,7 +2839,8 @@
     }
     function deleteInstance(item,type,skipConfirm=false) {
       const targets=sharedIdentityTypes(type).map(targetType=>[targetType,targetType===type?item:identityCounterpart(item,targetType)]).filter(([,target])=>target);
-      if (targets.some(([targetType,target])=>data[targetType].some(child=>child.parent===target.id))) return showToast('请先删除或移动该节点的子 Instance');
+      const removingWholeNode=mergedVersionGroup(item,type).length===1;
+      if(removingWholeNode&&targets.some(([targetType,target])=>logicalNodeHasChildren(data[targetType],target)))return showToast('请先删除或移动该节点的子 Block');
       const version=itemVersion(item,type);
       if (!skipConfirm&&!confirm(`确认删除 ${item.def.name} · T${item.tier} · ${version}？`)) return;
       const before = `${item.def.name} · T${item.tier} · ${version}`;
@@ -2616,10 +2862,10 @@
     function versionDeleteOwner(item,type) { return type==='spf'?[item.def.schematicOwner,item.def.layoutOwner].filter(Boolean).join(' / '):ownerFor(item,type); }
     function renderVersionDeleteOptions() {
       if(!pendingVersionDelete)return;
-      const {type,group,selected}=pendingVersionDelete;
-      const deletable=group.filter(item=>!data[type].some(child=>child.parent===item.id));
+      const {type,group,selected,special}=pendingVersionDelete,rows=special?(type==='io'?ioIpRows:analogIpRows):data[type];
+      const nodeHasChildren=logicalNodeHasChildren(rows,group[0]),deletable=group.length>1?group:nodeHasChildren?[]:group;
       const allSelected=deletable.length>0&&deletable.every(item=>selected.has(item.id));
-      document.getElementById('versionDeleteList').innerHTML=`<label class="version-delete-all"><input type="checkbox" data-version-delete-all ${allSelected?'checked':''} ${deletable.length?'':'disabled'}><span>全选可删除项</span></label>${group.map(item=>{const children=data[type].filter(child=>child.parent===item.id),blocked=children.length>0;return `<label class="version-delete-option ${blocked?'blocked':''}"><input type="checkbox" data-version-delete-id="${esc(item.id)}" ${selected.has(item.id)?'checked':''} ${blocked?'disabled':''}><strong>${esc(itemVersion(item,type))}</strong><span>${esc(versionDeleteOwner(item,type)||'Owner 未填写')} · ${esc(derivedCheckValue(item,type))}</span><small>${blocked?`有 ${children.length} 个子 Block`:''}</small></label>`;}).join('')}`;
+      document.getElementById('versionDeleteList').innerHTML=`<label class="version-delete-all"><input type="checkbox" data-version-delete-all ${allSelected?'checked':''} ${deletable.length?'':'disabled'}><span>全选可删除项</span></label>${group.map(item=>{const blocked=group.length===1&&nodeHasChildren,version=special?normalizeVersion(item.version):itemVersion(item,type),summary=special?[item.schematicOwner,item.layoutOwner].filter(Boolean).join(' / '):`${versionDeleteOwner(item,type)||'Owner 未填写'} · ${derivedCheckValue(item,type)}`;return `<label class="version-delete-option ${blocked?'blocked':''}"><input type="checkbox" data-version-delete-id="${esc(item.id)}" ${selected.has(item.id)?'checked':''} ${blocked?'disabled':''}><strong>${esc(version)}</strong><span>${esc(summary||'Owner 未填写')}</span><small>${blocked?'Block 有子节点，不能删除最后一个 Version':''}</small></label>`;}).join('')}`;
       const wholeGroup=group.length>0&&group.every(item=>selected.has(item.id));
       const warning=document.getElementById('versionDeleteWarning');
       warning.textContent=wholeGroup?`已选择全部 ${group.length} 个 Version，确认后将删除整个 Block。`:'';
@@ -2632,14 +2878,39 @@
     }
     function confirmVersionDelete() {
       if(!pendingVersionDelete?.selected.size)return;
-      const {item,type,group,selected}=pendingVersionDelete,targets=group.filter(candidate=>selected.has(candidate.id));
+      const {item,type,group,selected,special}=pendingVersionDelete,targets=group.filter(candidate=>selected.has(candidate.id));
       const wholeGroup=targets.length===group.length;
-      if(wholeGroup&&!confirm(`确认删除 ${item.def.name} · T${item.tier} 的全部 ${group.length} 个 Version？`))return;
+      const blockName=special?item.block:item.def.name;
+      const rows=special?(type==='io'?ioIpRows:analogIpRows):data[type];
+      if(wholeGroup&&logicalNodeHasChildren(rows,item)){showToast('请先删除或移动该 Block 的子节点');return;}
+      if(wholeGroup&&!confirm(`确认删除 ${blockName} · T${item.tier} 的全部 ${group.length} 个 Version？`))return;
       pendingVersionDelete=null;
       document.getElementById('versionDeleteModal').classList.remove('open');
+      if(special){deleteSpecialIpVersions(item,type,group,targets,wholeGroup);return;}
       targets.forEach(target=>deleteInstance(target,type,true));
       renderWbs();renderDashboard();renderDelay();
       showToast(wholeGroup?`${item.def.name} 整个 Block 已删除`:`已删除 ${targets.map(target=>itemVersion(target,type)).join('、')}`);
+    }
+    function deleteSpecialIpVersions(item,type,group,targets,wholeGroup) {
+      const rows=type==='io'?ioIpRows:analogIpRows,targetIds=new Set(targets.map(target=>target.id)),sourceRow=group.find(candidate=>candidate.sourceDefinitionId!==undefined&&candidate.sourceTableName),sourceSelected=sourceRow&&targetIds.has(sourceRow.id);
+      if(wholeGroup&&sourceRow){
+        const groupKey=specialIpGroupKey(item);
+        pendingSpecialIpDelete={item:sourceRow,type};
+        confirmSpecialIpDelete();
+        group.filter(candidate=>candidate.id!==sourceRow.id).forEach(candidate=>{const index=rows.findIndex(row=>row.id===candidate.id);if(index>=0)removeSpecialIpProjectionRow(type,rows,index);specialIpStablePositions[type].delete(candidate.id);specialIpStableSources[type].delete(candidate.id);});
+        pruneUnusedSpecialIpAncestors(type,rows,sourceRow.sourceTableName);
+        selectedSpecialIpVersions[type].delete(groupKey);
+        renderWbs();showToast(`${item.block} 整个 Block 已删除`);return;
+      }
+      if(sourceSelected){
+        const fallback=group.filter(candidate=>!targetIds.has(candidate.id))[0];
+        if(fallback){const sourcePosition=specialIpStablePositions[type].get(sourceRow.id);fallback.sourceTableName=sourceRow.sourceTableName;fallback.sourceDefinitionId=sourceRow.sourceDefinitionId;fallback.sourceNodeId=sourceRow.sourceNodeId;fallback.projectionDirect=sourceRow.projectionDirect;if(Number.isFinite(sourcePosition))specialIpStablePositions[type].set(fallback.id,sourcePosition);specialIpStableSources[type].set(fallback.id,sourceRow.sourceTableName);}
+      }
+      targets.forEach(target=>{const index=rows.findIndex(candidate=>candidate.id===target.id);if(index>=0)removeSpecialIpProjectionRow(type,rows,index);specialIpStablePositions[type].delete(target.id);specialIpStableSources[type].delete(target.id);});
+      const remaining=group.filter(candidate=>!targetIds.has(candidate.id)).sort((left,right)=>specialIpVersionRank(left)-specialIpVersionRank(right)),key=specialIpGroupKey(item);
+      if(remaining.length)selectedSpecialIpVersions[type].set(key,remaining[0].id);else selectedSpecialIpVersions[type].delete(key);
+      if(selectedSpecialIpItem&&targetIds.has(selectedSpecialIpItem.id)){if(remaining.length)openSpecialIpDrawer(remaining[0],type);else closeDrawer();}
+      renderWbs();showToast(`已删除 ${targets.map(target=>normalizeVersion(target.version)).join('、')}`);
     }
     function closeVersionDeleteModal() {
       document.getElementById('versionDeleteModal').classList.remove('open');
@@ -2778,6 +3049,7 @@
       return `<nav class="drawer-version-tabs" aria-label="${esc(item.def.name)} Version 切换">${group.map(candidate=>`<button type="button" data-drawer-version-id="${esc(candidate.id)}" class="${candidate.id===item.id?'active':''}" aria-current="${candidate.id===item.id?'page':'false'}">${esc(itemVersion(candidate,type))}</button>`).join('')}</nav>`;
     }
     function specialIpDetailField(label,value,status=false) {
+      if(label==='Review AI')return `<div class="field special-ip-long-text"><label>Review AI</label><textarea data-special-detail-edit="preSimReviewAi" aria-label="Review AI">${esc(value)}</textarea></div>`;
       const content=value?(status?`<span class="status ${ioIpStatusClass(value)}">${esc(value)}</span>`:`<strong>${esc(value)}</strong>`):'<strong>—</strong>';
       return `<div class="field"><label>${esc(label)}</label>${content}</div>`;
     }
@@ -2785,18 +3057,19 @@
       return `<section class="drawer-section"><div class="section-title"><h3>${esc(title)}</h3></div><div class="info-grid">${fields.map(([label,value,status])=>specialIpDetailField(label,value,status)).join('')}</div></section>`;
     }
     function specialIpDrawerHtml(item,type) {
+      const group=specialIpVersionGroup(item,type),tabs=group.length>1?`<nav class="drawer-version-tabs" aria-label="${esc(item.block)} Version 切换">${group.map(candidate=>`<button type="button" data-special-drawer-version-id="${esc(candidate.id)}" class="${candidate.id===item.id?'active':''}" aria-current="${candidate.id===item.id?'page':'false'}">${esc(normalizeVersion(candidate.version))}</button>`).join('')}</nav>`:'';
       const base=specialIpDetailSection('Block 信息',[
-        ['Source',item.sourceTableName],['Reference project',item.referenceProject],['Schematic owner',item.schematicOwner],['Layout owner',item.layoutOwner]
+        ['Source',item.sourceTableName],['Version',item.version],['Reference project',item.referenceProject],['Schematic owner',item.schematicOwner],['Layout owner',item.layoutOwner]
       ]);
       if(type==='io'){
         const schReleaseStatus=ioIpDerivedStatus(item,'schReleasePlanFinish','schReleaseActualFinish');
         const layoutFinishStatus=ioIpDerivedStatus(item,'layoutFinishPlanned','layoutFinishActual');
-        return `${base}
+        return `${tabs}${base}
           ${specialIpDetailSection('Hookup',[['Deadline',item.hookupDeadline],['Status',item.hookupStatus,true]])}
           ${specialIpDetailSection('Spec&Reviewb',[['Deadline',item.specReviewDeadline],['Status',item.specReviewStatus,true]])}
           ${specialIpDetailSection('Pre_sim result CRC review',[['Deadline',item.preSimDeadline],['Status',item.preSimStatus,true],['Review AI',item.preSimReviewAi],['Review AI Status',item.preSimReviewAiStatus,true]])}
           ${specialIpDetailSection('SCH release for Layout',[['Plan finish',item.schReleasePlanFinish],['Actual finish',item.schReleaseActualFinish],['Status',schReleaseStatus,true]])}
-          ${specialIpDetailSection('Schematic and Layout Co-work flow Check',[['1.Rls schematic email A1/A2（Designer填）',item.coWorkRlsSchematicEmail],['2.Floorplan done email B（Layout填）',item.coWorkFloorplanDoneEmail],['3.Floorplan confirm email B（Designer填）',item.coWorkFloorplanConfirmEmail],['4.Layout Status',item.coWorkLayoutStatus,true],['5.Layout routing check with design',item.coWorkRoutingCheck],['6.Routing done email D（Layout填）',item.coWorkRoutingDoneEmail]])}
+          ${specialIpDetailSection('Schematic and Layout Co-work flow Check',[['Rls schematic email A1/A2（Designer填）',item.coWorkRlsSchematicEmail],['Floorplan done email B（Layout填）',item.coWorkFloorplanDoneEmail],['Floorplan confirm email B（Designer填）',item.coWorkFloorplanConfirmEmail],['Layout Status',item.coWorkLayoutStatus,true],['Layout routing check with design',item.coWorkRoutingCheck],['Routing done email D（Layout填）',item.coWorkRoutingDoneEmail]])}
           ${specialIpDetailSection('Layout finish status（for layout）',[['Planned finish',item.layoutFinishPlanned],['Actual finish',item.layoutFinishActual],['Status',layoutFinishStatus,true]])}
           ${specialIpDetailSection('Layout modify email E3（Designer填）',[['Result',item.layoutModifyEmail]])}
           ${specialIpDetailSection('Layout quality check（matching&shielding）',[['Owner',item.qualityOwner],['Deadline',item.qualityDeadline],['Status',item.qualityStatus,true]])}
@@ -2805,9 +3078,9 @@
       const layoutFinishStatus=ioIpDerivedStatus(item,'layoutFinishPlanned','layoutFinishActual');
       const spfSimStatus=ioIpDerivedStatus(item,'spfSimPlanned','spfSimActual');
       const finalReviewStatus=ioIpDerivedStatus(item,'finalReviewPlanned','finalReviewActual');
-      return `${base}
+      return `${tabs}${base}
         ${specialIpDetailSection('Release for layout drawing',[['Planned finish',item.releasePlanned],['Actual finish',item.releaseActual],['Status',item.releaseStatus]])}
-        ${specialIpDetailSection('Schematic and Layout Co-work flow Check',[['1.Rls schematic email A1/A2（Designer填）',item.coWorkRlsSchematicEmail],['2.Floorplan done email B（Layout填）',item.coWorkFloorplanDoneEmail],['3.Floorplan confirm email C（Designer填）',item.coWorkFloorplanConfirmEmail],['4.Routing done email D（Layout填）',item.coWorkRoutingDoneEmail]])}
+        ${specialIpDetailSection('Schematic and Layout Co-work flow Check',[['Rls schematic email A1/A2（Designer填）',item.coWorkRlsSchematicEmail],['Floorplan done email B（Layout填）',item.coWorkFloorplanDoneEmail],['Floorplan confirm email C（Designer填）',item.coWorkFloorplanConfirmEmail],['Routing done email D（Layout填）',item.coWorkRoutingDoneEmail]])}
         ${specialIpDetailSection('Layout finish status（for layout）',[['Planned finish',item.layoutFinishPlanned],['Actual finish',item.layoutFinishActual],['Status',layoutFinishStatus,true]])}
         ${specialIpDetailSection('Layout modify email E3（Designer填）',[['Result',item.layoutModifyEmail]])}
         ${specialIpDetailSection('Layout quality check（matching&shielding）',[['Owner',item.qualityOwner],['Dea dline',item.qualityDeadline],['Status',item.qualityStatus,true]])}
@@ -2824,6 +3097,16 @@
       document.getElementById('drawerTitle').textContent=item.block;
       document.getElementById('drawerSubtitle').textContent=`${type==='io'?'IO IP':'Analog IP'} · T${item.tier} · Block 详情`;
       document.getElementById('drawerBody').innerHTML=specialIpDrawerHtml(item,type);
+      document.querySelectorAll('[data-special-drawer-version-id]').forEach(button=>button.addEventListener('click',()=>{
+        const rows=type==='io'?ioIpRows:analogIpRows,next=rows.find(candidate=>candidate.id===button.dataset.specialDrawerVersionId);
+        if(!next)return;
+        const scrollTop=document.getElementById('drawerBody').scrollTop;
+        selectSpecialIpVersion(next,type);selectedSpecialIpItem=next;
+        document.getElementById('drawerTitle').textContent=next.block;
+        document.getElementById('drawerBody').innerHTML=specialIpDrawerHtml(next,type);
+        openSpecialIpDrawer(next,type);document.getElementById('drawerBody').scrollTop=scrollTop;
+      }));
+      document.querySelectorAll('[data-special-detail-edit]').forEach(control=>control.addEventListener('change',()=>applySpecialIpFieldChange(item,type,control.dataset.specialDetailEdit,control.value)));
       document.getElementById('drawerBackdrop').classList.add('open');
       document.getElementById('detailDrawer').classList.add('open');
       renderWbs();
@@ -3044,10 +3327,10 @@
       document.getElementById('checkDetailHead').innerHTML=`<tr><th class="check-frozen check-block-column">Block</th><th class="check-frozen check-tier-column">Tier</th>${ownerHeaders}${visibleIndexes.map(index=>`<th><span class="check-column-title"><span>${esc(labels[index])}</span><small>${allItems.filter(item=>railFor(item,type).checks[index]).length}/${allItems.length} completed</small></span></th>`).join('')}<th>完成度</th><th>${esc(derivedCheckLabel(type))}</th></tr>`;
       document.getElementById('checkDetailBody').innerHTML=items.length?items.map(item=>{
         const rail=railFor(item,type),completed=rail.checks.filter(Boolean).length;
-        const instances=data[type].filter(instance=>instance.def.id===item.def.id);
-        const tiers=[...new Set(instances.map(instance=>`T${instance.tier}`))].join(', ');
+        const versions=data[type].filter(record=>record.def.id===item.def.id);
+        const tiers=[...new Set(versions.map(record=>`T${record.tier}`))].join(', ');
         const ownerCells=type==='spf'?`<td class="check-frozen check-owner-column">${esc(item.def.schematicOwner||'')}</td><td class="check-frozen check-layout-owner-column">${esc(item.def.layoutOwner||'')}</td>`:`<td class="check-frozen check-owner-column last-check-frozen">${esc(ownerFor(item,type)||'')}</td>`;
-        return `<tr><td class="check-frozen check-block-column"><button class="block-detail-button" data-check-block="${esc(item.def.id)}">${esc(item.def.name)}</button><br><small>${instances.length} instance${instances.length>1?'s':''}</small></td><td class="check-frozen check-tier-column">${esc(tiers)}</td>${ownerCells}${visibleIndexes.map(index=>`<td class="check-matrix-cell"><span class="check-state ${rail.checks[index]?'done':''}" title="${esc(labels[index])}: ${rail.checks[index]?'Done':'Not done'}">${rail.checks[index]?'✓':''}</span></td>`).join('')}<td><span class="check-progress-text">${completed}/${rail.checks.length}</span></td><td><span class="status ${rail.checks.every(Boolean)?'done':'ongoing'}">${esc(derivedCheckValue(item,type))}</span></td></tr>`;
+        return `<tr><td class="check-frozen check-block-column"><button class="block-detail-button" data-check-block="${esc(item.def.id)}">${esc(item.def.name)}</button><br><small>${versions.length} Version${versions.length>1?'s':''}</small></td><td class="check-frozen check-tier-column">${esc(tiers)}</td>${ownerCells}${visibleIndexes.map(index=>`<td class="check-matrix-cell"><span class="check-state ${rail.checks[index]?'done':''}" title="${esc(labels[index])}: ${rail.checks[index]?'Done':'Not done'}">${rail.checks[index]?'✓':''}</span></td>`).join('')}<td><span class="check-progress-text">${completed}/${rail.checks.length}</span></td><td><span class="status ${rail.checks.every(Boolean)?'done':'ongoing'}">${esc(derivedCheckValue(item,type))}</span></td></tr>`;
       }).join(''):`<tr><td colspan="${visibleIndexes.length+(type==='spf'?6:5)}"><div class="empty"><strong>没有符合条件的 Block</strong>请调整搜索或筛选条件</div></td></tr>`;
       document.querySelectorAll('[data-check-block]').forEach(button=>button.addEventListener('click',()=>{const item=data[type].find(instance=>instance.def.id===button.dataset.checkBlock);setHierarchy(type);openDrawer(item);setTimeout(()=>{const check=document.querySelector('#drawerBody [data-check]');check?.focus();check?.scrollIntoView({block:'center'});},0);}));
     }
@@ -3183,7 +3466,7 @@
     }
     function embeddedImportCommitHtml() {
       const accepted=embeddedImportState.rows.filter(row=>row.decision!=='skip');const definitions=new Set(accepted.map(row=>`${row.name.toLowerCase()}|${row.tier}|${row.fields.Version}`)).size;
-      if(embeddedImportState.created)return `<div class="ei-success"><div class="ei-success-mark">✓</div><h2>${esc(embeddedImportState.tableName)} 已创建</h2><p>${accepted.length} 个 Instance、${definitions} 个 Definition 已导入 DDCPC；派生状态已重新计算。</p><div class="ei-actions" style="justify-content:center"><button class="btn" id="eiNewImport">重新导入</button><button class="btn primary" id="eiOpenWbs">打开新表</button></div><div class="ei-notice" style="max-width:600px;margin:18px auto 0;text-align:left">Import Job：${esc(embeddedImportState.job)} · 生产环境支持按本批次整批撤销。</div></div>`;
+      if(embeddedImportState.created)return `<div class="ei-success"><div class="ei-success-mark">✓</div><h2>${esc(embeddedImportState.tableName)} 已创建</h2><p>${accepted.length} 条 Block Version、${definitions} 个 Block 已导入 DDCPC；派生状态已重新计算。</p><div class="ei-actions" style="justify-content:center"><button class="btn" id="eiNewImport">重新导入</button><button class="btn primary" id="eiOpenWbs">打开新表</button></div><div class="ei-notice" style="max-width:600px;margin:18px auto 0;text-align:left">Import Job：${esc(embeddedImportState.job)} · 生产环境支持按本批次整批撤销。</div></div>`;
       const hierarchyCounts=['schematic','layout','spf'].map(type=>[type.toUpperCase(),accepted.filter(row=>row.hierarchy===type).length]);
       const summary=[['新表',embeddedImportState.tableName],...hierarchyCounts,['Definitions',definitions],['跳过',embeddedImportState.rows.length-accepted.length],['错误',0]];
       return `<div class="ei-grid"><section class="ei-card"><div class="ei-card-head"><h2>导入摘要</h2></div><div class="ei-card-body"><div class="ei-summary">${summary.map(([label,value])=>`<div class="ei-summary-item"><label>${esc(label)}</label><strong>${esc(value)}</strong></div>`).join('')}</div></div></section><section class="ei-card"><div class="ei-card-head"><h2>写入新表</h2></div><div class="ei-card-body ei-form"><div class="ei-notice">✓ 创建并选择新表<br>✓ 写入 Schematic / Layout / SPF hierarchy<br>✓ 导入 Owner、日期、Check item 和 SPF 字段<br>✓ 重新计算 Progress 与 check status</div><button class="btn primary" id="eiCreate">导入并创建新表</button></div></section></div><div class="ei-actions"><button class="btn" data-ei-step="3">返回预览</button></div>`;
@@ -3199,7 +3482,8 @@
       const definitionFor=row=>{const sharedKey=`${row.name.toLowerCase()}|${row.tier}|${row.fields.Version}`;let definition=definitions.get(sharedKey);if(!definition){const slug=row.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'block';definition={id:`import-${slug}-${++definitionSequence}`,name:row.name,round:row.hierarchy==='spf'?'':normalizeVersion(row.fields.Version),category:'',reference:'',blockOwner:'',schematicOwner:'',layoutOwner:''};definitions.set(sharedKey,definition);}if(row.fields['Block Category'])definition.category=row.fields['Block Category'];if(row.fields['Reference project'])definition.reference=row.fields['Reference project'];if(row.fields['Schematic Owner'])definition.schematicOwner=row.fields['Schematic Owner'];if(row.fields['Layout Owner'])definition.layoutOwner=row.fields['Layout Owner'];return definition;};
       ['schematic','layout','spf'].forEach(type=>{const pathToInstances=new Map();accepted.filter(row=>row.hierarchy===type).sort((a,b)=>a.index-b.index).forEach(importRow=>{const definition=definitionFor(importRow),parentKey=embeddedPath(importRow.parentPath).join('/').toLowerCase(),parentCandidates=pathToInstances.get(parentKey)||[],parentId=parentKey?(parentCandidates.find(candidate=>candidate.version===importRow.fields.Version)||parentCandidates[0])?.id||null:null,id=`imp-${type.slice(0,3)}-${++instanceSequence}`,planned=type==='schematic'?importRow.fields['Planned release']:type==='layout'?importRow.fields['Plan finish']:importRow.fields['Planned SPF release'],actual=type==='schematic'?importRow.fields['Actual release']:type==='layout'?importRow.fields['Actual finish']:importRow.fields['Actual SPF release'];const item=row(id,definition,parentId,importRow.tier,importRow.checks,planned||'',actual||'');data[type].push(item);const pathKey=[...embeddedPath(importRow.parentPath),importRow.name].join('/').toLowerCase();pathToInstances.set(pathKey,[...(pathToInstances.get(pathKey)||[]),{id,version:importRow.fields.Version}]);railState[type][definition.id]={checks:[...importRow.checks],planned:planned||'',actual:actual||'',startDate:importRow.fields['Start date']||'',planWorkdays:importRow.fields['Plan workdays']||'',actualWorkdays:importRow.fields['Actual workdays']||'',resource:importRow.fields.Resource||'',checkStatus:importRow.checks.every(Boolean)?'Done':importRow.checks.some(Boolean)?'Ongoing':'Not started'};if(type==='spf')detailState.spf[definition.id]={round:normalizeVersion(importRow.fields.Version),lvsPath:importRow.fields['LVS path']||'',cdl:importRow.fields.cdl||'',gds:importRow.fields.gds||''};});});
       synchronizeSchematicLayoutIdentityRows();
-      data.layout.forEach(item=>{item.tierTop=data.layout.some(child=>child.parent===item.id);});
+      initializeLogicalBlockNodes('spf',data.spf);
+      data.layout.forEach(item=>{item.tierTop=logicalNodeHasChildren(data.layout,item);});
       const tableSelect=document.getElementById('tableSelect');
       if(![...tableSelect.options].some(option=>option.value===embeddedImportState.tableName))tableSelect.add(new Option(embeddedImportState.tableName,embeddedImportState.tableName));
       tableSelect.value=embeddedImportState.tableName;
@@ -3297,15 +3581,17 @@
     document.addEventListener('click',event=>{if(!document.getElementById('changePopover').contains(event.target)&&!event.target.closest('[data-change-history]')&&!event.target.closest('#structureChangeButton'))closeChangePopover();});
     document.addEventListener('click',event=>{if(!document.getElementById('calculationPopover').contains(event.target)&&!event.target.closest('[data-calculation-rule]'))closeCalculationPopover();});
     document.addEventListener('click',event=>{if(!document.getElementById('columnFilterPopover').contains(event.target)&&!event.target.closest('[data-column-filter]'))closeColumnFilterPopover();});
-    document.addEventListener('click',event=>{if(!document.getElementById('inlineAddMenu').contains(event.target)&&!event.target.closest('[data-add-child]'))closeInlineAddMenu();});
-    tableWrap.addEventListener('scroll',()=>{maintainOpenChangePopoverOnScroll();if(document.activeElement!==openCalculationButton)closeCalculationPopover();if(!document.getElementById('columnFilterPopover').contains(document.activeElement))closeColumnFilterPopover();closeInlineAddMenu();});
-    window.addEventListener('resize',()=>{closeChangePopover();closeCalculationPopover();closeColumnFilterPopover();closeInlineAddMenu();if(isWbsTableFullscreen())refreshWbsColumnLayout();});
+    document.addEventListener('click',event=>{if(!document.getElementById('inlineAddMenu').contains(event.target)&&!event.target.closest('[data-add-child]')&&!event.target.closest('[data-special-ip-add]'))closeInlineAddMenu();});
+    tableWrap.addEventListener('scroll',()=>{maintainOpenChangePopoverOnScroll();if(document.activeElement!==openCalculationButton)closeCalculationPopover();if(!document.getElementById('columnFilterPopover').contains(document.activeElement))closeColumnFilterPopover();closeReviewAiPreview();closeInlineAddMenu();});
+    window.addEventListener('resize',()=>{closeChangePopover();closeCalculationPopover();closeColumnFilterPopover();closeReviewAiPreview();closeInlineAddMenu();if(isWbsTableFullscreen())refreshWbsColumnLayout();});
+    document.getElementById('reviewAiPreview').addEventListener('mouseenter',()=>clearTimeout(reviewAiPreviewCloseTimer));
+    document.getElementById('reviewAiPreview').addEventListener('mouseleave',scheduleReviewAiPreviewClose);
     new ResizeObserver(()=>{if(isWbsTableFullscreen())refreshWbsColumnLayout();}).observe(document.documentElement);
     document.getElementById('drawerClose').addEventListener('click',closeDrawer);
     document.getElementById('drawerBackdrop').addEventListener('click',closeDrawer);
     document.getElementById('importExcelBtn').addEventListener('click',openEmbeddedExcelImport);
-    document.getElementById('inlineAddVersion').addEventListener('click',()=>{if(inlineAddAnchor)startInlineVersionDraft(inlineAddAnchor);});
-    document.getElementById('inlineAddBlock').addEventListener('click',()=>{if(inlineAddAnchor)startInlineBlockDraft(inlineAddAnchor);});
+    document.getElementById('inlineAddVersion').addEventListener('click',()=>{if(specialIpAddAnchor)return startSpecialIpVersionDraft(specialIpAddAnchor.item,specialIpAddAnchor.type);if(inlineAddAnchor)startInlineVersionDraft(inlineAddAnchor);});
+    document.getElementById('inlineAddBlock').addEventListener('click',()=>{if(specialIpAddAnchor)return startSpecialIpBlockDraft(specialIpAddAnchor.item,specialIpAddAnchor.type);if(inlineAddAnchor)startInlineBlockDraft(inlineAddAnchor);});
     document.querySelectorAll('[data-close-check-validation]').forEach(button=>button.addEventListener('click',closeCheckValidationModal));
     document.getElementById('checkValidationModal').addEventListener('click',event=>{if(event.target===event.currentTarget)closeCheckValidationModal();});
     document.querySelectorAll('[data-close-tier-duplicate]').forEach(button=>button.addEventListener('click',closeSameTierDuplicateModal));
@@ -3319,9 +3605,6 @@
     document.querySelectorAll('[data-close-special-ip-delete]').forEach(button=>button.addEventListener('click',closeSpecialIpDeleteModal));
     document.getElementById('specialIpDeleteModal').addEventListener('click',event=>{if(event.target===event.currentTarget)closeSpecialIpDeleteModal();});
     document.getElementById('confirmSpecialIpDelete').addEventListener('click',confirmSpecialIpDelete);
-    document.querySelectorAll('[data-close-special-ip-e3]').forEach(button=>button.addEventListener('click',closeSpecialIpE3Modal));
-    document.getElementById('specialIpE3Modal').addEventListener('click',event=>{if(event.target===event.currentTarget)closeSpecialIpE3Modal();});
-    document.getElementById('confirmSpecialIpE3').addEventListener('click',confirmSpecialIpE3);
     document.getElementById('refreshDashboard').addEventListener('click',()=>{renderDashboard();showToast('状态已按最新 check 和日期重新计算');});
     document.getElementById('tableSelect').addEventListener('change',event=>switchPrototypeTable(event.target.value));
     document.getElementById('wbsFullscreenToggle').addEventListener('click',toggleWbsTableFullscreen);
@@ -3332,7 +3615,6 @@
       if(specialIpAddDraft){cancelSpecialIpAddDraft(false);return;}
       if(inlineAddDraft){cancelInlineDraft(false);return;}
       if(document.getElementById('inlineAddMenu').classList.contains('open')){closeInlineAddMenu();return;}
-      if(document.getElementById('specialIpE3Modal').classList.contains('open')){closeSpecialIpE3Modal();return;}
       if(document.getElementById('specialIpDeleteModal').classList.contains('open')){closeSpecialIpDeleteModal();return;}
       if(isWbsTableFullscreen()){exitWbsTableFullscreen();return;}
       if(document.getElementById('versionDeleteModal').classList.contains('open')){closeVersionDeleteModal();return;}
