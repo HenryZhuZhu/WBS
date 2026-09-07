@@ -1091,11 +1091,14 @@
     let activeTableName = 'ChanEdgel';
     let schematicPlannedReleaseUnlocked = false;
 
+    function clonePrototypeState(value) {
+      return typeof structuredClone==='function'?structuredClone(value):JSON.parse(JSON.stringify(value));
+    }
     function captureTableState() {
-      return structuredClone({data,railState,detailState,changeHistory,structureChanges,schematicPlannedReleaseUnlocked});
+      return clonePrototypeState({data,railState,detailState,changeHistory,structureChanges,schematicPlannedReleaseUnlocked});
     }
     function restoreTableState(snapshot) {
-      const state=structuredClone(snapshot);
+      const state=clonePrototypeState(snapshot);
       ['schematic','layout','spf'].forEach(type=>{
         data[type].splice(0,data[type].length,...state.data[type]);
         Object.keys(railState[type]).forEach(key=>delete railState[type][key]);
@@ -2700,7 +2703,11 @@
         }));
         tr.querySelectorAll('[data-edit]').forEach(control => {
           control.addEventListener('click', e => e.stopPropagation());
-          control.addEventListener('change', () => updateTableField(item, control.dataset.edit, control.value));
+          control.addEventListener('change', event => {
+            const field=event.currentTarget.dataset.edit,value=event.currentTarget.value;
+            if(field==='category')window.setTimeout(()=>updateTableField(item,field,value),0);
+            else updateTableField(item,field,value);
+          });
         });
         tr.querySelector('[data-change-history]')?.addEventListener('click', e => { e.stopPropagation(); openRowChangeHistory(item,e.currentTarget); });
         tr.addEventListener('click', () => { selectedItem = item; renderWbs(); });
@@ -2754,7 +2761,22 @@
       else if(field==='schematicOwner'||(field==='owner'&&currentHierarchy==='schematic')) recordDefinitionChange(item,['schematic','spf'],labels[field],oldValue,normalized);
       else if(field==='layoutOwner'||(field==='owner'&&currentHierarchy==='layout')) recordDefinitionChange(item,['layout','spf'],labels[field],oldValue,normalized);
       else recordChange(item,currentHierarchy,labels[field],oldValue,normalized);
-      const specialIpSyncMessage=field==='category'?syncWbsCategoryToSpecialIp(item,oldValue,normalized):null;
+      let specialIpSyncMessage=null;
+      if(field==='category'){
+        let incrementalError=null;
+        try{
+          specialIpSyncMessage=syncWbsCategoryToSpecialIp(item,oldValue,normalized);
+        }catch(error){incrementalError=error;console.warn('Incremental Block Category projection failed; reconciling from source state',error);}
+        try{
+          reconcileActiveSourceCategoriesToSpecialIp();
+          if(incrementalError)specialIpSyncMessage=`已通过来源数据同步至 ${normalized}`;
+        }catch(error){
+          console.error('Block Category projection reconciliation failed',error);
+          item.def.category=oldValue;
+          try{reconcileActiveSourceCategoriesToSpecialIp();}catch(recoveryError){console.error('Block Category projection recovery failed',recoveryError);}
+          renderWbs();showToast('Block Category 更新失败，已恢复原值，请重试');return;
+        }
+      }
       renderWbs(); renderDashboard(); renderDelay();
       showToast(`${labels[field]} 已更新${specialIpSyncMessage?`；${specialIpSyncMessage}`:''}`);
     }
@@ -3636,7 +3658,7 @@
     window.addEventListener('resize',()=>{closeChangePopover();closeCalculationPopover();closeColumnFilterPopover();closeReviewAiPreview();closeInlineAddMenu();if(isWbsTableFullscreen())refreshWbsColumnLayout();});
     document.getElementById('reviewAiPreview').addEventListener('mouseenter',()=>clearTimeout(reviewAiPreviewCloseTimer));
     document.getElementById('reviewAiPreview').addEventListener('mouseleave',scheduleReviewAiPreviewClose);
-    new ResizeObserver(()=>{if(isWbsTableFullscreen())refreshWbsColumnLayout();}).observe(document.documentElement);
+    if(typeof ResizeObserver==='function')new ResizeObserver(()=>{if(isWbsTableFullscreen())refreshWbsColumnLayout();}).observe(document.documentElement);
     document.getElementById('drawerClose').addEventListener('click',closeDrawer);
     document.getElementById('drawerBackdrop').addEventListener('click',closeDrawer);
     document.getElementById('importExcelBtn').addEventListener('click',openEmbeddedExcelImport);
@@ -3687,7 +3709,7 @@
 
     synchronizeSchematicLayoutIdentityRows();
     const initialTableState=captureTableState();
-    ['ChanEdgel','ChanLeft','ChanMid'].forEach(tableName=>tableStateStore.set(tableName,structuredClone(initialTableState)));
+    ['ChanEdgel','ChanLeft','ChanMid'].forEach(tableName=>tableStateStore.set(tableName,clonePrototypeState(initialTableState)));
     reconcileActiveSourceCategoriesToSpecialIp();
     renderWbs(); renderDashboard(); renderDelay();
     setSidebarCollapsed(localStorage.getItem('de-wbs-sidebar-collapsed') === 'true');
