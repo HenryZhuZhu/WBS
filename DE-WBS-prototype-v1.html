@@ -1199,14 +1199,14 @@
       if(selectedSpecialIpItem?.id===removed.id)closeDrawer();
       return removed;
     }
-    function sourceProjectionChain(item) {
-      const sourceRows=data[currentHierarchy],chain=[];
+    function sourceProjectionChain(item,sourceHierarchy=currentHierarchy) {
+      const sourceRows=data[sourceHierarchy],chain=[];
       let current=item;
       while(current){chain.unshift(current);current=logicalParentNodeId(current)?logicalNodeRepresentative(sourceRows,logicalParentNodeId(current)):null;}
       return chain;
     }
-    function projectSpecialIpChain(type,category,rows,factory,item,sourceTableName) {
-      const chain=sourceProjectionChain(item),sourceOrder=sourceHierarchyNodeOrder(currentHierarchy);
+    function projectSpecialIpChain(type,category,rows,factory,item,sourceTableName,sourceHierarchy=currentHierarchy) {
+      const chain=sourceProjectionChain(item,sourceHierarchy),sourceOrder=sourceHierarchyNodeOrder(sourceHierarchy);
       let parentProjected=null;
       chain.forEach(sourceItem=>{
         let projected=rows.find(row=>sourceMatchesSpecialIpRow(row,sourceItem,sourceTableName));
@@ -1222,6 +1222,21 @@
         parentProjected=projected;
       });
       sortSpecialIpRows(type,rows);
+    }
+    function reconcileActiveSourceCategoriesToSpecialIp() {
+      if(isSpecialIpTable())return;
+      const sourceTableName=activeTableName,sourceHierarchy=data.schematic.length?'schematic':data.layout.length?'layout':null;
+      if(!sourceHierarchy)return;
+      const sourceItems=hierarchyOrderedItems(sourceHierarchy),representatives=[],seenNodeIds=new Set();
+      sourceItems.forEach(item=>{const nodeId=logicalNodeId(item);if(!seenNodeIds.has(nodeId)){seenNodeIds.add(nodeId);representatives.push(item);}});
+      const transitions=[['io',IO_IP_TABLE_NAME,ioIpRows,createDerivedIoIpRow],['analog',ANALOG_IP_TABLE_NAME,analogIpRows,createDerivedAnalogIpRow]];
+      transitions.forEach(([type,category,rows,factory])=>{
+        const memberships=specialIpDirectMemberships[type],prefix=`${sourceTableName}\u0000`,desired=new Set(representatives.filter(item=>item.def.category===category).map(item=>specialIpMembershipKey(sourceTableName,logicalNodeId(item))));
+        [...memberships].filter(key=>key.startsWith(prefix)&&!desired.has(key)).forEach(key=>memberships.delete(key));
+        desired.forEach(key=>memberships.add(key));
+        representatives.filter(item=>desired.has(specialIpMembershipKey(sourceTableName,logicalNodeId(item)))).forEach(item=>projectSpecialIpChain(type,category,rows,factory,item,sourceTableName,sourceHierarchy));
+        reconcileSpecialIpSourceProjection(type,rows,sourceTableName);
+      });
     }
     function reconcileSpecialIpSourceProjection(type,rows,sourceTableName) {
       const directMemberships=specialIpDirectMemberships[type];
@@ -1445,6 +1460,7 @@
       if(isSpecialIpTable())renderWbs();
       else {
         if(!data[currentHierarchy].length)currentHierarchy=['schematic','layout','spf'].find(type=>data[type].length)||'schematic';
+        reconcileActiveSourceCategoriesToSpecialIp();
         setHierarchy(currentHierarchy);renderDashboard();renderDelay();
       }
       showToast(`已切换到表 ${tableName}`);
@@ -3491,6 +3507,7 @@
       resetWbsColumnFilters();
       currentHierarchy=['schematic','layout','spf'].find(type=>data[type].length)||'schematic';
       tableStateStore.set(activeTableName,captureTableState());
+      reconcileActiveSourceCategoriesToSpecialIp();
       embeddedImportState.created=true;embeddedImportState.job=`IMP-${new Date().toISOString().slice(0,10).replaceAll('-','')}-${String(Date.now()).slice(-6)}`;
       renderEmbeddedImport();renderDashboard();
     }
@@ -3632,6 +3649,7 @@
     synchronizeSchematicLayoutIdentityRows();
     const initialTableState=captureTableState();
     ['ChanEdgel','ChanLeft','ChanMid'].forEach(tableName=>tableStateStore.set(tableName,structuredClone(initialTableState)));
+    reconcileActiveSourceCategoriesToSpecialIp();
     renderWbs(); renderDashboard(); renderDelay();
     setSidebarCollapsed(localStorage.getItem('de-wbs-sidebar-collapsed') === 'true');
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
