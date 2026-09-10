@@ -203,8 +203,8 @@
     .editable-cell .cell-editor { position: relative; display: none; width: 100%; }
     .editable-cell .cell-editor.choice::after { content: ""; position: absolute; right: 10px; top: 10px; width: 6px; height: 6px; border-right: 1.5px solid #667384; border-bottom: 1.5px solid #667384; transform: rotate(45deg); pointer-events: none; }
     .editable-cell .cell-display { min-height: 30px; width: 100%; display: flex; align-items: center; padding: 0 7px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .editable-cell:hover .cell-display, .editable-cell:focus-within .cell-display { display: none; }
-    .editable-cell:hover .cell-editor, .editable-cell:focus-within .cell-editor { display: block; }
+    .editable-cell:hover .cell-display, .editable-cell:focus-within .cell-display, .editable-cell.editor-focus-target .cell-display { display: none; }
+    .editable-cell:hover .cell-editor, .editable-cell:focus-within .cell-editor, .editable-cell.editor-focus-target .cell-editor { display: block; }
     .editable-cell .cell-editor .cell-input, .editable-cell .cell-editor .cell-select { width: 100%; }
     .editable-cell .status { min-width: 100%; justify-content: flex-start; }
     .cell-display.empty { color: transparent; }
@@ -221,6 +221,36 @@
       box-shadow: none;
     }
     .review-ai-inline-editor { min-height: 30px; resize: none; overflow: hidden; line-height: 18px; }
+    .category-choice { position: relative; width: 100%; }
+    .category-choice input { width: 100%; padding-right: 27px !important; }
+    .category-choice-toggle { position: absolute; right: 1px; top: 1px; bottom: 1px; width: 25px; padding: 0; display: grid; place-items: center; border: 0; background: transparent; color: var(--text-2); }
+    .category-choice-toggle svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .category-popover { position: fixed; z-index: 140; padding: 4px; border: 1px solid var(--line-strong); border-radius: 8px; background: white; box-shadow: var(--shadow); overflow-y: auto; overscroll-behavior: contain; }
+    .category-popover[hidden] { display: none; }
+    .category-option { width: 100%; min-height: 32px; padding: 7px 9px; display: flex; align-items: center; gap: 8px; border: 0; border-radius: 4px; background: transparent; color: var(--text); font: inherit; font-size: 12px; text-align: left; white-space: normal; overflow-wrap: anywhere; }
+    .category-option.active, .category-option:hover { color: var(--blue); background: #edf4ff; }
+    .category-option-label { flex: 1; min-width: 0; }
+    .category-option-create { color: var(--blue); border-top: 1px solid var(--line); border-radius: 0; margin-top: 4px; }
+    .category-option-mark { width: 16px; flex: 0 0 16px; }
+    .category-empty { padding: 10px 9px; color: var(--text-3); font-size: 12px; }
+    .category-option-row { display: flex; align-items: center; gap: 2px; border-radius: 4px; }
+    .category-option-row > .category-option { flex: 1; min-width: 0; }
+    .category-option-actions { display: flex; flex: 0 0 52px; gap: 2px; visibility: hidden; }
+    .category-option-row:hover .category-option-actions, .category-option-row:focus-within .category-option-actions, .category-option-row.active .category-option-actions { visibility: visible; }
+    .category-option-action { width: 24px; height: 26px; padding: 0; border: 0; background: transparent; color: var(--text-2); display: grid; place-items: center; border-radius: 4px; }
+    .category-option-action svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .category-option-action:hover, .category-option-action:focus-visible { color: var(--blue); background: #edf4ff; }
+    .category-option-action[data-category-action="delete"]:hover { color: #c62828; background: #fff0f0; }
+    #categoryManageModal .modal { width: min(480px,calc(100vw - 32px)); }
+    #categoryManageModal .modal-body { max-height: min(65vh,540px); overflow: auto; }
+    #categoryManageName { width: 100%; height: 32px; padding: 0 8px; border: 1px solid var(--line-strong); border-radius: 5px; }
+    #categoryManageNameField[hidden] { display: none; }
+    .category-manage-message { margin: 12px 0; font-size: 12px; color: var(--text-2); white-space: normal; overflow-wrap: anywhere; }
+    .category-manage-error { color: #b42318; }
+    .category-usage-list { margin: 0; padding: 0; list-style: none; }
+    .category-usage-list li { padding: 8px 0; border-top: 1px solid var(--line); font-size: 12px; overflow-wrap: anywhere; }
+    .category-usage-list strong, .category-usage-list span { display: block; }
+    .category-usage-list span { margin-top: 3px; color: var(--text-2); }
     .editable-cell .cell-editor .date-input { padding-right: 7px; }
     .editable-cell .cell-editor .numeric-input { padding-right: 7px; font-variant-numeric: tabular-nums; }
     .editable-cell .cell-editor input[list]::-webkit-calendar-picker-indicator,
@@ -1050,6 +1080,7 @@
     const calculationRules = {
       schematicProgress: {label:'Schematic Progress',intro:'系统根据 Schematic 日期自动判定，不支持手动修改。',steps:['Planned release 未填写：Not started','Actual release 晚于 Planned release：Delay','其他情况：On schedule']},
       layoutProgress: {label:'Layout Progress',intro:'系统根据 Layout 日期自动判定，不支持手动修改。',steps:['Plan finish 未填写：Not started','Actual finish 晚于 Plan finish：Delay','其他情况：On schedule']},
+      layoutPlanFinish: {label:'Plan finish',intro:'由系统根据排期参数自动计算得出。',steps:['Plan finish = Start date + Plan workdays ÷ Resource','Plan workdays 已跳过节假日']},
       overallCheck: {label:'Schematic check status',intro:'由 Schematic Check item 和层级校验规则自动派生。',steps:['本 Block 的 5 个 Schematic Check item 全部完成','父节点完成最后一项前，所有直接子节点必须完成全部 Check item','满足以上条件：Done；否则：Ongoing']},
       layoutQualified: {label:'Layout check status',intro:'由 Layout KR Check item 和层级校验规则自动派生。',steps:['本 Block 的 4 个 Layout Check item 全部完成','父节点完成最后一项前，所有直接子节点必须完成全部 Check item','满足以上条件：Done；否则：Ongoing']},
       spfReady: {label:'SPF check status',intro:'由 SPF Check item 和层级校验规则自动派生。',steps:['本 Block 的 5 个 SPF Check item 全部完成','父节点完成最后一项前，所有直接子节点必须完成全部 Check item','满足以上条件：Done；否则：Ongoing']},
@@ -1068,6 +1099,284 @@
     };
     const versionOptions = ['1st', '2nd', '3rd', '4th', '5th'];
     const blockCategories = ['', 'DFT', 'Analog IP', 'Fuse', 'Data path', 'DqByte', 'Banklogic', 'Xdec+Ydec', 'Row+Refresh+RHR', 'IO IP', 'Controller', 'DLDO'];
+    const builtInBlockCategories=new Set(blockCategories);
+    function matchingBlockCategory(value) {
+      const normalized=String(value??'').trim().toLowerCase();
+      return blockCategories.find(category=>category.toLowerCase()===normalized);
+    }
+    function canCreateBlockCategory(value) {
+      const normalized=String(value??'').trim();
+      return Boolean(normalized)&&matchingBlockCategory(normalized)===undefined&&!['analog','io','空'].includes(normalized.toLowerCase());
+    }
+    function categoryProjectContexts() {
+      const contexts=new Map(tableStateStore);
+      if(!isSpecialIpTable())contexts.set(activeTableName,{data,changeHistory});
+      return contexts;
+    }
+    function categoryOptionReferences(value) {
+      const references=[];
+      for(const [tableName,state] of categoryProjectContexts()){
+        const groups=new Map();
+        for(const hierarchy of ['schematic','layout'])for(const item of state.data[hierarchy]){
+          const selected=item.def.category===value;
+          const restoration=[IO_IP_TABLE_NAME,ANALOG_IP_TABLE_NAME].includes(item.def.category)&&specialIpPreviousCategories.get(specialIpSourceIdentity(tableName,item.def.id))===value;
+          if(!selected&&!restoration)continue;
+          if(!groups.has(item.def.id))groups.set(item.def.id,{tableName,definitionId:item.def.id,name:item.def.name,tier:item.tier,version:item.def.round||'',hierarchies:[],restoration});
+          const group=groups.get(item.def.id);
+          if(!group.hierarchies.includes(hierarchy))group.hierarchies.push(hierarchy);
+        }
+        references.push(...groups.values());
+      }
+      if(inlineAddDraft?.category===value)references.push({tableName:activeTableName,name:inlineAddDraft.name||'新增 Block',tier:inlineAddDraft.tier,version:inlineAddDraft.version||'',hierarchies:[inlineAddDraft.hierarchy],draft:true});
+      return references;
+    }
+    function changeCustomBlockCategory(value,action,newValue='') {
+      flushPendingCategoryEdits();
+      const deleting=action==='delete',index=blockCategories.indexOf(value),normalized=deleting?'':String(newValue).trim(),matching=matchingBlockCategory(normalized);
+      if(index<0||builtInBlockCategories.has(value))return {ok:false,message:'系统内置选项不能修改或删除'};
+      if(!['rename','delete'].includes(action))return {ok:false,message:'无效的选项操作'};
+      if(!deleting){
+        if(!normalized)return {ok:false,message:'请输入有效的自定义 Category 名称'};
+        if(matching!==undefined&&matching!==value)return {ok:false,message:'已存在同名选项，请使用其他名称'};
+        if(!canCreateBlockCategory(normalized)&&matching!==value)return {ok:false,message:'请输入有效的自定义 Category 名称'};
+        if(normalized===value)return {ok:true};
+      }
+      const rollback=[];
+      try{
+        const event=changeEvent(currentActorId,'Block Category',value,normalized,auditNow());
+        for(const state of categoryProjectContexts().values()){
+          const definitions=new Set(Object.values(state.data).flatMap(rows=>rows.map(item=>item.def)).filter(def=>def.category===value));
+          const definitionIds=new Set([...definitions].map(def=>def.id));
+          for(const def of definitions){rollback.push(()=>{def.category=value;});def.category=normalized;}
+          for(const type of ['schematic','layout'])for(const definitionId of definitionIds){
+            if(!state.data[type].some(item=>item.def.id===definitionId))continue;
+            const history=state.changeHistory[type],previous=history[definitionId];
+            rollback.push(()=>{if(previous)history[definitionId]=previous;else delete history[definitionId];});
+            history[definitionId]=[{...event},...(previous||[])];
+          }
+        }
+        for(const [key,baseline] of specialIpPreviousCategories)if(baseline===value){rollback.push(()=>specialIpPreviousCategories.set(key,value));specialIpPreviousCategories.set(key,normalized);}
+        if(inlineAddDraft?.category===value){const draft=inlineAddDraft;rollback.push(()=>{draft.category=value;});draft.category=normalized;}
+        for(const type of ['schematic','layout']){
+          const selected=wbsColumnFilters[type].category;
+          if(selected?.has(value)){const previous=[...selected];rollback.push(()=>{selected.clear();previous.forEach(entry=>selected.add(entry));});selected.delete(value);selected.add(normalized);}
+        }
+        if(deleting){rollback.push(()=>blockCategories.splice(index,0,value));blockCategories.splice(index,1);}
+        else{rollback.push(()=>{blockCategories[index]=value;});blockCategories[index]=normalized;}
+        assertHierarchyIntegrity();
+      }catch(error){
+        rollback.reverse().forEach(undo=>undo());
+        console.error('Category option change failed; transaction restored',error);
+        return {ok:false,message:`${deleting?'删除':'修改'}失败，未改动原数据，请重试`};
+      }
+      return {ok:true};
+    }
+    let categoryChoiceState=null;
+    let categoryOptionManagement=null;
+    function categoryOptionActionsHtml(option,index) {
+      if(option.create||builtInBlockCategories.has(option.value))return '';
+      return `<span class="category-option-actions"><button type="button" class="category-option-action" data-category-action="rename" data-category-index="${index}" aria-label="修改 ${esc(option.value)}" title="修改 ${esc(option.value)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m16 3 5 5M4 20l4-1L21 6a2.1 2.1 0 0 0-3-3L5 16l-1 4Z"></path></svg></button><button type="button" class="category-option-action" data-category-action="delete" data-category-index="${index}" aria-label="删除 ${esc(option.value)}" title="删除 ${esc(option.value)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6v14H5V6M10 11v5M14 11v5"></path></svg></button></span>`;
+    }
+    function categoryManageModalElement() {
+      let modal=document.getElementById('categoryManageModal');
+      if(modal)return modal;
+      modal=document.createElement('div');modal.id='categoryManageModal';modal.className='modal-backdrop';modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');modal.setAttribute('aria-labelledby','categoryManageTitle');
+      modal.innerHTML='<div class="modal"><div class="modal-head"><h3 id="categoryManageTitle"></h3><button type="button" class="drawer-close" data-close-category-manage aria-label="关闭">×</button></div><div class="modal-body"><label class="field" id="categoryManageNameField">选项名称<input id="categoryManageName" autocomplete="off"></label><p class="category-manage-message" id="categoryManageMessage"></p><p class="category-manage-message category-manage-error" id="categoryManageError" role="alert"></p><ul class="category-usage-list" id="categoryManageUsage"></ul></div><div class="modal-foot"><button type="button" class="btn" data-close-category-manage>取消</button><button type="button" class="btn primary" id="categoryManageConfirm"></button></div></div>';
+      document.body.appendChild(modal);
+      modal.querySelectorAll('[data-close-category-manage]').forEach(button=>button.addEventListener('click',()=>closeCategoryManageModal()));
+      modal.addEventListener('click',event=>{if(event.target===modal)closeCategoryManageModal();});
+      modal.addEventListener('keydown',event=>{
+        if(event.isComposing||event.keyCode===229)return;
+        if(event.key==='Escape'){event.preventDefault();event.stopPropagation();closeCategoryManageModal();}
+        if(event.key==='Enter'&&event.target.id==='categoryManageName'){event.preventDefault();confirmCategoryManagement();}
+        if(event.key==='Tab'){
+          const targets=[...modal.querySelectorAll('button:not([disabled]),input')].filter(element=>element.getClientRects().length),index=targets.indexOf(document.activeElement);
+          if(event.shiftKey&&index<=0){event.preventDefault();targets.at(-1)?.focus();}
+          else if(!event.shiftKey&&index===targets.length-1){event.preventDefault();targets[0]?.focus();}
+        }
+      });
+      modal.querySelector('#categoryManageName').addEventListener('input',()=>{document.getElementById('categoryManageError').textContent='';});
+      modal.querySelector('#categoryManageConfirm').addEventListener('click',confirmCategoryManagement);
+      return modal;
+    }
+    function renderCategoryUsage(references) {
+      document.getElementById('categoryManageUsage').innerHTML=references.map(reference=>`<li><strong>${esc(reference.tableName)} · ${esc(reference.name)} · T${reference.tier} · ${esc(reference.version||'Version 空')}</strong><span>${reference.hierarchies.map(type=>type==='schematic'?'Schematic':'Layout').join(' / ')}${reference.restoration?' · 特殊表删除后的 Category 恢复值':''}${reference.draft?' · 新增 Block 草稿':''}</span></li>`).join('');
+    }
+    function openCategoryManagement(index,action) {
+      const picker=categoryChoiceState,option=picker?.options[index];
+      if(!option||option.create||builtInBlockCategories.has(option.value)||!picker.control.isConnected||picker.context.tableName!==activeTableName||picker.context.hierarchy!==currentHierarchy)return;
+      closeCategoryChoice();flushPendingCategoryEdits();
+      const modal=categoryManageModalElement(),references=categoryOptionReferences(option.value);
+      categoryOptionManagement={value:option.value,action,context:picker.context};
+      document.getElementById('categoryManageTitle').textContent=`${action==='rename'?'修改':'删除'} Block Category`;
+      document.getElementById('categoryManageNameField').hidden=action!=='rename';
+      document.getElementById('categoryManageName').value=option.value;
+      document.getElementById('categoryManageError').textContent='';
+      document.getElementById('categoryManageMessage').textContent=action==='rename'?`确认将“${option.value}”改名？当前 Project 内的 ${references.length} 处使用位置将同步更新，历史记录保留。`:references.length?`确认删除选项“${option.value}”？当前 Project 内使用该选项的 Category 将置空，关联恢复值同步清空。Block、其他字段和历史记录保留。`:`确认删除选项“${option.value}”？`;
+      renderCategoryUsage(references);
+      const confirm=document.getElementById('categoryManageConfirm');confirm.textContent=action==='rename'?'确认修改':'确认删除';confirm.disabled=false;
+      modal.classList.add('open');
+      const target=action==='rename'?document.getElementById('categoryManageName'):confirm.disabled?modal.querySelector('[data-close-category-manage]'):confirm;
+      target.focus();if(action==='rename')target.select();
+    }
+    function closeCategoryManageModal(restoreFocus=true) {
+      const state=categoryOptionManagement;categoryOptionManagement=null;
+      document.getElementById('categoryManageModal')?.classList.remove('open');
+      if(!restoreFocus||!state||state.context.tableName!==activeTableName||state.context.hierarchy!==currentHierarchy)return;
+      const context=state.context;
+      const control=context.draft===inlineAddDraft&&context.draft?document.querySelector('[data-inline-field="category"]'):[...wbsBody.querySelectorAll('tr[data-id]')].find(row=>row.dataset.id===context.itemId)?.querySelector('[data-category-choice]');
+      if(control){const cell=control.closest('.editable-cell');cell?.classList.add('editor-focus-target');control.dataset.categorySkipOpen='true';control.focus({preventScroll:true});delete control.dataset.categorySkipOpen;cell?.classList.remove('editor-focus-target');}
+    }
+    function confirmCategoryManagement() {
+      const state=categoryOptionManagement;
+      if(!state)return;
+      if(state.context.tableName!==activeTableName||state.context.hierarchy!==currentHierarchy){closeCategoryManageModal(false);return;}
+      const result=changeCustomBlockCategory(state.value,state.action,document.getElementById('categoryManageName').value);
+      if(!result.ok){document.getElementById('categoryManageError').textContent=result.message;return;}
+      renderWbs();
+      if(drawerContext)closeDrawer(false);
+      closeCategoryManageModal();
+      showToast(state.action==='rename'?'Block Category 已修改，项目内引用已同步':'Block Category 选项已删除，使用该选项的值已置空');
+    }
+    function categoryChoiceHtml(value,label,draft=false) {
+      return `<div class="category-choice"><input class="cell-input" ${draft?'data-inline-field="category"':'data-edit="category"'} data-category-choice role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-controls="categoryOptions" aria-expanded="false" aria-label="${esc(label)}" autocomplete="off" value="${esc(value||'')}"><button class="category-choice-toggle" type="button" tabindex="-1" aria-label="展开 Block Category 选项" title="展开 Block Category 选项"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button></div>`;
+    }
+    function closeCategoryChoice() {
+      const state=categoryChoiceState;
+      categoryChoiceState=null;
+      document.getElementById('categoryOptions')?.setAttribute('hidden','');
+      if(!state)return;
+      state.control.value=state.original;
+      state.control.setAttribute('aria-expanded','false');
+      state.control.removeAttribute('aria-activedescendant');
+    }
+    function categoryOptionsElement() {
+      let popover=document.getElementById('categoryOptions');
+      if(popover)return popover;
+      popover=document.createElement('div');
+      popover.id='categoryOptions';popover.className='category-popover';popover.role='listbox';popover.setAttribute('aria-label','Block Category');popover.hidden=true;
+      document.body.appendChild(popover);
+      popover.addEventListener('pointerdown',event=>event.preventDefault());
+      popover.addEventListener('click',event=>{
+        const action=event.target.closest('[data-category-action]');
+        if(action){event.stopPropagation();openCategoryManagement(Number(action.dataset.categoryIndex),action.dataset.categoryAction);return;}
+        const option=event.target.closest('[data-category-option]');if(option)chooseCategoryOption(Number(option.dataset.categoryOption));
+      });
+      popover.addEventListener('focusout',event=>{if(categoryChoiceState&&!popover.contains(event.relatedTarget)&&event.relatedTarget!==categoryChoiceState.control)closeCategoryChoice();});
+      popover.addEventListener('keydown',event=>{
+        const action=event.target.closest('[data-category-action]');
+        if(action&&['Enter',' '].includes(event.key)){event.preventDefault();event.stopPropagation();openCategoryManagement(Number(action.dataset.categoryIndex),action.dataset.categoryAction);return;}
+        if(event.key==='Escape'){event.preventDefault();event.stopPropagation();const control=categoryChoiceState?.control;closeCategoryChoice();if(control){control.dataset.categorySkipOpen='true';control.focus();delete control.dataset.categorySkipOpen;}}
+      });
+      document.addEventListener('pointerdown',event=>{if(categoryChoiceState&&!popover.contains(event.target)&&!categoryChoiceState.control.parentElement.contains(event.target))closeCategoryChoice();});
+      document.addEventListener('scroll',event=>{if(categoryChoiceState&&(event.target===document||event.target===document.getElementById('tableWrap')))closeCategoryChoice();},true);
+      window.addEventListener('resize',closeCategoryChoice);
+      return popover;
+    }
+    function renderCategoryOptions(reset=true) {
+      const state=categoryChoiceState;
+      if(!state)return;
+      const query=state.query.trim().toLowerCase(),popover=categoryOptionsElement();
+      const matches=blockCategories.filter(value=>!query||value.toLowerCase().includes(query));
+      if(query)matches.sort((left,right)=>Number(right.toLowerCase().startsWith(query))-Number(left.toLowerCase().startsWith(query)));
+      state.options=matches.map(value=>({value,create:false}));
+      if(canCreateBlockCategory(state.query))state.options.push({value:state.query.trim(),create:true});
+      if(reset)state.active=query?(matches.length?0:-1):matches.indexOf(state.original);
+      popover.innerHTML=state.options.map((option,index)=>`<div class="category-option-row ${index===state.active?'active':''}"><button type="button" role="option" tabindex="-1" id="categoryOption-${index}" data-category-option="${index}" aria-selected="${index===state.active}" class="category-option ${option.create?'category-option-create':''} ${index===state.active?'active':''}"><span class="category-option-mark" aria-hidden="true">${option.create?'+':option.value===state.original?'✓':''}</span><span class="category-option-label">${option.create?`新增并使用“${esc(option.value)}”`:esc(option.value||'空')}</span></button>${categoryOptionActionsHtml(option,index)}</div>`).join('')||'<div class="category-empty">无匹配选项</div>';
+      popover.hidden=false;
+      state.control.setAttribute('aria-expanded','true');
+      if(state.active>=0)state.control.setAttribute('aria-activedescendant',`categoryOption-${state.active}`);else state.control.removeAttribute('aria-activedescendant');
+      const rect=state.control.getBoundingClientRect(),width=Math.min(Math.max(300,rect.width),window.innerWidth-16);
+      const below=window.innerHeight-rect.bottom-12,above=rect.top-12,up=below<180&&above>below;
+      popover.style.width=`${width}px`;popover.style.maxHeight=`${Math.min(280,Math.max(60,up?above:below))}px`;
+      popover.style.left=`${Math.max(8,Math.min(rect.left,window.innerWidth-width-8))}px`;
+      popover.style.top=`${up?Math.max(8,rect.top-popover.offsetHeight-4):rect.bottom+4}px`;
+      const activeOption=popover.querySelector(`#categoryOption-${state.active}`);
+      if(activeOption){
+        const top=activeOption.offsetTop,bottom=top+activeOption.offsetHeight;
+        if(top<popover.scrollTop)popover.scrollTop=top;
+        else if(bottom>popover.scrollTop+popover.clientHeight)popover.scrollTop=bottom-popover.clientHeight;
+      }
+    }
+    function openCategoryChoice(control,context) {
+      if(categoryChoiceState?.control===control)return;
+      closeCategoryChoice();
+      categoryChoiceState={control,context,original:control.value,query:'',active:-1,options:[],composing:false};
+      renderCategoryOptions();control.select();
+    }
+    function chooseCategoryOption(index,focusSelector='[data-category-choice]') {
+      const state=categoryChoiceState,option=state?.options[index];
+      if(!option)return;
+      const {context}=state;
+      if(context.tableName!==activeTableName||context.hierarchy!==currentHierarchy||!state.control.isConnected){closeCategoryChoice();return;}
+      if(context.draft){
+        if(inlineAddDraft!==context.draft){closeCategoryChoice();return;}
+        const value=matchingBlockCategory(option.value)??option.value;
+        if(option.create&&canCreateBlockCategory(value))blockCategories.push(value);
+        context.draft.category=value;
+        closeCategoryChoice();state.control.value=value;
+        return;
+      }
+      const item=data[context.hierarchy].find(row=>row.id===context.itemId&&row.def.id===context.definitionId);
+      closeCategoryChoice();
+      if(!item)return;
+      const edit=queueCategoryEdit(item,context.hierarchy,option.value,option.create);
+      setTimeout(()=>{
+        if(context.tableName!==activeTableName||context.hierarchy!==currentHierarchy)return;
+        const rowElement=[...wbsBody.querySelectorAll('tr[data-id]')].find(row=>row.dataset.id===context.itemId),control=rowElement?.querySelector(edit.saved===false?'[data-category-choice]':focusSelector);
+        if(control){
+          const cell=control.closest('.editable-cell');cell?.classList.add('editor-focus-target');
+          control.dataset.categorySkipOpen='true';control.focus({preventScroll:true});delete control.dataset.categorySkipOpen;
+          cell?.classList.remove('editor-focus-target');
+          if(edit.saved===false){openCategoryChoice(control,context);control.value=option.value;categoryChoiceState.query=option.value;renderCategoryOptions();control.setSelectionRange(control.value.length,control.value.length);}
+        }
+      },0);
+    }
+    function bindCategoryChoice(control,context) {
+      const open=()=>openCategoryChoice(control,context);
+      const cell=control.closest('.editable-cell');
+      cell?.addEventListener('focus',()=>{cell.classList.add('editor-focus-target');control.focus({preventScroll:true});cell.classList.remove('editor-focus-target');});
+      control.addEventListener('click',event=>{event.stopPropagation();open();});
+      control.addEventListener('focus',()=>{if(!control.dataset.categorySkipOpen)open();});
+      control.addEventListener('blur',event=>{if(categoryChoiceState?.control===control&&!document.getElementById('categoryOptions')?.contains(event.relatedTarget))closeCategoryChoice();});
+      control.addEventListener('compositionstart',()=>{if(categoryChoiceState?.control===control)categoryChoiceState.composing=true;});
+      control.addEventListener('compositionend',()=>{if(categoryChoiceState?.control===control){categoryChoiceState.composing=false;categoryChoiceState.query=control.value;renderCategoryOptions();}});
+      control.addEventListener('input',()=>{if(categoryChoiceState?.control===control&&!categoryChoiceState.composing){categoryChoiceState.query=control.value;renderCategoryOptions();}});
+      control.addEventListener('change',()=>{
+        if(categoryChoiceState?.control===control)return;
+        const value=matchingBlockCategory(control.value);
+        if(value===undefined)return;
+        if(context.tableName!==activeTableName||context.hierarchy!==currentHierarchy||!control.isConnected)return;
+        if(context.draft){if(inlineAddDraft===context.draft)context.draft.category=value;}
+        else{const item=data[context.hierarchy].find(row=>row.id===context.itemId&&row.def.id===context.definitionId);if(item&&item.def.category!==value)queueCategoryEdit(item,context.hierarchy,value);}
+      });
+      control.addEventListener('keydown',event=>{
+        if(event.isComposing||event.keyCode===229||categoryChoiceState?.composing)return;
+        if(event.key==='Escape'){event.preventDefault();event.stopPropagation();closeCategoryChoice();return;}
+        if(event.key==='ArrowRight'&&categoryChoiceState?.control===control){
+          const action=document.querySelector(`#categoryOption-${categoryChoiceState.active}`)?.parentElement.querySelector('[data-category-action]');
+          if(action){event.preventDefault();action.focus();return;}
+        }
+        if(!['ArrowDown','ArrowUp','Enter','Tab'].includes(event.key))return;
+        if(event.key==='Tab'){
+          const state=categoryChoiceState;
+          if(state?.control===control){
+            const value=matchingBlockCategory(control.value),index=state.options.findIndex(option=>!option.create&&option.value===value);
+            if(index>=0&&value!==state.original){if(!context.draft)event.preventDefault();chooseCategoryOption(index,event.shiftKey?'[data-version-switch], [data-add-child]':'[data-edit="reference"]');}
+            else closeCategoryChoice();
+          }
+          return;
+        }
+        event.preventDefault();event.stopPropagation();open();
+        const state=categoryChoiceState;
+        if(event.key==='Enter'){chooseCategoryOption(state.active);return;}
+        const total=state.options.length;
+        if(total){state.active=state.active<0?(event.key==='ArrowDown'?0:total-1):(state.active+(event.key==='ArrowDown'?1:-1)+total)%total;renderCategoryOptions(false);}
+      });
+      const toggle=control.parentElement.querySelector('.category-choice-toggle');
+      toggle.addEventListener('pointerdown',event=>event.preventDefault());
+      toggle.addEventListener('click',event=>{event.stopPropagation();if(categoryChoiceState?.control===control)closeCategoryChoice();else{control.focus();open();}});
+    }
     const changeActors = {
       lin: { name:'Lin Q.', role:'Process Leader', initials:'LQ' },
       qin: { name:'Qin Yang', role:'Schematic Owner', initials:'QY' },
@@ -1294,11 +1603,12 @@
     }
     const pendingCategoryEdits=new Map();
     let categoryCommitTimer=null,flushingCategoryEdits=false;
-    function queueCategoryEdit(item,hierarchy,value) {
-      const edit={tableName:activeTableName,hierarchy,itemId:item.id,definitionId:item.def.id,value};
+    function queueCategoryEdit(item,hierarchy,value,createOption=false) {
+      const edit={tableName:activeTableName,hierarchy,itemId:item.id,definitionId:item.def.id,value,createOption};
       pendingCategoryEdits.set(`${edit.tableName}\u0000${edit.definitionId}`,edit);
       clearTimeout(categoryCommitTimer);
       categoryCommitTimer=setTimeout(flushPendingCategoryEdits,0);
+      return edit;
     }
     function flushPendingCategoryEdits() {
       if(flushingCategoryEdits)return;
@@ -1309,7 +1619,7 @@
           pendingCategoryEdits.delete(key);
           if(edit.tableName!==activeTableName){showToast('来源表已切换，请返回原表重试');continue;}
           const item=data[edit.hierarchy].find(row=>row.id===edit.itemId&&row.def.id===edit.definitionId);
-          if(item)commitBlockCategory(item,edit.value);
+          if(item)edit.saved=commitBlockCategory(item,edit.value,edit.createOption);
         }
       }finally{flushingCategoryEdits=false;}
     }
@@ -1798,6 +2108,7 @@
       renderWbs();showToast(`${item.block} 已更新`);
     }
     function switchPrototypeTable(tableName) {
+      closeCategoryManageModal(false);
       flushPendingCategoryEdits();
       setTableSelectorValue(tableName);
       if(tableName===activeTableName)return;
@@ -2580,7 +2891,7 @@
       return `<span class="inline-draft-actions"><button class="inline-draft-action confirm" id="confirmInlineDraft" type="button" title="确认创建" aria-label="确认创建"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"></path></svg></button><button class="inline-draft-action cancel" id="cancelInlineDraft" type="button" title="取消" aria-label="取消"><svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"></path></svg></button></span>`;
     }
     function inlineDraftInput(field,value='',attributes='') { return `<input data-inline-field="${field}" value="${esc(value)}" ${attributes}>`; }
-    function inlineDraftSelect(field,values,value='') { return `<select data-inline-field="${field}">${values.map(option=>`<option value="${esc(option)}" ${option===value?'selected':''}>${option||'空'}</option>`).join('')}</select>`; }
+    function inlineDraftSelect(field,values,value='') { return field==='category'?categoryChoiceHtml(value,'新 Block 的 Block Category',true):`<select data-inline-field="${field}">${values.map(option=>`<option value="${esc(option)}" ${option===value?'selected':''}>${option||'空'}</option>`).join('')}</select>`; }
     function inlineDraftBusinessCells() {
       const draft=inlineAddDraft,readonly='<span class="inline-draft-readonly">确认后生成</span>';
       if(currentHierarchy==='schematic')return `<td class="frozen-column frozen-category-column">${draft.mode==='version'?esc(draft.category||''):inlineDraftSelect('category',blockCategories,draft.category)}</td><td class="frozen-column frozen-reference-column last-frozen-column">${draft.mode==='version'?esc(draft.reference||''):inlineDraftInput('reference',draft.reference,'list="referenceProjects" placeholder="Reference project"')}</td><td>${readonly}</td><td>${inlineDraftInput('planned',draft.planned,'type="date"')}</td><td>${inlineDraftInput('actual',draft.actual,'type="date"')}</td><td>${inlineDraftInput('schematicOwner',draft.schematicOwner,'list="schematicOwners" placeholder="Schematic Owner"')}</td><td>${readonly}</td><td>${readonly}</td><td>${readonly}</td><td class="change-column">${readonly}</td>`;
@@ -2616,6 +2927,7 @@
     function bindInlineDraft() {
       if(!inlineAddDraft||inlineAddDraft.hierarchy!==currentHierarchy)return;
       document.querySelectorAll('[data-inline-field]').forEach(control=>{
+        if(control.matches('[data-category-choice]')){bindCategoryChoice(control,{tableName:activeTableName,hierarchy:currentHierarchy,draft:inlineAddDraft});return;}
         control.addEventListener('click',event=>event.stopPropagation());
         control.addEventListener('input',()=>{inlineAddDraft[control.dataset.inlineField]=control.value;});
         control.addEventListener('change',()=>{inlineAddDraft[control.dataset.inlineField]=control.value;if(inlineAddDraft.mode==='version'&&control.dataset.inlineField==='version'){inlineAddDraft.focus=true;renderWbs();}});
@@ -2949,6 +3261,7 @@
     }
 
     function renderWbs() {
+      closeCategoryChoice();
       assertHierarchyIntegrity();
       if(selectedSpecialIpItem&&![...ioIpRows,...analogIpRows].some(row=>row.id===selectedSpecialIpItem.id))closeDrawer(false);
       closeReviewAiPreview();
@@ -2972,7 +3285,7 @@
         ? `<th class="change-column"><span>最近修改</span>${changeDrawerToggle}</th>`
         : `<th class="change-column"><span>最近修改</span><button class="header-structure-change" id="structureChangeButton" type="button" aria-expanded="false" title="Block变更记录" aria-label="打开 Block变更记录"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13"></path><path d="M8 12h13"></path><path d="M8 18h13"></path><path d="M3 6h.01"></path><path d="M3 12h.01"></path><path d="M3 18h.01"></path></svg></button>${changeDrawerToggle}</th>`;
       const workflowHeaders = isLayout
-        ? `${relatedProgressHeader}<th>${meta.owner}</th><th>Plan workdays</th><th>Resource</th><th>Start date</th><th>${meta.date}</th><th>${meta.actual}</th>${ownProgressHeader}<th>Check item</th><th>${calculatedHeader('Layout check status','layoutQualified')}</th>`
+        ? `${relatedProgressHeader}<th>${meta.owner}</th><th>Plan workdays</th><th>Resource</th><th>Start date</th><th>${calculatedHeader(meta.date,'layoutPlanFinish')}</th><th>${meta.actual}</th>${ownProgressHeader}<th>Check item</th><th>${calculatedHeader('Layout check status','layoutQualified')}</th>`
         : `${ownProgressHeader}${plannedReleaseHeader()}<th>${meta.actual}</th><th>${meta.owner}</th><th>Check item</th>${overallHeader}${relatedProgressHeader}`;
       wbsHead.innerHTML = isSpf
         ? `<tr><th class="frozen-column frozen-block-column">Block</th><th class="frozen-column frozen-round-column last-frozen-column">Version</th><th>Schematic Owner</th><th>Layout Owner</th><th>Check item</th><th>${calculatedHeader('SPF check status','spfReady')}</th><th>LVS path</th><th>cdl</th><th>gds</th><th>${meta.date}</th><th>${meta.actual}</th>${changeHeader}</tr>`
@@ -3076,7 +3389,7 @@
       const groupExpanded = mergeGroup.every(member=>member.expanded);
       const levelPad = (item.tier - 1) * 17;
       const late = state === 'delay';
-      const categoryCell = `<div class="editable-cell"><div class="cell-display ${item.def.category ? '' : 'empty'}">${item.def.category ? esc(item.def.category) : ''}</div><div class="cell-editor choice"><select class="cell-select ${item.def.category ? '' : 'empty-value'}" data-edit="category" aria-label="${esc(item.def.name)} Block Category">${optionsHtml(blockCategories,item.def.category)}</select></div></div>`;
+      const categoryCell = `<div class="editable-cell" tabindex="0" aria-label="编辑 ${esc(item.def.name)} Block Category"><div class="cell-display ${item.def.category ? '' : 'empty'}" title="${esc(item.def.category||'')}">${item.def.category ? esc(item.def.category) : ''}</div><div class="cell-editor">${categoryChoiceHtml(item.def.category,`${item.def.name} Block Category`)}</div></div>`;
       const ownerList = type === 'schematic' ? 'schematicOwners' : 'layoutOwners';
       const spfInfo = type === 'spf' ? spfInfoFor(item) : null;
       const roundCell = versionSwitcherCell(item,type);
@@ -3135,6 +3448,7 @@
           updateDefinitionCheck(item,currentHierarchy,index,!railFor(item,currentHierarchy).checks[index]);
         }));
         tr.querySelectorAll('[data-edit]').forEach(control => {
+          if(control.matches('[data-category-choice]')){bindCategoryChoice(control,{tableName,hierarchy,itemId:item.id,definitionId:item.def.id});return;}
           control.addEventListener('click', e => e.stopPropagation());
           control.addEventListener('change', event => {
             const field=event.currentTarget.dataset.edit,value=event.currentTarget.value;
@@ -3147,9 +3461,11 @@
       });
     }
 
-    function commitBlockCategory(item,value) {
+    function commitBlockCategory(item,value,createOption=false) {
       const {item:sourceItem}=specialIpSourceContext(item);
-      if(!sourceItem||!blockCategories.includes(value)){showToast('Block Category 无效，请重新选择');return false;}
+      const existing=matchingBlockCategory(value),newOption=existing===undefined&&createOption&&canCreateBlockCategory(value);
+      if(!sourceItem||(existing===undefined&&!newOption)){showToast('Block Category 无效，请选择已有选项或新增并使用');return false;}
+      value=existing??String(value).trim();
       const oldValue=sourceItem.def.category;
       const definitions=[...new Set([...data.schematic,...data.layout].filter(row=>row.def.id===sourceItem.def.id).map(row=>row.def))];
       const oldCategories=definitions.map(def=>[def,def.category]);
@@ -3181,6 +3497,7 @@
         console.error('Block Category commit failed; transaction restored',error);
         renderWbs();showToast('Block Category 保存失败，未改动原数据，请重试');return false;
       }
+      if(newOption)blockCategories.push(value);
       if(oldValue!==value)recordDefinitionChange(sourceItem,['schematic','layout'],'Block Category',oldValue,value);
       renderWbs();renderDashboard();renderDelay();
       showToast(`Block Category 已更新${incrementalError?'；已从来源 Version 恢复同步':''}`);return true;
@@ -3950,6 +4267,7 @@
     }
 
     function setHierarchy(type) {
+      closeCategoryManageModal(false);
       flushPendingCategoryEdits();
       if(type!==currentHierarchy)closeDrawer(false);
       inlineAddDraft=null;closeInlineAddMenu();
@@ -4132,6 +4450,7 @@
     }
     function closeSameTierDuplicateModal() { document.getElementById('sameTierDuplicateModal').classList.remove('open'); }
     function showPage(name) {
+      closeCategoryManageModal(false);
       if(!document.getElementById(name+'Page')?.classList.contains('active'))closeDrawer(false);
       if(name!=='wbs'){inlineAddDraft=null;closeInlineAddMenu();}
       document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===name+'Page'));
